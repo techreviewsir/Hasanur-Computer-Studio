@@ -15,7 +15,7 @@ except Exception:
 # পেজ কনফিগারেশন
 st.set_page_config(page_title="হাসানুর কম্পিউটার স্টুডিও", layout="wide", page_icon="📸")
 
-# ড্যাশবোর্ড থিম, বাটন গ্রিড এবং লিঙ্ক স্টাইলিং এর জন্য কাস্টম CSS
+# ড্যাশবোর্ড থিম ও কাস্টম ডিজাইন CSS
 st.markdown("""
     <style>
     .main { background-color: #0f172a; color: #f8fafc; }
@@ -51,6 +51,14 @@ st.markdown("""
         display: inline-block;
         margin-bottom: 15px;
     }
+    .form-preview {
+        background-color: #1e293b;
+        padding: 30px;
+        border-radius: 8px;
+        border: 2px dashed #334155;
+        color: #f8fafc;
+        font-family: 'Courier New', Courier, monospace;
+    }
     </style>
 """, unsafe_allow_html=True)
 
@@ -68,19 +76,17 @@ if lang_mode == "🇧🇩 বাংলা UI":
     footer_text = "© ২০২৬ হাসানুর কম্পিউটার স্টুডিও, মনিরামপুর, যশোর। অল রাইটস রিজার্ভড।"
     upload_msg = "এডিট করার জন্য আপনার ছবিটি এখানে আপলোড করুন..."
     apply_txt = "Apply (পরিবর্তন সেভ করুন)"
-    reset_txt = "Reset (রিসেট)"
     
-    # আপনার রিকোয়েস্ট অনুযায়ী ১ থেকে ১০ কাজের তালিকা (বাংলা)
     menu_options = (
         "1. ✂️ Crop Tool (ফটো ক্রপ)",
         "2. 🪄 En-Real & Enhan-AI (ছবি উন্নতকরণ)",
         "3. 🎨 BG-First & BG-AI (ব্যাকগ্রাউন্ড পরিবর্তন)",
         "4. 🧽 Erase & Restore Tool (অবজেক্ট রিমুভ)",
-        "5. 🔄 Undo & Redo System (ইতিহাস)",
-        "6. 🎛️ Brightness, Contrast & Saturation",
+        "5. 📜 প্রত্যয়ন পত্র ও ছাড়পত্র ফরম জেনারেটর",
+        "6. 📝 প্রফেশনাল সিভি/বায়োডাটা মেকার ফরম",
         "7. 🔗 Multiple PDF Merger (পিডিএফ জোড়া)",
         "8. ❌ PDF Page Delete Tool (পেজ বাদ দেওয়া)",
-        "9. 🌐 অনলাইন সেবা ও লিঙ্কসমূহ (সকল লিংক)",
+        "9. 🌐 অনলাইন সেবা ও লিঙ্কসমূহ (ভিসা, পাসপোর্ট ও আবেদন)",
         "10. ⚙️ Settings & Studio Info (সেটিংস)"
     )
 else:
@@ -91,19 +97,17 @@ else:
     footer_text = "© 2026 Hasanur Computer Studio, Monirampur, Jashore. All Rights Reserved."
     upload_msg = "Upload your image here to edit..."
     apply_txt = "Apply Changes"
-    reset_txt = "Reset"
     
-    # ১ থেকে ১০ কাজের তালিকা (ইংরেজি)
     menu_options = (
         "1. ✂️ Crop Tool",
         "2. 🪄 En-Real & Enhan-AI Pro",
         "3. 🎨 BG-First & BG-AI Core",
         "4. 🧽 Erase & Restore Tool",
-        "5. 🔄 Undo & Redo System",
-        "6. 🎛️ Filters (Brightness & Saturation)",
+        "5. 📜 Certificate & TC Form Generator",
+        "6. 📝 Professional CV/Bio-Data Maker",
         "7. 🔗 Multiple PDF Merger",
         "8. ❌ PDF Page Delete Tool",
-        "9. 🌐 Online Services & Links",
+        "9. 🌐 Online Services & Links Portal",
         "10. ⚙️ Settings & Studio Info"
     )
 
@@ -117,11 +121,10 @@ st.sidebar.markdown(f"## {menu_title}")
 tool_option = st.sidebar.radio("টুলবক্স মেনু:", menu_options)
 st.sidebar.markdown("---")
 
-# ইমেজ ফাইল আপলোডার গলোবাল হ্যান্ডলিং (ফটো মডিউলগুলোর জন্য ১-৬)
-is_photo_module = any(x in tool_option for x in ["1.", "2.", "3.", "4.", "5.", "6."])
+# ইমেজ ফাইল আপলোডার গ্লোবাল হ্যান্ডলিং (ফটো মডিউলগুলোর জন্য ১-৪)
+is_photo_module = any(x in tool_option for x in ["1.", "2.", "3.", "4."])
 uploaded_file = st.file_uploader(upload_msg, type=["jpg", "jpeg", "png"]) if is_photo_module else None
 
-# গ্লোবাল ইমেজ লোড ও ভিউপোর্ট লেআউট
 base_image = None
 if uploaded_file is not None:
     base_image = Image.open(uploaded_file)
@@ -180,16 +183,18 @@ elif "3." in tool_option:
                     transparent = remove(base_image)
                     if "BG-First" in bg_mode:
                         out = transparent
+                        file_ext = "PNG"; mime_type = "image/png"; filename = "transparent.png"
                     else:
                         h_val = bg_color.lstrip('#')
                         bg_rgb = tuple(int(h_val[i:i+2], 16) for i in (0, 2, 4))
                         bg = Image.new("RGBA", base_image.size, bg_rgb + (255,))
                         bg.paste(transparent, (0, 0), transparent)
                         out = bg.convert("RGB")
+                        file_ext = "JPEG"; mime_type = "image/jpeg"; filename = "colored.jpg"
                     with col_v2:
                         st.image(out, caption="Background Processed", use_container_width=True)
-            else:
-                st.error("AI engine is unavailable on this system.")
+                        buf = io.BytesIO(); out.save(buf, format=file_ext)
+                        st.download_button("📥 Download Background Changed Photo", data=buf.getvalue(), file_name=filename, mime=mime_type, use_container_width=True)
 
 # ====================================================================
 # MODULE 4: 🧽 Erase & Restore Tool
@@ -205,35 +210,115 @@ elif "4." in tool_option:
                 out = base_image
             with col_v2:
                 st.image(out, caption="Processed Image", use_container_width=True)
+                buf = io.BytesIO(); out.save(buf, format="JPEG")
+                st.download_button("📥 Download Image", data=buf.getvalue(), file_name="edited.jpg", use_container_width=True)
 
 # ====================================================================
-# MODULE 5: 🔄 Undo & Redo System
+# MODULE 5: 📜 প্রত্যয়ন পত্র ও ছাড়পত্র ফরম জেনারেটর (NEW)
 # ====================================================================
 elif "5." in tool_option:
-    st.markdown("### 🔄 5. Undo & Redo System History")
-    st.info("💡 এডিটর স্টেট মেমোরি অ্যাক্টিভ। কোনো পরিবর্তন ভুল হলে আপনি লেয়ার হিস্ট্রি ঠিক করতে পারবেন।")
-    col_u1, col_u2 = st.columns(2)
-    with col_u1:
-        st.button("🔄 Undo", use_container_width=True)
-    with col_u2:
-        st.button("🔁 Redo", use_container_width=True)
+    st.markdown("### 📜 5. চারিত্রিক/নাগরিক প্রত্যয়ন পত্র ও স্কুল ছাড়পত্র (TC) জেনারেটর")
+    doc_type = st.selectbox("নথিপত্রের ধরণ সিলেক্ট করুন:", ["নাগরিক/চারিত্রিক প্রত্যয়ন পত্র", "স্কুল/কলেজ ছাড়পত্র (Transfer Certificate)"])
+    
+    col_f1, col_f2 = st.columns(2)
+    with col_f1:
+        c_name = st.text_input("আবেদনকারীর নাম (Name):", "মোঃ হাসানুর রহমান")
+        c_father = st.text_input("পিতা/স্বামীর নাম (Father's Name):", "মোঃ আব্দুর রশিদ")
+        c_mother = st.text_input("মাতার নাম (Mother's Name):", "মোসাম্মৎ রহিমা বেগম")
+    with col_f2:
+        c_village = st.text_input("গ্রাম/মহল্লা (Village):", "মনিরামপুর")
+        c_post = st.text_input("ডাকঘর (Post Office):", "মনিরামপুর")
+        c_thana = st.text_input("উপজেলা ও জেলা (Upazila & District):", "মনিরামপুর, যশোর")
+        
+    if doc_type == "নাগরিক/চারিত্রিক প্রত্যয়ন পত্র":
+        c_character = st.selectbox("চারিত্রিক অবস্থা:", ["উত্তম", "ভালো", "সন্তোষজনক"])
+        template = f"""
+        ===================================================================
+                                প্রত্যয়ন পত্র
+        ===================================================================
+        এই মর্মে প্রত্যয়ন করা যাইতেছে যে, {c_name}, পিতা: {c_father}, মাতা: {c_mother}, 
+        গ্রাম: {c_village}, ডাকঘর: {c_post}, উপজেলা: {c_thana}। 
+        
+        তিনি আমার পরিচিত। আমার জানামতে তিনি অত্র এলাকার স্থায়ী বাসিন্দা এবং বাংলাদেশের 
+        একজন সৎ ও নাগরিক। সমাজ বা রাষ্ট্র বিরোধী কোনো কাজের সাথে তিনি জড়িত নহেন। 
+        তাহার নৈতিক চরিত্র অত্যন্ত {c_character}।
+        
+        আমি তাহার সর্বাঙ্গীন উন্নতি ও মঙ্গল কামনা করি।
+        
+                                                   স্বাক্ষর ও সীল 
+                                             চেয়ারম্যান / পৌর মেয়র
+        """
+    else:
+        c_class = st.text_input("শেষ পঠিত শ্রেণী (Last Class):", "নবম শ্রেণী")
+        c_roll = st.text_input("রোল নম্বর (Roll No):", "০৫")
+        template = f"""
+        ===================================================================
+                        বিদ্যালয় / কলেজ ছাড়পত্র (TC)
+        ===================================================================
+        এই মর্মে ছাড়পত্র প্রদান করা যাইতেছে যে, {c_name}, পিতা: {c_father}, মাতা: {c_mother}, 
+        অত্র প্রতিষ্ঠানের একজন নিয়মিত শিক্ষার্থী ছিলেন। তিনি সর্বশেষ {c_class}-এ অধ্যয়ন করিয়াছেন, 
+        যাহার রোল নম্বর ছিল {c_roll}। 
+        
+        অত্র প্রতিষ্ঠানে অধ্যয়নকালীন তাহার আচরণ সন্তোষজনক ছিল। প্রতিষ্ঠানের নিকট তাহার কোনো 
+        বকেয়া পাওনা বা দেনা নাই। 
+        
+        তাহার ভবিষ্যতের সকল প্রকার সাফল্য ও উন্নতি কামনা করিয়া অত্র ছাড়পত্র ইস্যু করা হইলো।
+        
+                                                   স্বাক্ষর ও সীল 
+                                                   প্রধান শিক্ষক
+        """
+        
+    st.markdown("#### 📄 প্রিন্ট প্রিভিউ (Print Preview):")
+    st.markdown(f"<div class='form-preview'><pre>{template}</pre></div>", unsafe_allow_html=True)
+    st.download_button("📥 প্রিন্ট করার জন্য ডকুমেন্ট ডাউনলোড করুন (TXT/PDF)", data=template.encode('utf-8'), file_name="document_output.txt", use_container_width=True)
 
 # ====================================================================
-# MODULE 6: 🎛️ Brightness, Contrast & Saturation (আপনার স্ক্রিনশটের স্লাইডার)
+# MODULE 6: 📝 প্রফেশনাল সিভি/বায়োডাটা মেকার ফরম (NEW)
 # ====================================================================
 elif "6." in tool_option:
-    st.markdown("### 🎛️ 6. Filters (Brightness, Contrast & Saturation)")
-    if base_image:
-        b_val = st.slider("☀️ Brightness", 50, 200, 100, format="%d%%") / 100.0
-        c_val = st.slider("👁️ Contrast", 50, 200, 100, format="%d%%") / 100.0
-        s_val = st.slider("🎨 Saturation", 50, 200, 100, format="%d%%") / 100.0
+    st.markdown("### 📝 6. প্রফেশনাল সিভি / বায়োডাটা মেকার ফরম")
+    st.info("💡 নিচের তথ্যগুলো পূরণ করুন, ডানপাশে অটোমেটিক প্রফেশনাল রেজিউমে তৈরি হয়ে যাবে।")
+    
+    col_c1, col_c2 = st.columns(2)
+    with col_c1:
+        cv_name = st.text_input("পূর্ণ নাম (Full Name):", "হাসানুর রহমান")
+        cv_email = st.text_input("ইমেইল (Email):", "hasanur@example.com")
+        cv_phone = st.text_input("মোবাইল (Mobile):", "01743614359")
+        cv_edu = st.text_area("শিক্ষাগত যোগ্যতা (Education):", "১. এসএসসি - জিপিএ ৫.০০ (২০১৮)\n২. এইচএসসি - জিপিএ ৪.৮০ (২০২০)")
+    with col_c2:
+        cv_skills = st.text_area("দক্ষতা (Skills):", "কম্পিউটার টাইপিং, গ্রাফিক্স ডিজাইন, ইন্টারনেট ব্রাউজিং ও অনলাইন অ্যাপ্লিকেশন")
+        cv_exp = st.text_area("অভিজ্ঞতা (Experience):", "হাসানুর কম্পিউটার স্টুডিওতে ৩ বছরের ডিজিটাল সার্ভিস প্রদানের অভিজ্ঞতা।")
         
-        if st.button(apply_txt, type="primary", use_container_width=True):
-            img = ImageEnhance.Brightness(base_image).enhance(b_val)
-            img = ImageEnhance.Contrast(img).enhance(c_val)
-            out = ImageEnhance.Color(img).enhance(s_val)
-            with col_v2:
-                st.image(out, caption="Filters Applied Successfully", use_container_width=True)
+    cv_template = f"""
+    =======================================================================
+                                 CURRICULUM VITAE
+    =======================================================================
+    নাম (Name)       : {cv_name}
+    মোবাইল (Mobile)  : {cv_phone}
+    ইমেইল (Email)    : {cv_email}
+    -----------------------------------------------------------------------
+    CAREER OBJECTIVE:
+    To work in a challenging environment where I can utilize my computer skills 
+    and general expertise to contribute effectively to the organization.
+    
+    EDUCATIONAL QUALIFICATION:
+    {cv_edu}
+    
+    PROFESSIONAL SKILLS:
+    {cv_skills}
+    
+    WORK EXPERIENCE:
+    {cv_exp}
+    -----------------------------------------------------------------------
+    Declaration: I hereby declare that all the information provided above is true 
+    to the best of my knowledge.
+    
+    
+    👉 Signature: __________________
+    """
+    st.markdown("#### 📄 সিভি রেডি প্রিভিউ:")
+    st.markdown(f"<div class='form-preview'><pre>{cv_template}</pre></div>", unsafe_allow_html=True)
+    st.download_button("📥 সিভি (CV) ফাইল ডাউনলোড করুন", data=cv_template.encode('utf-8'), file_name="Hasanur_Studio_CV.txt", use_container_width=True)
 
 # ====================================================================
 # MODULE 7: 🔗 Multiple PDF Merger
@@ -272,46 +357,42 @@ elif "8." in tool_option:
             st.download_button("📥 Download Edited PDF", data=out_pdf.getvalue(), file_name="edited.pdf", mime="application/pdf", use_container_width=True)
 
 # ====================================================================
-# MODULE 9: 🌐 অনলাইন সেবা ও লিঙ্কসমূহ (প্রথম স্ক্রিনশটের হুবহু সব লিংক)
+# MODULE 9: 🌐 অনলাইন সেবা ও লিঙ্কসমূহ (ভিসা, পাসপোর্ট ও দোকান অ্যাপ্লিকেশন স্পেশাল)
 # ====================================================================
 elif "9." in tool_option:
-    st.markdown("### 🌐 9. অনলাইন সেবা ও লিঙ্ক পোর্টাল ডিরেক্টরি")
-    st.markdown("<div class='header-link'>📋 সকল লিংক (Daily Services & Directory)</div>", unsafe_allow_html=True)
+    st.markdown("### 🌐 9. অল-ইন-ওয়ান অনলাইন সেবা, অ্যাপ্লিকেশন ও লিঙ্ক ডিরেক্টরি")
     
-    # আপনার স্ক্রিনশটের হুবহু সমস্ত গুরুত্বপূর্ণ বাংলা সার্ভিসের ডিরেক্টরি লিংক
-    links_data = {
-        "উন্মুক্ত বিশ্ববিদ্যালয়": "https://www.bou.ac.bd",
-        "জন্ম নিবন্ধন": "https://bdris.gov.bd",
-        "জাতীয় পরিচয় পত্র": "https://services.nidw.gov.bd",
-        "জাতীয় বিশ্ববিদ্যালয়": "https://www.nu.ac.bd",
-        "টিকা": "https://surokkha.gov.bd",
-        "টিকেট": "https://eticket.railway.gov.bd",
-        "পাবলিক বিশ্ববিদ্যালয়": "https://www.ugc.gov.bd",
-        "পাসপোর্ট": "https://www.epassport.gov.bd",
-        "পুলিশ ও নাগরিক": "https://pcc.police.gov.bd",
-        "প্রবাসী": "https://www.probashi.gov.bd",
-        "প্রবেশ পত্র": "http://teletalk.com.bd",
-        "বিদ্যুৎ": "https://www.bangladesh.gov.bd",
-        "ভাতা": "https://mis.bhata.gov.bd",
-        "ভিসা": "https://www.visa.gov.bd",
-        "ভূমি সংক্রান্ত": "https://land.gov.bd",
-        "ভ্যাট / ই-টিন": "https://secure.incometax.gov.bd",
-        "মুক্তিযোদ্ধา": "https://molwa.gov.bd",
-        "মেডিকেল": "https://dgme.gov.bd",
-        "রেজাল্ট": "http://www.educationboardresults.gov.bd",
-        "লাইসেন্স": "https://bsp.brta.gov.bd",
-        "শিক্ষা বোর্ড": "https://dhakaeducationboard.gov.bd",
-        "সরকারি চাকুরীজীবী": "https://mopa.gov.bd",
-        "স্টুডিও টুলস্": "https://streamlit.io"
+    st.markdown("<div class='header-link'>🛂 পাসপোর্ট ও ভিসা ট্র্যাকিং পোর্টাল</div>", unsafe_allow_html=True)
+    passport_links = {
+        "ই-পাসপোর্ট নতুন আবেদন": "https://www.epassport.gov.bd",
+        "পাসপোর্ট স্ট্যাটাস চেক": "https://www.epassport.gov.bd/landing",
+        "বাংলাদেশ অনলাইন ভিসা (IVAC)": "https://www.visa.gov.bd",
+        "ভারতীয় ভিসা আবেদন (IVAC)": "https://www.ivacbd.com",
+        "ভিসা চেকিং পোর্টাল (বিদেশ)": "https://services.mofa.gov.bd"
     }
+    html_p = "".join([f'<a class="link-box" href="{url}" target="_blank">{name}</a>' for name, url in passport_links.items()])
+    st.markdown(html_p, unsafe_allow_html=True)
     
-    html_content = ""
-    for name, url in links_data.items():
-        html_content += f'<a class="link-box" href="{url}" target="_blank">{name}</a>'
-        
-    st.markdown(html_content, unsafe_allow_html=True)
+    st.markdown("<div class='header-link'>📝 চাকরি, এনআইডি ও নাগরিক আবেদন পোর্টাল</div>", unsafe_allow_html=True)
+    gov_links = {
+        "টেলিটক সরকারি চাকরি আবেদন": "http://teletalk.com.bd",
+        "জন্ম ও মৃত্যু নিবন্ধন": "https://bdris.gov.bd",
+        "জাতীয় পরিচয় পত্র (NID Correction)": "https://services.nidw.gov.bd",
+        "ভূমি খতিয়ান ও পর্চা (e-Porcha)": "https://land.gov.bd",
+        "ড্রাইভিং লাইসেন্স (BRTA BSP)": "https://bsp.brta.gov.bd",
+        "অনলাইন আয়কর রেজিষ্ট্রেশন (e-TIN)": "https://secure.incometax.gov.bd",
+        "করোনা টিকা কার্ড (সুরক্ষা)": "https://surokkha.gov.bd",
+        "রেলওয়ে অনলাইন টিকেট": "https://eticket.railway.gov.bd",
+        "শিক্ষা বোর্ড রেজাল্ট": "http://www.educationboardresults.gov.bd",
+        "জাতীয় বিশ্ববিদ্যালয় (NU) ভর্তি/ফরম": "https://www.nu.ac.bd",
+        "উন্মুক্ত বিশ্ববিদ্যালয় (BOU) পোর্টাল": "https://www.bou.ac.bd",
+        "প্রবাসী কল্যাণ ও কর্মসংস্থান (BMET)": "https://www.probashi.gov.bd"
+    }
+    html_g = "".join([f'<a class="link-box" href="{url}" target="_blank">{name}</a>' for name, url in gov_links.items()])
+    st.markdown(html_g, unsafe_allow_html=True)
+    
     st.markdown("---")
-    st.info("💡 যেকোনো সেবার লিংকে ক্লিক করলে সেটি সরাসরি নতুন ট্যাবে অফিশিয়াল সরকারি বা প্রাতিষ্ঠানিক পোর্টালে ওপেন হবে।")
+    st.info("💡 এই ডিরেক্টরির যেকোনো লিংকে ক্লিক করলে কাস্টমারের ফর্ম সাবমিট করার অফিশিয়াল সরকারি বা প্রাতিষ্ঠানিক ওয়েব পোর্টাল নতুন ট্যাবে সরাসরি ওপেন হবে।")
 
 # ====================================================================
 # MODULE 10: ⚙️ Settings & Studio Info
@@ -322,10 +403,10 @@ else:
     st.markdown("""
     <div style='background-color: #1e293b; padding: 20px; border-radius: 10px; border: 1px solid #334155;'>
         <h4>🛡️ অ্যাপ্লিকেশন প্রোফাইল ও কপিরাইট</h4>
-        <p>এটি <b>হাসানুর কম্পিউটার স্টুডিও</b>-এর একটি সম্পূর্ণ নিজস্ব ও কাস্টমাইজড ডিজিটাল ওয়েব ল্যাব। এখানে ওয়ান-ক্লিক ফটো এডিটিং ও প্রফেশনাল ডকুমেন্ট সলিউশন প্রদান করা হয়।</p>
+        <p>এটি <b>হাসানুর কম্পিউটার স্টুডিও</b>-এর একটি সম্পূর্ণ নিজস্ব ও কাস্টমাইজড ডিজিটাল ওয়েব ল্যাব। এখানে ওয়ান-ক্লিক ফটো এডিটিং, ডিরেক্টরি অ্যাপ্লিকেশন লিঙ্ক ও প্রফেশনাল ডকুমেন্ট সলিউশন প্রদান করা হয়।</p>
         <ul>
             <li><b>ওয়েবসাইট টাইপ:</b> কাস্টম স্টুডিও ড্যাশবোর্ড ল্যাব</li>
-            <li><b>কোর ইঞ্জিন:</b> প্রফেশনাল ফটোশপ এআই ফিল্টার ও পিডিএফ আর্কিটেকচার</li>
+            <li><b>কোর ইঞ্জিন:</b> প্রফেশনাল ফটোশপ এআই ফিল্টার, পিডিএফ আর্কিটেকচার ও ফর্ম মেকার</li>
             <li><b>লোকেশন:</b> মনিরামপুর, যশোর</li>
         </ul>
     </div>
