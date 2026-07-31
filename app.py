@@ -130,6 +130,7 @@ t = {
     "services_header": "🌐 Online Government & Essential Services" if is_eng else "🌐 অনলাইন সরকারি ও জরুরি সেবা",
 }
 
+# স্টুডিও হেডার মেইন স্ক্রিনে প্রদর্শন
 st.markdown(f"""
 <div class="studio-header">
     <h1>{t['title']}</h1>
@@ -138,15 +139,17 @@ st.markdown(f"""
 </div>
 """, unsafe_allow_html=True)
 
+# =====================================================================
+# ফাইল আপলোডার অপশনটি এখন হেডার লেখার ঠিক নিচে (মেইন স্ক্রিনের শুরুতে) বসানো হয়েছে
+# =====================================================================
+st.markdown(f"### {t['upload_header']}")
+global_file = st.file_uploader(t['upload_label'], type=["jpg", "jpeg", "png", "pdf"])
+
 st.markdown("---")
 
 if 'app_mode' not in st.session_state:
     st.session_state.app_mode = 1
 
-st.sidebar.header(t['upload_header'])
-global_file = st.sidebar.file_uploader(t['upload_label'], type=["jpg", "jpeg", "png", "pdf"])
-
-st.sidebar.markdown("---")
 st.sidebar.header(t['menu_header'])
 
 if is_eng:
@@ -239,7 +242,7 @@ if app_mode == 1:
         else:
             st.warning("Please upload a valid image file." if is_eng else "দয়া করে একটি ছবি ফাইল আপলোড করুন।")
     else:
-        st.info("👋 **Welcome!** Please select a file from the sidebar." if is_eng else "👋 **স্বাগতম!** সাইডবার থেকে ফাইল সিলেক্ট করুন।")
+        st.info("👋 **Welcome!** Please select a file above." if is_eng else "👋 **স্বাগতম!** উপরে ফাইল আপলোড করুন।")
 
 elif app_mode == 2:
     st.header("🎨 " + ("Custom Background & Color Studio" if is_eng else "কাস্টম ব্যাকগ্রাউন্ড কালার ও ছবি স্টুডিও"))
@@ -290,7 +293,7 @@ elif app_mode == 2:
                         final_image.save(buf, format="JPEG", quality=95)
                         st.download_button("Download Custom Studio Image" if is_eng else "কাস্টম স্টুডিও ছবি ডাউনলোড করুন", buf.getvalue(), "custom_studio_hd.jpg", "image/jpeg", key="dl_2")
     else:
-        st.warning("Please upload an image from the sidebar." if is_eng else "দয়া করে বাম পাশের সাইডবার থেকে একটি ছবি আপলোড করুন।")
+        st.warning("Please upload an image above." if is_eng else "দয়া করে উপরে একটি ছবি আপলোড করুন।")
 
 elif app_mode == 3:
     st.header("📱 " + ("Samsung S26 Ultra AI Object Editor" if is_eng else "স্যামসাং S26 আলট্রা এআই অবজেক্ট ও প্রম্পট এডিটর"))
@@ -313,7 +316,7 @@ elif app_mode == 3:
                         final_ai_img.save(buf, format="JPEG", quality=95)
                         st.download_button("Download AI Edited Image" if is_eng else "এআই এডিটেড ছবি ডাউনলোড করুন", buf.getvalue(), "s26_ai_edited.jpg", "image/jpeg", key="dl_3")
     else:
-        st.warning("Please upload an image from the sidebar.")
+        st.warning("Please upload an image above.")
 
 elif app_mode == 4:
     st.header("☀️ " + ("Image Brightness & Enhancer" if is_eng else "ছবির আলো ও কন্ট্রাস্ট ঠিক করুন"))
@@ -331,7 +334,7 @@ elif app_mode == 4:
             enhanced_image.save(buf, format="JPEG", quality=95)
             st.download_button("Download", buf.getvalue(), "enhanced.jpg", "image/jpeg", key="dl_4")
     else:
-        st.warning("Please upload an image from the sidebar.")
+        st.warning("Please upload an image above.")
 
 elif app_mode == 5:
     st.header("🆔 " + ("ID Card Crop & Rotate Tool" if is_eng else "আইডি কার্ড ক্রপ ও রোটেশন টুল"))
@@ -347,7 +350,7 @@ elif app_mode == 5:
             img.save(buf, format="JPEG", quality=95)
             st.download_button("Download ID Card", buf.getvalue(), "id_card.jpg", "image/jpeg", key="dl_5")
     else:
-        st.warning("Please upload an image from the sidebar.")
+        st.warning("Please upload an image above.")
 
 elif app_mode == 6:
     st.header("🛂 " + ("Passport Size Photo Sheet (4 Copies)" if is_eng else "পাসপোর্ট সাইজ ছবি শিট (৪ কপি)"))
@@ -365,7 +368,7 @@ elif app_mode == 6:
             sheet.save(buf, format="JPEG", quality=95)
             st.download_button("Download Passport Sheet", buf.getvalue(), "passport_sheet.jpg", "image/jpeg", key="dl_6")
     else:
-        st.warning("Please upload an image from the sidebar.")
+        st.warning("Please upload an image above.")
 
 elif app_mode == 7:
     st.header("🎂 " + ("Age Calculator" if is_eng else "নিখুঁত বয়স ক্যালকুলেটর টুল"))
@@ -504,7 +507,7 @@ elif app_mode == 12:
             resized.save(buf, format="JPEG", quality=95)
             st.download_button("Download Resized Image", buf.getvalue(), "resized.jpg", "image/jpeg", key="dl_12")
     else:
-        st.warning("Please upload an image from the sidebar.")
+        st.warning("Please upload an image above.")
 
 elif app_mode == 13:
     st.header("⬛ " + ("Black & White Converter" if is_eng else "সাদাকালো ছবি কনভার্টার"))
@@ -517,7 +520,7 @@ elif app_mode == 13:
             img.save(buf, format="JPEG", quality=95)
             st.download_button("Download B&W Image", buf.getvalue(), "bw.jpg", "image/jpeg", key="dl_13")
     else:
-        st.warning("Please upload an image from the sidebar.")
+        st.warning("Please upload an image above.")
 
 elif app_mode == 14:
     st.header("🔄 " + ("Image Rotate & Flip" if is_eng else "ছবি ঘোরানোর টুল"))
@@ -533,7 +536,7 @@ elif app_mode == 14:
             img.save(buf, format="JPEG", quality=95)
             st.download_button("Download Rotated Image", buf.getvalue(), "rotated.jpg", "image/jpeg", key="dl_14")
     else:
-        st.warning("Please upload an image from the sidebar.")
+        st.warning("Please upload an image above.")
 
 elif app_mode == 15:
     st.header("🖼️ " + ("Add Image Border & Frame" if is_eng else "বর্ডার ও ফ্রেম যুক্ত করুন"))
@@ -547,7 +550,7 @@ elif app_mode == 15:
             bordered.save(buf, format="JPEG", quality=95)
             st.download_button("Download Bordered Image", buf.getvalue(), "bordered.jpg", "image/jpeg", key="dl_15")
     else:
-        st.warning("Please upload an image from the sidebar.")
+        st.warning("Please upload an image above.")
 
 elif app_mode == 16:
     st.header("💧 " + ("Watermark Adding Tool" if is_eng else "টেক্সট ওয়াটারমার্ক টুল"))
@@ -559,7 +562,7 @@ elif app_mode == 16:
             st.image(img, use_container_width=True)
             st.success(f"Watermark '{text}' prepared.")
     else:
-        st.warning("Please upload an image from the sidebar.")
+        st.warning("Please upload an image above.")
 
 elif app_mode == 17:
     st.header("📄 " + ("PDF Text & Image Extract Tool" if is_eng else "পিডিএফ এক্সট্র্যাক্ট টুল"))
@@ -579,10 +582,10 @@ elif app_mode == 17:
         else:
             st.warning("Please upload a PDF file.")
     else:
-        st.warning("Please upload a PDF file from the sidebar.")
+        st.warning("Please upload a PDF file above.")
 
 # =========================================================================
-# আপনার দেওয়া স্ক্রিনশট অনুযায়ী ক্যাটাগরি ও সমস্ত সার্ভিস লিংক ডিরেক্টরি
+# ক্যাটাগরি ও সমস্ত সার্ভিস লিংক ডিরেক্টরি
 # =========================================================================
 st.markdown("---")
 st.header("🌐 " + ("Complete Government & Online Service Directory" if is_eng else "সকল ক্যাটাগরি ভিত্তিক সরকারি ও অনলাইন সার্ভিস ডিরেক্টরি"))
