@@ -6,6 +6,30 @@ import streamlit as st
 from rembg import remove, new_session
 from pypdf import PdfReader
 
+# =====================================================================
+# Advanced Edge Refinement & Foreground Estimation (Photoroom Style)
+# =====================================================================
+def FB_blur_fusion_foreground_estimator_1(image, alpha, r=90):
+    alpha = alpha[:, :, None]
+    return FB_blur_fusion_foreground_estimator(image, F=image, B=image, alpha=alpha, r=r)[0]
+
+def FB_blur_fusion_foreground_estimator_2(image, alpha, r=90):
+    alpha = alpha[:, :, None]
+    F, blur_B = FB_blur_fusion_foreground_estimator(image, image, image, alpha, r)
+    return FB_blur_fusion_foreground_estimator(image, F, blur_B, alpha, r=6)[0]
+
+def FB_blur_fusion_foreground_estimator(image, F, B, alpha, r=90):
+    blurred_alpha = cv2.blur(alpha, (r, r))[:, :, None]
+
+    blurred_FA = cv2.blur(F * alpha, (r, r))
+    blurred_F = blurred_FA / (blurred_alpha + 1e-5)
+
+    blurred_B1A = cv2.blur(B * (1 - alpha), (r, r))
+    blurred_B = blurred_B1A / ((1 - blurred_alpha) + 1e-5)
+    F = blurred_F + alpha * (image - alpha * blurred_F - (1 - alpha) * blurred_B)
+    F = np.clip(F, 0, 1)
+    return F, blurred_B
+
 # পেজের লেআউট এবং স্টাইলিশ বক্স, হভার ইফেক্ট ও অলওয়েজ শো সাইডবার সেটআপ
 st.set_page_config(page_title="Hasanur Computer Studio", layout="wide")
 
@@ -100,10 +124,23 @@ if global_file is not None:
                 st.image(Image.open(global_file), use_container_width=True, caption="Original / আসল ছবি")
             with col2:
                 if st.button("Remove Background & Apply Custom Color"):
-                    with st.spinner("Processing with Advanced AI (HD)..."):
+                    with st.spinner("Processing with Advanced AI & Edge Refinement..."):
                         session = new_session("u2net_human_seg")
                         output_bytes = remove(global_file.getvalue(), session=session)
-                        foreground = Image.open(io.BytesIO(output_bytes)).convert("RGBA")
+                        
+                        # ফিউশন প্রসেসিংয়ের মাধ্যমে এজ স্মুথ করা
+                        foreground_pil = Image.open(io.BytesIO(output_bytes)).convert("RGBA")
+                        orig_pil = Image.open(global_file).convert("RGB").resize(foreground_pil.size)
+                        
+                        img_np = np.array(orig_pil).astype(np.float32) / 255.0
+                        alpha_np = np.array(foreground_pil.split()[-1]).astype(np.float32) / 255.0
+                        
+                        refined_fg_np = FB_blur_fusion_foreground_estimator_2(img_np, alpha_np)
+                        refined_fg_np = np.clip(refined_fg_np * 255, 0, 255).astype(np.uint8)
+                        
+                        alpha_uint8 = (alpha_np * 255).astype(np.uint8)
+                        refined_fg_rgba = np.dstack((refined_fg_np, alpha_uint8))
+                        foreground = Image.fromarray(refined_fg_rgba, "RGBA")
                         
                         hex_code = bg_color.lstrip('#')
                         bg_rgb = tuple(int(hex_code[i:i+2], 16) for i in (0, 2, 4))
@@ -131,10 +168,22 @@ if global_file is not None:
             with col1:
                 st.image(Image.open(global_file), use_container_width=True, caption="Original / আসল ছবি")
             with col2:
-                with st.spinner("Applying background and generating HD..."):
+                with st.spinner("Applying Photoroom Fusion Studio & generating HD..."):
                     session = new_session("u2net_human_seg")
                     output_bytes = remove(global_file.getvalue(), session=session)
-                    foreground = Image.open(io.BytesIO(output_bytes)).convert("RGBA")
+                    
+                    foreground_pil = Image.open(io.BytesIO(output_bytes)).convert("RGBA")
+                    orig_pil = Image.open(global_file).convert("RGB").resize(foreground_pil.size)
+                    
+                    img_np = np.array(orig_pil).astype(np.float32) / 255.0
+                    alpha_np = np.array(foreground_pil.split()[-1]).astype(np.float32) / 255.0
+                    
+                    refined_fg_np = FB_blur_fusion_foreground_estimator_2(img_np, alpha_np)
+                    refined_fg_np = np.clip(refined_fg_np * 255, 0, 255).astype(np.uint8)
+                    
+                    alpha_uint8 = (alpha_np * 255).astype(np.uint8)
+                    refined_fg_rgba = np.dstack((refined_fg_np, alpha_uint8))
+                    foreground = Image.fromarray(refined_fg_rgba, "RGBA")
                     
                     hex_code = bg_color.lstrip('#')
                     bg_rgb = tuple(int(hex_code[i:i+2], 16) for i in (0, 2, 4))
