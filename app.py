@@ -5,6 +5,7 @@ from PIL import Image, ImageOps, ImageDraw, ImageFont
 import streamlit as st
 from pypdf import PdfReader
 from datetime import date
+from rembg import remove
 
 # পেজের লেআউট সেটআপ
 st.set_page_config(page_title="হাসানুর কম্পিউটার স্টুডিও / Hasanur Computer Studio", layout="wide")
@@ -122,7 +123,7 @@ st.sidebar.header(t['menu_header'])
 
 menu_dict = {
     1: ("✨ ইমেজ ব্রাইটনেস ও কালার এডিটর", "ছবির আলো, ব্রাইটনেস ও কন্ট্রাস্ট ঠিক করার টুল।"),
-    2: ("🎨 স্টুডিও ব্যাকগ্রাউন্ড কালার চেঞ্জার (নিখুঁত)", "বডি অক্ষত রেখে ব্যাকগ্রাউন্ডের রঙ পরিবর্তন করুন।"),
+    2: ("🎨 স্টুডিও ব্যাকগ্রাউন্ড রিমুভ ও কালার চেঞ্জার", "পাসপোর্ট ছবির ব্যাকগ্রাউন্ড নিখুঁতভাবে রিমুভ করে নতুন কালার দিন।"),
     3: ("🆔 আইডি কার্ড ক্রপ ও সোজা করার টুল", "আইডি কার্ড ক্রপ ও নির্দিষ্ট কোণে ঘোরানো।"),
     4: ("🛂 পাসপোর্ট সাইজ ছবি শিট তৈরি (৪ কপি)", "এক ক্লিকে ৪ কপি পাসপোর্ট ছবি শিট তৈরি।"),
     5: ("🎂 বয়স ক্যালকুলেটর (Age Calculator)", "নির্ভুল বয়স ও দিন-মাস হিসাব।"),
@@ -165,47 +166,41 @@ if app_mode == 1:
         st.info("👋 অনুগ্রহ করে উপরে একটি ছবি আপলোড করুন।")
 
 elif app_mode == 2:
-    st.header("🎨 স্টুডিও ব্যাকগ্রাউন্ড কালার চেঞ্জার (নিখুঁত)")
+    st.header("🎨 স্টুডিও ব্যাকগ্রাউন্ড রিমুভ ও কালার চেঞ্জার")
     if global_file is not None:
         image = Image.open(global_file).convert("RGB")
         st.image(image, caption="মূল ছবি (Original Image)", width=300)
         
-        st.markdown("### ব্যাকগ্রাউন্ড পরিবর্তনের সেটিংস:")
-        new_bg_color = st.color_picker("নতুন ব্যাকগ্রাউন্ড কালার নির্বাচন করুন", "#1A73E8") # প্রফেশনাল ব্লু
-        
-        # ফ্লাড ফিল টলারেন্স স্লাইডার (এটি দিয়ে ব্যাকগ্রাউন্ডের পরিধি কমানো বা বাড়ানো যাবে)
-        tolerance = st.slider("ব্যাকগ্রাউন্ড সেন্সিটিভিটি (Tolerance)", 5, 80, 25)
+        st.markdown("### ব্যাকগ্রাউন্ড কালার নির্বাচন করুন:")
+        bg_color_picker = st.color_picker("নতুন ব্যাকগ্রাউন্ড রঙ (যেমন: নীল বা সাদা)", "#1A73E8")
         
         if st.button("ব্যাকগ্রাউন্ড পরিবর্তন করুন"):
-            img_np = np.array(image)
-            h, w, _ = img_np.shape
-            
-            # ছবির চার কোণা থেকে ব্যাকগ্রাউন্ডের রঙ স্যাম্পল নেওয়া
-            corners = [
-                img_np[0, 0], img_np[0, w-1], 
-                img_np[h-1, 0], img_np[h-1, w-1],
-                img_np[0, w//2], img_np[h-1, w//2]
-            ]
-            bg_color_sample = np.mean(corners, axis=0)
-            
-            # ওপেনসিভি ফ্লড ফিল অ্যালগরিদম ব্যবহার করে শুধু বাইরের ব্যাকগ্রাউন্ড পরিবর্তন করা (বডি অক্ষত থাকবে)
-            mask = np.zeros((h + 2, w + 2), np.uint8)
-            im_floodfill = img_np.copy()
-            
-            # হেক্স কালারকে RGB তে রূপান্তর
-            h_hex = new_bg_color.lstrip('#')
-            target_rgb = (int(h_hex[4:6], 16), int(h_hex[2:4], 16), int(h_hex[0:2], 16)) # OpenCV uses BGR format internally
-            
-            # ফ্লাড ফিল প্রয়োগ (চার কোণা থেকে ব্যাকগ্রাউন্ড ফিল করবে)
-            cv2.floodFill(im_floodfill, mask, (0, 0), target_rgb, (tolerance,)*3, (tolerance,)*3, cv2.FLOODFILL_FIXED_RANGE)
-            cv2.floodFill(im_floodfill, mask, (w-1, 0), target_rgb, (tolerance,)*3, (tolerance,)*3, cv2.FLOODFILL_FIXED_RANGE)
-            
-            final_img = Image.fromarray(im_floodfill)
-            st.image(final_img, use_container_width=True, caption="পরিবর্তিত ব্যাকগ্রাউন্ড সহ ছবি")
-            
-            buf = io.BytesIO()
-            final_img.save(buf, format="JPEG", quality=95)
-            st.download_button("Download Studio Image", buf.getvalue(), "studio_bg.jpg", "image/jpeg", key="dl_bg")
+            with st.spinner("এআই দিয়ে ব্যাকগ্রাউন্ড রিমুভ করা হচ্ছে, অপেক্ষা করুন..."):
+                try:
+                    # বাইট রিড করে rembg দিয়ে ব্যাকগ্রাউন্ড রিমুভ
+                    bytes_data = global_file.getvalue()
+                    output_bytes = remove(bytes_data)
+                    
+                    # ট্রান্সপারেন্ট ছবি ওপেন করা
+                    img_rgba = Image.open(io.BytesIO(output_bytes)).convert("RGBA")
+                    
+                    # হেক্স কালারকে RGB তে রূপান্তর
+                    h_hex = bg_color_picker.lstrip('#')
+                    new_rgb = tuple(int(h_hex[i:i+2], 16) for i in (0, 2, 4))
+                    
+                    # নতুন ব্যাকগ্রাউন্ড তৈরি
+                    background = Image.new("RGBA", img_rgba.size, new_rgb + (255,))
+                    
+                    # ব্যাকগ্রাউন্ডের উপর মূল মানুষটিকে বসানো
+                    final_img = Image.alpha_composite(background, img_rgba).convert("RGB")
+                    
+                    st.image(final_img, use_container_width=True, caption="নিখুঁত ব্যাকগ্রাউন্ড পরিবর্তিত ছবি")
+                    
+                    buf = io.BytesIO()
+                    final_img.save(buf, format="JPEG", quality=95)
+                    st.download_button("Download Studio Image", buf.getvalue(), "studio_bg.jpg", "image/jpeg", key="dl_bg")
+                except Exception as e:
+                    st.error(f"ত্রুটি দেখা দিয়েছে: {e}")
     else:
         st.warning("দয়া করে ছবি আপলোড করুন।")
 
