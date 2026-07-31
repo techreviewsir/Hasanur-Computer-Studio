@@ -41,38 +41,26 @@ st.markdown("""
     .contact-info { text-align: center; color: #38bdf8; font-size: 15px; margin-bottom: 25px; font-weight: bold; }
     .footer { text-align: center; margin-top: 60px; padding: 20px; color: #64748b; border-top: 1px solid #334155; font-size: 14px; }
     
-    .counter-container {
-        display: flex;
-        justify-content: center;
-        gap: 20px;
-        margin-bottom: 25px;
-    }
-    .counter-box {
-        background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    /* ছোট সাইডবার স্ট্যাটাস বক্স */
+    .sidebar-counter {
+        background: #1e293b;
         border: 1px solid #334155;
-        border-radius: 12px;
-        padding: 15px 30px;
-        text-align: center;
-        min-width: 180px;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-    }
-    .counter-val {
-        font-size: 28px;
-        font-weight: bold;
-        color: #38bdf8;
-    }
-    .counter-label {
+        border-radius: 8px;
+        padding: 8px 12px;
+        margin-bottom: 15px;
         font-size: 13px;
-        color: #94a3b8;
-        margin-top: 5px;
+        color: #f8fafc;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
     }
     .live-dot {
-        height: 10px;
-        width: 10px;
+        height: 8px;
+        width: 8px;
         background-color: #22c55e;
         border-radius: 50%;
         display: inline-block;
-        margin-right: 6px;
+        margin-right: 4px;
         animation: blinker 1.5s linear infinite;
     }
     @keyframes blinker {
@@ -130,7 +118,14 @@ st.markdown("""
 if 'active_module' not in st.session_state:
     st.session_state.active_module = "1"
 
-# সাইডবার ড্যাশবোর্ড কন্ট্রোল
+# সাইডবার ড্যাশবোর্ড কন্ট্রোল (প্রজেক্ট স্ট্রাকচারের উপরে ছোট করে ভিজিটর ও লাইভ কাউন্ট যুক্ত করা হলো)
+st.sidebar.markdown(f"""
+    <div class="sidebar-counter">
+        <span>👥 মোট: <b>{st.session_state.total_visitors}</b></span>
+        <span><span class="live-dot"></span>অনলাইন: <b>{st.session_state.live_users}</b></span>
+    </div>
+""", unsafe_allow_html=True)
+
 st.sidebar.markdown("## 📊 Project Structure")
 lang_mode = st.sidebar.radio("🌐 Select Language / ভাষা নির্বাচন করুন:", ("🇧🇩 বাংলা UI", "🇬🇧 English UI"))
 st.sidebar.markdown("---")
@@ -180,20 +175,6 @@ if st.sidebar.button(b11, use_container_width=True, type="primary" if st.session
 st.markdown(f"<h1>{title_text}</h1>", unsafe_allow_html=True)
 st.markdown(f"<div class='subtitle'>{sub_text}</div>", unsafe_allow_html=True)
 st.markdown(f"<div class='contact-info'>{hotline_text}</div>", unsafe_allow_html=True)
-
-# ভিজিটর ও লাইভ ইউজার স্ট্যাটাস প্যানেল
-st.markdown(f"""
-    <div class="counter-container">
-        <div class="counter-box">
-            <div class="counter-val">👥 {st.session_state.total_visitors}</div>
-            <div class="counter-label">মোট ভিজিটর (Total Visitors)</div>
-        </div>
-        <div class="counter-box">
-            <div class="counter-val"><span class="live-dot"></span>🟢 {st.session_state.live_users}</div>
-            <div class="counter-label">অনলাইনে আছেন (Live Users)</div>
-        </div>
-    </div>
-""", unsafe_allow_html=True)
 st.markdown("---")
 
 is_photo_module = st.session_state.active_module in ["1", "2", "3", "4", "5", "6", "11"]
