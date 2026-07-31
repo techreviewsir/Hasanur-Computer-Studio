@@ -330,21 +330,65 @@ elif app_mode == 14:
         st.warning("দয়া করে একটি পিডিএফ ফাইল আপলোড করুন।")
 
 # =========================================================================
-# সার্ভিস ডিরেক্টরি
+# ক্যাটাগরি ও সমস্ত সার্ভিস লিংক ডিরেক্টরি (পুনরায় যুক্ত করা হয়েছে)
 # =========================================================================
 st.markdown("---")
-st.header("🌐 অনলাইন সরকারি ও জরুরি সেবা লিংক")
-st.markdown("""
-<div class="link-box">
-    <h4>📜 জন্ম নিবন্ধন (Birth Registration)</h4>
-    <p><b>লিংক:</b> <a href="https://bdris.gov.bd/" target="_blank">BDRIS Portal</a></p>
-</div>
-<div class="link-box">
-    <h4>📇 জাতীয় পরিচয়পত্র (NID Services)</h4>
-    <p><b>লিংক:</b> <a href="https://services.nidw.gov.bd/" target="_blank">NID Card Portal</a></p>
-</div>
-<div class="link-box">
-    <h4>🛂 পাসপোর্ট (e-Passport Portal)</h4>
-    <p><b>লিংক:</b> <a href="https://www.epassport.gov.bd/" target="_blank">Online e-Passport Application</a></p>
-</div>
-""", unsafe_allow_html=True)
+st.header("🌐 " + ("Complete Government & Online Service Directory" if is_eng else "সকল ক্যাটাগরি ভিত্তিক সরকারি ও অনলাইন সার্ভিস ডিরেক্টরি"))
+
+col_a, col_b = st.columns(2)
+
+with col_a:
+    st.markdown("""
+    <div class="link-box">
+        <h4>🏛️ উন্মুক্ত বিশ্ববিদ্যালয় (Open University)</h4>
+        <p><b>লিংক:</b> <a href="https://www.bou.ac.bd/" target="_blank">BOU Official Website</a></p>
+    </div>
+    <div class="link-box">
+        <h4>📜 জন্ম নিবন্ধন (Birth Registration)</h4>
+        <p><b>লিংক:</b> <a href="https://bdris.gov.bd/" target="_blank">BDRIS Portal</a></p>
+    </div>
+    <div class="link-box">
+        <h4>📇 জাতীয় পরিচয়পত্র (NID Services)</h4>
+        <p><b>লিংক:</b> <a href="https://services.nidw.gov.bd/" target="_blank">NID Card Portal</a></p>
+    </div>
+    <div class="link-box">
+        <h4>🎓 জাতীয় বিশ্ববিদ্যালয় (National University)</h4>
+        <p><b>লিংক:</b> <a href="https://www.nu.ac.bd/" target="_blank">NU Portal & Admissions</a></p>
+    </div>
+    <div class="link-box">
+        <h4>💉 টিকা (Vaccination Portal)</h4>
+        <p><b>লিংক:</b> <a href="https://surokkha.gov.bd/" target="_blank">Surokkha Vaccine Registration</a></p>
+    </div>
+    <div class="link-box">
+        <h4>🎫 টিকেট (Railway & Bus Tickets)</h4>
+        <p><b>লিংক:</b> <a href="https://eticket.railway.gov.bd/" target="_blank">Bangladesh Railway E-Ticket</a></p>
+    </div>
+    """, unsafe_allow_html=True)
+
+with col_b:
+    st.markdown("""
+    <div class="link-box">
+        <h4>🏫 পাবলিক বিশ্ববিদ্যালয় (Public Universities)</h4>
+        <p><b>লিংক:</b> <a href="https://uccas.gov.bd/" target="_blank">UG Admission Portal</a></p>
+    </div>
+    <div class="link-box">
+        <h4>🛂 পাসপোর্ট (e-Passport Portal)</h4>
+        <p><b>লিংক:</b> <a href="https://www.epassport.gov.bd/" target="_blank">Online e-Passport Application</a></p>
+    </div>
+    <div class="link-box">
+        <h4>👮 পুলিশ ও নাগরিক (Police Clearance)</h4>
+        <p><b>লিংক:</b> <a href="https://pcc.police.gov.bd/" target="_blank">Police Clearance Certificate Portal</a></p>
+    </div>
+    <div class="link-box">
+        <h4>✈️ প্রবাসী (BMET & Expatriates Welfare)</h4>
+        <p><b>লিংক:</b> <a href="https://www.bmet.gov.bd/" target="_blank">BMET Portal & Smart Card</a></p>
+    </div>
+    <div class="link-box">
+        <h4>📝 প্রবেশপত্র (Admit Card & Exam Portals)</h4>
+        <p><b>লিংক:</b> <a href="http://www.teletalk.com.bd/" target="_blank">Teletalk Job Portal</a></p>
+    </div>
+    <div class="link-box">
+        <h4>⚡ বিদ্যুৎ (Electricity Bill Pay)</h4>
+        <p><b>লিংক:</b> <a href="https://www.bpdb.gov.bd/" target="_blank">BPDB Portal</a></p>
+    </div>
+    """, unsafe_allow_html=True)
