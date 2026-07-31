@@ -118,7 +118,7 @@ st.markdown("""
 if 'active_module' not in st.session_state:
     st.session_state.active_module = "1"
 
-# সাইডবার ড্যাশবোর্ড কন্ট্রোল (প্রজেক্ট স্ট্রাকচারের উপরে ছোট করে ভিজিটর ও লাইভ কাউন্ট যুক্ত করা হলো)
+# সাইডবার কাউন্টার ও মেনু
 st.sidebar.markdown(f"""
     <div class="sidebar-counter">
         <span>👥 মোট: <b>{st.session_state.total_visitors}</b></span>
@@ -140,9 +140,9 @@ if lang_mode == "🇧🇩 বাংলা UI":
     apply_txt = "Apply (পরিবর্তন সেভ করুন)"
     
     b1, b2, b3, b4, b5, b6, b7, b8, b9, b10, b11 = (
-        "1. 📐 বাঁকা আইডি সোজা", "2. ✂️ ফটো ক্রপ", "3. 🪄 ফটো রুম এআই (PhotoRoom)", "4. 🪄 ছবি উন্নতকরণ",
-        "5. 🎨 ব্যাকগ্রাউন্ড ও কালার", "6. 🧽 অবজেক্ট রিমুভ", "7. 📜 প্রত্যয়ন ও ছাড়পত্র", "8. 📝 সিভি/বায়োডাটা মেকার",
-        "9. 🔗 পিডিএফ টুলস", "10. 🌐 অনলাইন লিঙ্ক ও সেটিংস", "📄 11. এআই ডকুমেন্ট রিসাইজার (A4)"
+        "1. 🪄 ছবির ব্যাকগ্রাউন্ড পরিবর্তন", "2. 🪄 ছবি উন্নত করুন", "3. 🎨 ব্যাকগ্রাউন্ড কালার", "4. ✂️ ফটো ক্রপ",
+        "5. 🧽 অবজেক্ট রিমুভ", "6. 📐 বাঁকা আইডি কার্ড সোজা", "7. 📜 প্রতাপ ফটো ও প্রত্যয়ন", "8. 📝 সিভি/বায়োডাটা মেকার",
+        "9. 🔗 পিডিএফ টুলস", "10. 🌐 অনলাইন সেবা ও লিঙ্ক", "📄 11. এ ফোর ডকুমেন্ট রিসাইজার"
     )
 else:
     title_text = "📸 Hasanur Computer Studio"
@@ -154,9 +154,9 @@ else:
     apply_txt = "Apply Changes"
     
     b1, b2, b3, b4, b5, b6, b7, b8, b9, b10, b11 = (
-        "1. 📐 ID Card Fixer", "2. ✂️ Crop Tool", "3. 🪄 PhotoRoom AI", "4. 🪄 En-Real AI",
-        "5. 🎨 BG & Color Changer", "6. 🧽 Erase Tool", "7. 📜 Forms & TC", "8. 📝 CV Maker",
-        "9. 🔗 PDF Tools", "10. 🌐 Online Directory", "📄 11. AI Document Resizer (A4)"
+        "1. 🪄 BG Change (PhotoRoom)", "2. 🪄 Photo Enhancer", "3. 🎨 BG Color Panel", "4. ✂️ Crop Tool",
+        "5. 🧽 Object Remover", "6. 📐 ID Card Fixer", "7. 📜 Forms & TC", "8. 📝 CV Maker",
+        "9. 🔗 PDF Tools", "10. 🌐 Online Directory", "📄 11. A4 Document Resizer"
     )
 
 st.sidebar.markdown(f"### {sidebar_menu_title}")
@@ -189,41 +189,91 @@ if uploaded_file is not None:
 
 # ================= MODULE 1 =================
 if st.session_state.active_module == "1":
-    st.markdown("### 📐 1. বাঁকা আইডি সোজা করার টুল (Persp-AI)")
+    st.markdown("### 🪄 1. ছবির ব্যাকগ্রাউন্ড পরিবর্তন (PhotoRoom AI)")
     if base_image:
-        st.info("💡 মোবাইল থেকে তোলা যেকোনো বাঁকা কার্ডের ৪টি কোণকে সোজা করতে নিচের কন্ট্রোলগুলো এডজাস্ট করুন।")
-        img_np = np.array(base_image)
-        h, w = img_np.shape[:2]
-        
-        col_s1, col_s2 = st.columns(2)
-        with col_s1:
-            top_left_x = st.slider("টপ-লেফট X (উপরের বাম কোণ)", 0, w, int(w*0.05))
-            top_left_y = st.slider("টপ-লেফট Y", 0, h, int(h*0.05))
-            bottom_left_x = st.slider("বটম-লেফট X (নিচের বাম কোণ)", 0, w, int(w*0.05))
-            bottom_left_y = st.slider("বটম-লেফট Y", 0, h, int(h*0.95))
-        with col_s2:
-            top_right_x = st.slider("টপ-রাইট X (উপরের ডান কোণ)", 0, w, int(w*0.95))
-            top_right_y = st.slider("টপ-রাইট Y", 0, h, int(h*0.05))
-            bottom_right_x = st.slider("বটম-রাইট X (নিচের ডান কোণ)", 0, w, int(w*0.95))
-            bottom_right_y = st.slider("বটম-রাইট Y", 0, h, int(h*0.95))
+        if REMBG_AVAILABLE:
+            bg_selection = st.selectbox(
+                "ব্যাকগ্রাউন্ড স্টাইল সিলেক্ট করুন:", 
+                ["স্বচ্ছ (Transparent/PNG)", "আকাশী (Sky Blue)", "পাসপোর্ট নীল (Studio Blue)", "অফিসিয়াল সাদা (Pure White)", "সলিড কালার (Color Picker)", "🏞️ গ্যালারি থেকে নিজস্ব কাস্টম ছবি/সিনারি"]
+            )
+            custom_bg_file = None
+            custom_color = "#ffffff"
+            if bg_selection == "সলিড কালার (Color Picker)":
+                custom_color = st.color_picker("আপনার পছন্দের রঙ সিলেক্ট করুন:", "#ff4b4b")
+            elif bg_selection == "🏞️ গ্যালারি থেকে নিজস্ব কাস্টম ছবি/সিনারি":
+                custom_bg_file = st.file_uploader("আপনার কাঙ্খিত ব্যাকগ্রাউন্ড সিনারিটি আপলোড করুন:", type=["jpg", "jpeg", "png"], key="m1_bg")
             
-        pts1 = np.float32([[top_left_x, top_left_y], [top_right_x, top_right_y], [bottom_left_x, bottom_left_y], [bottom_right_x, bottom_right_y]])
-        pts2 = np.float32([[0, 0], [w, 0], [0, h], [w, h]])
-        
-        matrix = cv2.getPerspectiveTransform(pts1, pts2)
-        result_np = cv2.warpPerspective(img_np, matrix, (w, h))
-        out = Image.fromarray(result_np)
-        
-        with col_v2:
-            st.image(out, caption="সোজা করা আইডি কার্ড (Preview)", use_container_width=True)
-            buf = io.BytesIO(); out.save(buf, format="JPEG", quality=100, subsampling=0)
-            st.download_button(label="📥 সোজা করা HD আইডি কার্ড ডাউনলোড করুন", data=buf.getvalue(), file_name="hasanur_studio_fixed_id.jpg", mime="image/jpeg", use_container_width=True)
+            ai_feathering = st.slider("এআই কিনারা ব্লেন্ডিং (Feathering Level):", 0, 40, 15, 5)
+            
+            if st.button("ব্যাকগ্রাউন্ড পরিবর্তন করুন", type="primary", use_container_width=True):
+                with st.spinner("ব্যাকগ্রাউন্ড প্রসেস করা হচ্ছে..."):
+                    transparent_img = remove(base_image, session=ai_session, alpha_matting=True, alpha_matting_erode_size=ai_feathering)
+                
+                if bg_selection == "স্বচ্ছ (Transparent/PNG)":
+                    out = transparent_img; file_ext = "PNG"; mime_type = "image/png"; filename = "bg_removed.png"
+                elif bg_selection == "🏞️ গ্যালারি থেকে নিজস্ব কাস্টম ছবি/সিনারি" and custom_bg_file is not None:
+                    bg_custom = Image.open(custom_bg_file).resize(base_image.size, Image.Resampling.LANCZOS).convert("RGBA")
+                    bg_custom.paste(transparent_img, (0, 0), transparent_img)
+                    out = bg_custom.convert("RGB"); file_ext = "JPEG"; mime_type = "image/jpeg"; filename = "custom_bg.jpg"
+                else:
+                    if bg_selection == "আকাশী (Sky Blue)": hex_val = "87CEEB"
+                    elif bg_selection == "পাসপোর্ট নীল (Studio Blue)": hex_val = "0033aa"
+                    elif bg_selection == "অফিসিয়াল সাদা (Pure White)": hex_val = "ffffff"
+                    else: hex_val = custom_color.lstrip('#')
+                    bg_rgb = tuple(int(hex_val[i:i+2], 16) for i in (0, 2, 4))
+                    bg = Image.new("RGBA", base_image.size, bg_rgb + (255,))
+                    bg.paste(transparent_img, (0, 0), transparent_img)
+                    out = bg.convert("RGB"); file_ext = "JPEG"; mime_type = "image/jpeg"; filename = "new_bg.jpg"
+                
+                with col_v2:
+                    st.image(out, caption="Output", use_container_width=True)
+                    buf = io.BytesIO()
+                    if file_ext == "PNG": out.save(buf, format=file_ext)
+                    else: out.save(buf, format=file_ext, quality=100, subsampling=0)
+                    st.download_button("📥 ডাউনলোড করুন", data=buf.getvalue(), file_name=filename, mime=mime_type, use_container_width=True)
+        else:
+            st.error("rembg মডিউল ইনস্টল করা নেই।")
 
 # ================= MODULE 2 =================
 elif st.session_state.active_module == "2":
-    st.markdown("### ✂️ 2. Crop Tool")
+    st.markdown("### 🪄 2. ছবি উন্নত করুন (Photo Enhancer)")
     if base_image:
-        crop_type = st.radio("Select Crop Ratio / ক্রপ রেশিও:", ("Passport Size (413x531 px)", "Stamp Size (236x295 px)", "Custom Auto ID Card"))
+        enhance_mode = st.radio("মোড সিলেক্ট করুন:", ("Sharpness Booster", "Auto Light & Color Adjust"))
+        if st.button(apply_txt, type="primary", use_container_width=True):
+            if "Sharpness" in enhance_mode: out = ImageEnhance.Sharpness(base_image).enhance(2.5)
+            else:
+                img_c = ImageEnhance.Contrast(base_image).enhance(1.3)
+                out = ImageEnhance.Brightness(img_c).enhance(1.1)
+            with col_v2:
+                st.image(out, caption="Enhanced Output", use_container_width=True)
+                buf = io.BytesIO(); out.save(buf, format="JPEG", quality=100, subsampling=0)
+                st.download_button("📥 ডাউনলোড করুন", data=buf.getvalue(), file_name="enhanced.jpg", mime="image/jpeg", use_container_width=True)
+
+# ================= MODULE 3 =================
+elif st.session_state.active_module == "3":
+    st.markdown("### 🎨 3. ব্যাকগ্রাউন্ড কালার পরিবর্তন প্যানেল")
+    if base_image:
+        bg_color_pick = st.color_picker("ব্যাকগ্রাউন্ড কালার বেছে নিন:", "#87CEEB")
+        smoothness = st.slider("বর্ডার মসৃণতা:", 0, 20, 8, 2)
+        if st.button(apply_txt, type="primary", use_container_width=True):
+            if REMBG_AVAILABLE:
+                with st.spinner("Applying Color..."):
+                    transparent = remove(base_image, session=ai_session, alpha_matting=True, alpha_matting_erode_size=smoothness)
+                    h_val = bg_color_pick.lstrip('#')
+                    bg_rgb = tuple(int(h_val[i:i+2], 16) for i in (0, 2, 4))
+                    bg = Image.new("RGBA", base_image.size, bg_rgb + (255,))
+                    bg.paste(transparent, (0, 0), transparent)
+                    out = bg.convert("RGB")
+                    with col_v2:
+                        st.image(out, caption="Colored BG Output", use_container_width=True)
+                        buf = io.BytesIO(); out.save(buf, format="JPEG", quality=100, subsampling=0)
+                        st.download_button("📥 ডাউনলোড করুন", data=buf.getvalue(), file_name="color_bg.jpg", mime="image/jpeg", use_container_width=True)
+
+# ================= MODULE 4 =================
+elif st.session_state.active_module == "4":
+    st.markdown("### ✂️ 4. ফটো ক্রপ টুল (Crop Tool)")
+    if base_image:
+        crop_type = st.radio("ক্রপ সাইজ:", ("Passport Size (413x531 px)", "Stamp Size (236x295 px)", "Custom Ratio"))
         if st.button(apply_txt, type="primary", use_container_width=True):
             if "Passport" in crop_type: out = base_image.resize((413, 531), Image.Resampling.LANCZOS)
             elif "Stamp" in crop_type: out = base_image.resize((236, 295), Image.Resampling.LANCZOS)
@@ -231,159 +281,54 @@ elif st.session_state.active_module == "2":
             with col_v2:
                 st.image(out, caption="Cropped Output", use_container_width=True)
                 buf = io.BytesIO(); out.save(buf, format="JPEG", quality=100, subsampling=0)
-                st.download_button(label="📥 ক্রপ করা HD ছবি ডাউনলোড করুন", data=buf.getvalue(), file_name="cropped_hd.jpg", mime="image/jpeg", use_container_width=True)
-
-# ================= MODULE 3 =================
-elif st.session_state.active_module == "3":
-    st.markdown("### 🪄 3. ফটো রুম ইন্টেলিজেন্ট এআই (PhotoRoom AI Smooth Core)")
-    if base_image:
-        if REMBG_AVAILABLE:
-            st.success("⚡ PhotoRoom Intelligent AI ইঞ্জিন একটিভেট হয়েছে!")
-            bg_selection = st.selectbox(
-                "ব্যাকগ্রাউন্ড স্টাইল সিলেক্ট করুন:", 
-                ["স্বচ্ছ (Transparent/PNG)", "আকাশী (Sky Blue)", "পাসপোর্ট নীল (Studio Blue)", "অফিসিয়াল সাদা (Pure White)", "সলিড কালার (Color Picker)", "🏞️ গ্যালারি থেকে নিজস্ব কাস্টম ছবি/সিনারি"]
-            )
-            
-            custom_bg_file = None
-            custom_color = "#ffffff"
-            if bg_selection == "সলিড কালার (Color Picker)":
-                custom_color = st.color_picker("আপনার পছন্দের রঙ সিলেক্ট করুন:", "#ff4b4b")
-            elif bg_selection == "🏞️ গ্যালারি থেকে নিজস্ব কাস্টম ছবি/সিনারি":
-                custom_bg_file = st.file_uploader("আপনার কাঙ্খিত ব্যাকগ্রাউন্ড সিনারিটি আপলোড করুন:", type=["jpg", "jpeg", "png"], key="photoroom_bg")
-            
-            ai_feathering = st.slider("এআই কিনারা ব্লেন্ডিং (Feathering Level):", min_value=0, max_value=40, value=15, step=5)
-            ai_threshold = st.slider("মাস্কিং গভীরতা (Alpha Threshold):", min_value=10, max_value=240, value=120, step=10)
-            
-            if st.button("ফটো রুম স্মার্ট আউটপুট তৈরি করুন", type="primary", use_container_width=True):
-                with st.spinner("ইন্টেলিজেন্ট এআই দিয়ে ব্যাকগ্রাউন্ড স্মুথলি রিমুভ করা হচ্ছে..."):
-                    transparent_img = remove(
-                        base_image, 
-                        session=ai_session, 
-                        alpha_matting=True, 
-                        alpha_matting_foreground_threshold=240,
-                        alpha_matting_background_threshold=10,
-                        alpha_matting_erode_size=ai_feathering
-                    )
-                    
-                    if ai_feathering > 0:
-                        alpha = transparent_img.split()[-1]
-                        alpha = alpha.point(lambda p: 255 if p > ai_threshold else 0)
-                        smoothed_alpha = alpha.filter(ImageFilter.GaussianBlur(ai_feathering / 5))
-                        transparent_img.putalpha(smoothed_alpha)
-                
-                if bg_selection == "স্বচ্ছ (Transparent/PNG)":
-                    out = transparent_img
-                    file_ext = "PNG"; mime_type = "image/png"; filename = "photoroom_intelligent_hd.png"
-                elif bg_selection == "🏞️ গ্যালারি থেকে নিজস্ব কাস্টম ছবি/সিনারি" and custom_bg_file is not None:
-                    bg_custom = Image.open(custom_bg_file).resize(base_image.size, Image.Resampling.LANCZOS).convert("RGBA")
-                    bg_custom.paste(transparent_img, (0, 0), transparent_img)
-                    out = bg_custom.convert("RGB")
-                    file_ext = "JPEG"; mime_type = "image/jpeg"; filename = "photoroom_custom_bg.jpg"
-                else:
-                    if bg_selection == "আকাশী (Sky Blue)": hex_val = "87CEEB"
-                    elif bg_selection == "পাসপোর্ট নীল (Studio Blue)": hex_val = "0033aa"
-                    elif bg_selection == "অফিসিয়াল সাদা (Pure White)": hex_val = "ffffff"
-                    else: hex_val = custom_color.lstrip('#')
-                        
-                    bg_rgb = tuple(int(hex_val[i:i+2], 16) for i in (0, 2, 4))
-                    bg = Image.new("RGBA", base_image.size, bg_rgb + (255,))
-                    bg.paste(transparent_img, (0, 0), transparent_img)
-                    out = bg.convert("RGB")
-                    file_ext = "JPEG"; mime_type = "image/jpeg"; filename = "photoroom_studio_hd.jpg"
-                
-                with col_v2:
-                    st.image(out, caption="PhotoRoom AI Output", use_container_width=True)
-                    buf = io.BytesIO()
-                    if file_ext == "PNG": out.save(buf, format=file_ext)
-                    else: out.save(buf, format=file_ext, quality=100, subsampling=0)
-                    st.download_button(label="📥 ডাউনলোড করুন HD ইমেজ", data=buf.getvalue(), file_name=filename, mime=mime_type, use_container_width=True)
-        else:
-            st.error("দুঃখিত, rembg AI ইঞ্জিন ইনস্টল করা নেই।")
-
-# ================= MODULE 4 =================
-elif st.session_state.active_module == "4":
-    st.markdown("### 🪄 4. Photo Enhancer")
-    if base_image:
-        enhance_mode = st.radio("Choose Mode / মোড সিলেক্ট করুন:", ("En-Real (Sharpness Booster)", "Enhan-AI (Auto Light & Color Adjust)"))
-        if st.button(apply_txt, type="primary", use_container_width=True):
-            if "En-Real" in enhance_mode: out = ImageEnhance.Sharpness(base_image).enhance(2.5)
-            else:
-                img_c = ImageEnhance.Contrast(base_image).enhance(1.3)
-                out = ImageEnhance.Brightness(img_c).enhance(1.1)
-            with col_v2:
-                st.image(out, caption="Enhanced Output", use_container_width=True)
-                buf = io.BytesIO(); out.save(buf, format="JPEG", quality=100, subsampling=0)
-                st.download_button(label="📥 উন্নত করা HD ছবি ডাউনলোড করুন", data=buf.getvalue(), file_name="enhanced_hd.jpg", mime="image/jpeg", use_container_width=True)
+                st.download_button("📥 ডাউনলোড করুন", data=buf.getvalue(), file_name="cropped.jpg", mime="image/jpeg", use_container_width=True)
 
 # ================= MODULE 5 =================
 elif st.session_state.active_module == "5":
-    st.markdown("### 🎨 5. BG-First & BG-AI Background Panel")
+    st.markdown("### 🧽 5. অবজেক্ট রিমুভ ও ফিল্টার টুল")
     if base_image:
-        bg_mode = st.radio("Method:", ("BG-First (Remove BG Transparent)", "BG-AI (Custom Solid Color BG)", "BG-Custom (Upload Custom BG Image)"))
-        bg_color = "#87CEEB"
-        custom_bg_file_5 = None
-        if "Solid" in bg_mode or "BG-AI" in bg_mode:
-            bg_color = st.color_picker("ব্যাকগ্রাউন্ড কালার সিলেক্ট করুন:", "#87CEEB")
-        elif "BG-Custom" in bg_mode:
-            custom_bg_file_5 = st.file_uploader("ব্যাকগ্রাউন্ড ছবি আপলোড করুন:", type=["jpg", "jpeg", "png"], key="bg_panel_bg")
-            
-        smoothness = st.slider("বর্ডার মসৃণতা (Smooth Edge Level):", min_value=0, max_value=20, value=8, step=2)
-        
-        if st.button(apply_txt, type="primary", use_container_width=True):
-            if REMBG_AVAILABLE:
-                with st.spinner("Processing Background..."):
-                    transparent = remove(
-                        base_image, 
-                        session=ai_session, 
-                        alpha_matting=True,
-                        alpha_matting_foreground_threshold=240,
-                        alpha_matting_background_threshold=10,
-                        alpha_matting_erode_size=smoothness
-                    )
-                    
-                    if smoothness > 0:
-                        alpha = transparent.split()[-1]
-                        smoothed_alpha = alpha.filter(ImageFilter.GaussianBlur(smoothness / 4))
-                        transparent.putalpha(smoothed_alpha)
-                    
-                    if "BG-First" in bg_mode:
-                        out = transparent; file_ext = "PNG"; mime_type = "image/png"; filename = "transparent_hd.png"
-                    elif "BG-Custom" in bg_mode and custom_bg_file_5 is not None:
-                        bg_custom = Image.open(custom_bg_file_5).resize(base_image.size, Image.Resampling.LANCZOS).convert("RGBA")
-                        bg_custom.paste(transparent, (0, 0), transparent)
-                        out = bg_custom.convert("RGB"); file_ext = "JPEG"; mime_type = "image/jpeg"; filename = "custom_bg_hd.jpg"
-                    else:
-                        h_val = bg_color.lstrip('#')
-                        bg_rgb = tuple(int(h_val[i:i+2], 16) for i in (0, 2, 4))
-                        bg = Image.new("RGBA", base_image.size, bg_rgb + (255,))
-                        bg.paste(transparent, (0, 0), transparent)
-                        out = bg.convert("RGB"); file_ext = "JPEG"; mime_type = "image/jpeg"; filename = "passport_hd.jpg"
-                        
-                    with col_v2:
-                        st.image(out, caption="Output", use_container_width=True)
-                        buf = io.BytesIO()
-                        if file_ext == "PNG": out.save(buf, format=file_ext)
-                        else: out.save(buf, format=file_ext, quality=100, subsampling=0)
-                        st.download_button(label="📥 HD ছবি ডাউনলোড করুন", data=buf.getvalue(), file_name=filename, mime=mime_type, use_container_width=True)
-            else:
-                st.error("AI engine is unavailable.")
-
-# ================= MODULE 6 =================
-elif st.session_state.active_module == "6":
-    st.markdown("### 🧽 6. Erase & Restore Tool")
-    if base_image:
-        action = st.radio("Action:", ("Erase (Blemish Remover Filter)", "Restore (Reset Layer)"))
+        action = st.radio("অ্যাকশন:", ("Erase / Smooth Blemish", "Reset"))
         if st.button(apply_txt, type="primary", use_container_width=True):
             if "Erase" in action: out = base_image.filter(ImageFilter.MedianFilter(size=3))
             else: out = base_image
             with col_v2:
                 st.image(out, caption="Processed Image", use_container_width=True)
                 buf = io.BytesIO(); out.save(buf, format="JPEG", quality=100, subsampling=0)
-                st.download_button(label="📥 ডাউনলোড করুন", data=buf.getvalue(), file_name="edited_hd.jpg", mime="image/jpeg", use_container_width=True)
+                st.download_button("📥 ডাউনলোড করুন", data=buf.getvalue(), file_name="cleaned.jpg", mime="image/jpeg", use_container_width=True)
+
+# ================= MODULE 6 =================
+elif st.session_state.active_module == "6":
+    st.markdown("### 📐 6. বাঁকা আইডি কার্ড সোজা করার টুল")
+    if base_image:
+        st.info("আইডি কার্ডের কোণগুলো এডজাস্ট করুন:")
+        img_np = np.array(base_image)
+        h, w = img_np.shape[:2]
+        col_s1, col_s2 = st.columns(2)
+        with col_s1:
+            tl_x = st.slider("টপ-লেফট X", 0, w, int(w*0.05))
+            tl_y = st.slider("টপ-লেফট Y", 0, h, int(h*0.05))
+            bl_x = st.slider("বটম-লেফট X", 0, w, int(w*0.05))
+            bl_y = st.slider("বটম-লেফট Y", 0, h, int(h*0.95))
+        with col_s2:
+            tr_x = st.slider("টপ-রাইট X", 0, w, int(w*0.95))
+            tr_y = st.slider("টপ-রাইট Y", 0, h, int(h*0.05))
+            br_x = st.slider("বটম-রাইট X", 0, w, int(w*0.95))
+            br_y = st.slider("বটম-রাইট Y", 0, h, int(h*0.95))
+            
+        pts1 = np.float32([[tl_x, tl_y], [tr_x, tr_y], [bl_x, bl_y], [br_x, br_y]])
+        pts2 = np.float32([[0, 0], [w, 0], [0, h], [w, h]])
+        matrix = cv2.getPerspectiveTransform(pts1, pts2)
+        result_np = cv2.warpPerspective(img_np, matrix, (w, h))
+        out = Image.fromarray(result_np)
+        
+        with col_v2:
+            st.image(out, caption="Fixed ID Card", use_container_width=True)
+            buf = io.BytesIO(); out.save(buf, format="JPEG", quality=100, subsampling=0)
+            st.download_button("📥 সোজা করা আইডি ডাউনলোড করুন", data=buf.getvalue(), file_name="fixed_id.jpg", mime="image/jpeg", use_container_width=True)
 
 # ================= MODULE 7 =================
 elif st.session_state.active_module == "7":
-    st.markdown("### 📜 7. প্রত্যয়ন পত্র ও ছাড়পত্র ফরম জেনারেটর")
+    st.markdown("### 📜 7. প্রতাপ ফটো ও প্রত্যয়ন পত্র জেনারেটর")
     doc_type = st.selectbox("নথিপত্রের ধরণ:", ["নাগরিক/চারিত্রিক প্রত্যয়ন পত্র", "স্কুল/কলেজ ছাড়পত্র (Transfer Certificate)"])
     col_f1, col_f2 = st.columns(2)
     with col_f1:
@@ -409,7 +354,7 @@ elif st.session_state.active_module == "7":
 
 # ================= MODULE 8 =================
 elif st.session_state.active_module == "8":
-    st.markdown("### 📝 8. প্রফেশনাল সিভি মেকার")
+    st.markdown("### 📝 8. প্রফেশনাল সিভি/বায়োডাটা মেকার")
     col_c1, col_c2 = st.columns(2)
     with col_c1:
         cv_name = st.text_input("পূর্ণ নাম:", "হাসানুর রহমান")
@@ -427,10 +372,10 @@ elif st.session_state.active_module == "8":
 
 # ================= MODULE 9 =================
 elif st.session_state.active_module == "9":
-    st.markdown("### 🔗 9. পিডিএফ টুলবক্স")
-    pdf_mode = st.radio("সার্ভিস:", ["PDF Merger", "Page Delete"])
+    st.markdown("### 🔗 9. পিডিএফ টুলস (PDF Merger & Editor)")
+    pdf_mode = st.radio("সার্ভিস নির্বাচন করুন:", ["PDF Merger", "Page Delete (PDF Edit)"])
     if "Merger" in pdf_mode:
-        pdf_files = st.file_uploader("Upload PDFs:", type=["pdf"], accept_multiple_files=True)
+        pdf_files = st.file_uploader("একাধিক PDF ফাইল আপلود করুন:", type=["pdf"], accept_multiple_files=True)
         if pdf_files and len(pdf_files) >= 2:
             if st.button("Merge PDFs", type="primary", use_container_width=True):
                 writer = PdfWriter()
@@ -439,20 +384,20 @@ elif st.session_state.active_module == "9":
                     for page in reader.pages: writer.add_page(page)
                 out_pdf = io.BytesIO(); writer.write(out_pdf); writer.close()
                 st.success("Successfully Merged!")
-                st.download_button("📥 Download PDF", data=out_pdf.getvalue(), file_name="merged.pdf", mime="application/pdf", use_container_width=True)
+                st.download_button("📥 Download Merged PDF", data=out_pdf.getvalue(), file_name="merged.pdf", mime="application/pdf", use_container_width=True)
     else:
-        single_pdf = st.file_uploader("Upload PDF:", type=["pdf"])
+        single_pdf = st.file_uploader("একটি PDF ফাইল আপলোড করুন:", type=["pdf"])
         if single_pdf:
             reader = PdfReader(single_pdf); total = len(reader.pages)
-            st.info(f"Total Pages: {total}")
-            del_page = st.number_input("Delete Page No:", min_value=1, max_value=total, value=1)
+            st.info(f"মোট পেজ সংখ্যা: {total}")
+            del_page = st.number_input("যে পেজটি ডিলিট করতে চান তার নম্বর:", min_value=1, max_value=total, value=1)
             if st.button("Delete Page", type="primary", use_container_width=True):
                 writer = PdfWriter()
                 for i in range(total):
                     if i != (del_page - 1): writer.add_page(reader.pages[i])
                 out_pdf = io.BytesIO(); writer.write(out_pdf); writer.close()
-                st.success("Deleted!")
-                st.download_button("📥 Download PDF", data=out_pdf.getvalue(), file_name="edited.pdf", mime="application/pdf", use_container_width=True)
+                st.success("পেজ ডিলিট সফল হয়েছে!")
+                st.download_button("📥 Download Edited PDF", data=out_pdf.getvalue(), file_name="edited.pdf", mime="application/pdf", use_container_width=True)
 
 # ================= MODULE 10 =================
 elif st.session_state.active_module == "10":
@@ -467,9 +412,9 @@ elif st.session_state.active_module == "10":
 
 # ================= MODULE 11 =================
 else:
-    st.markdown("### 📄 11. A4 AI ডকুমেন্ট রিসাইজার")
+    st.markdown("### 📄 11. এ ফোর ডকুমেন্ট রিসাইজার (A4 Document Resizer)")
     if base_image:
-        st.info("🤖 ইন্টেলিজেন্ট কোণ ডিটেক্টর সক্রিয় রয়েছে।")
+        st.info("🤖 ডকুমেন্ট স্ক্যান ও A4 সাইজে রূপান্তর করার টুল।")
         img_np = np.array(base_image)
         h, w = img_np.shape[:2]
         a4_w, a4_h = 842, 1191 
@@ -487,14 +432,13 @@ else:
             br_y = st.slider("নিচের-ডান Y", 0, h, int(h*0.98))
             
         doc_filter = st.radio("স্ক্যান টাইপ:", ["Magic Enhancer", "Black & White Scan", "Original Color Fixed"])
-        brightness_val = st.slider("উজ্জ্বলতা:", 0.5, 2.0, 1.2, step=0.1)
-        contrast_val = st.slider("কন্ট্রাস্ট:", 0.5, 2.5, 1.4, step=0.1)
+        brightness_val = st.slider("উজ্জ্বলতা:", 0.5, 2.0, 1.2, 0.1)
+        contrast_val = st.slider("কন্ট্রাস্ট:", 0.5, 2.5, 1.4, 0.1)
 
-        if st.button("স্মার্ট এআই প্রসেসিং শুরু করুন", type="primary", use_container_width=True):
+        if st.button("A4 রিসাইজ প্রসেস করুন", type="primary", use_container_width=True):
             with st.spinner("Processing A4..."):
                 pts_src = np.float32([[tl_x, tl_y], [tr_x, tr_y], [bl_x, bl_y], [br_x, br_y]])
                 pts_dst = np.float32([[0, 0], [a4_w, 0], [0, a4_h], [a4_w, a4_h]])
-                
                 matrix = cv2.getPerspectiveTransform(pts_src, pts_dst)
                 warped_np = cv2.warpPerspective(img_np, matrix, (a4_w, a4_h))
                 
@@ -511,6 +455,6 @@ else:
                     st.image(processed_img, caption="A4 Scanned Copy", use_container_width=True)
                     buf = io.BytesIO()
                     processed_img.save(buf, format="JPEG", quality=100, subsampling=0)
-                    st.download_button(label="📥 ডাউনলোড A4 HD ডকুমেন্ট", data=buf.getvalue(), file_name="A4_document.jpg", mime="image/jpeg", use_container_width=True)
+                    st.download_button("📥 ডাউনলোড A4 HD ডকুমেন্ট", data=buf.getvalue(), file_name="A4_document.jpg", mime="image/jpeg", use_container_width=True)
 
 st.markdown(f"<div class='footer'>{footer_text}</div>", unsafe_allow_html=True)
