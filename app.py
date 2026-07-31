@@ -200,7 +200,6 @@ if st.session_state.active_module == "1":
             with st.spinner("এআই দিয়ে অত্যন্ত নিখুঁতভাবে ব্যাকগ্রাউন্ড রিমুভ করা হচ্ছে..."):
                 try:
                     if REMBG_AVAILABLE:
-                        # alpha_matting দিয়ে প্রান্তগুলো একদম মসৃণ ও নিখুঁত করা হয়েছে
                         output_image = remove(
                             base_image, 
                             session=ai_session, 
@@ -440,8 +439,6 @@ else:
                 processed_img = ImageEnhance.Brightness(processed_img).enhance(brightness_val)
                 processed_img = ImageEnhance.Contrast(processed_img).enhance(contrast_val)
                 
-                if "Black & White", doc_filter: # handled clean
-                    pass
                 if "Black & White Scan" in doc_filter:
                     processed_img = processed_img.convert("L")
                 elif "Magic Enhancer" in doc_filter:
