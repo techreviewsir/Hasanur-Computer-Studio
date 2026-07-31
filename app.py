@@ -5,6 +5,7 @@ from PIL import Image, ImageOps, ImageDraw, ImageFont
 import streamlit as st
 from pypdf import PdfReader
 from datetime import date
+from rembg import remove
 
 # পেজের লেআউট সেটআপ
 st.set_page_config(page_title="হাসানুর কম্পিউটার স্টুডিও / Hasanur Computer Studio", layout="wide")
@@ -122,7 +123,7 @@ st.sidebar.header(t['menu_header'])
 
 menu_dict = {
     1: ("✨ ইমেজ ব্রাইটনেস ও কালার এডিটর", "ছবির আলো, ব্রাইটনেস ও কন্ট্রাস্ট ঠিক করার টুল।"),
-    2: ("🖼️ ছবির কালার ব্যাকগ্রাউন্ড বা ফ্রেম বদল", "ছবির চারপাশে সুন্দর ফ্রেম বা কালার ব্যাকগ্রাউন্ড দিন।"),
+    2: ("🎨 স্টুডিও ব্যাকগ্রাউন্ড রিমুভ ও কালার চেঞ্জার", "পাসপোর্ট ছবির ব্যাকগ্রাউন্ড নিখুঁতভাবে রিমুভ করে নতুন কালার দিন।"),
     3: ("🆔 আইডি কার্ড ক্রপ ও সোজা করার টুল", "আইডি কার্ড ক্রপ ও নির্দিষ্ট কোণে ঘোরানো।"),
     4: ("🛂 পাসপোর্ট সাইজ ছবি শিট তৈরি (৪ কপি)", "এক ক্লিকে ৪ কপি পাসপোর্ট ছবি শিট তৈরি।"),
     5: ("🎂 বয়স ক্যালকুলেটর (Age Calculator)", "নির্ভুল বয়স ও দিন-মাস হিসাব।"),
@@ -145,7 +146,7 @@ for num, (item_name, desc) in menu_dict.items():
 app_mode = st.session_state.app_mode
 
 # =====================================================================
-# ফিচারসমূহ হ্যান্ডলিং (ক্র্যাশ মুক্ত)
+# ফিচারসমূহ হ্যান্ডলিং
 # =====================================================================
 
 if app_mode == 1:
@@ -165,23 +166,39 @@ if app_mode == 1:
         st.info("👋 অনুগ্রহ করে উপরে একটি ছবি আপলোড করুন।")
 
 elif app_mode == 2:
-    st.header("🖼️ ছবির কালার ব্যাকগ্রাউন্ড বা ফ্রেম বদল")
+    st.header("🎨 স্টুডিও ব্যাকগ্রাউন্ড রিমুভ ও কালার চেঞ্জার")
     if global_file is not None:
-        img = Image.open(global_file).convert("RGB")
-        st.image(img, caption="Original Image", width=300)
-        border_size = st.slider("Border / Background Padding Size", 0, 100, 20)
-        color_choice = st.color_picker("Pick Background/Border Color", "#0B50FA")
+        image = Image.open(global_file).convert("RGB")
+        st.image(image, caption="Original Image", width=300)
         
-        if st.button("Apply Background / Border"):
-            # Hex to RGB
-            h = color_choice.lstrip('#')
-            rgb_col = tuple(int(h[i:i+2], 16) for i in (0, 2, 4))
-            new_img = ImageOps.expand(img, border=border_size, fill=rgb_col)
-            st.image(new_img, use_container_width=True, caption="Processed Image")
-            
-            buf = io.BytesIO()
-            new_img.save(buf, format="JPEG", quality=95)
-            st.download_button("Download Processed Image", buf.getvalue(), "custom_bg.jpg", "image/jpeg", key="dl_bg")
+        st.markdown("### ব্যাকগ্রাউন্ড কালার নির্বাচন করুন:")
+        bg_color_picker = st.color_picker("নতুন ব্যাকগ্রাউন্ড রঙ", "#336699") # ডিফল্ট স্টুডিও ব্লু
+        
+        if st.button("ব্যাকগ্রাউন্ড পরিবর্তন করুন"):
+            with st.spinner("ব্যাকগ্রাউন্ড রিমুভ করা হচ্ছে, অনুগ্রহ করে অপেক্ষা করুন..."):
+                try:
+                    # রিমুভবিজি দিয়ে ব্যাকগ্রাউন্ড রিমুভ করে ট্রান্সপারেন্ট পিএনজি করা
+                    input_bytes = global_file.getvalue()
+                    output_bytes = remove(input_bytes)
+                    img_transparent = Image.open(io.BytesIO(output_bytes)).convert("RGBA")
+                    
+                    # হেক্স কালারকে RGB তে রূপান্তর
+                    h_hex = bg_color_picker.lstrip('#')
+                    new_rgb = tuple(int(h_hex[i:i+2], 16) for i in (0, 2, 4))
+                    
+                    # নতুন কালারের ব্যাকগ্রাউন্ড ক্যানভাস তৈরি
+                    background = Image.new("RGBA", img_transparent.size, new_rgb + (255,))
+                    
+                    # ছবির ওপর ব্যাকগ্রাউন্ড কম্পোজিট করা
+                    final_img = Image.alpha_composite(background, img_transparent).convert("RGB")
+                    
+                    st.image(final_img, use_container_width=True, caption="Studio Background Changed Image")
+                    
+                    buf = io.BytesIO()
+                    final_img.save(buf, format="JPEG", quality=95)
+                    st.download_button("Download Studio Image", buf.getvalue(), "studio_bg.jpg", "image/jpeg", key="dl_bg")
+                except Exception as e:
+                    st.error(f"দুঃখিত, ব্যাকগ্রাউন্ড পরিবর্তনে সমস্যা হয়েছে: {e}")
     else:
         st.warning("দয়া করে ছবি আপলোড করুন।")
 
