@@ -25,6 +25,11 @@ def FB_blur_fusion_foreground_estimator(image, F, B, alpha, r=90):
     F = np.clip(F, 0, 1)
     return F, blurred_B
 
+# ক্যাশ রিসোর্স দিয়ে হালকা মডেল লোড করা যাতে সার্ভার ক্র্যাশ না করে
+@st.cache_resource
+def get_rembg_session():
+    return new_session("u2net")
+
 # পেজের লেআউট সেটআপ
 st.set_page_config(page_title="হাসানুর কম্পিউটার স্টুডিও / Hasanur Computer Studio", layout="wide")
 
@@ -139,7 +144,7 @@ st.markdown(f"""
 </div>
 """, unsafe_allow_html=True)
 
-# ফাইল আপলোডার অপশনটি হেডার লেখার ঠিক নিচে বসানো হয়েছে
+# ফাইল আপলোডার অপশনটি হেডার লেখার ঠিক নিচে বসানো হয়েছে
 st.markdown(f"### {t['upload_header']}")
 global_file = st.file_uploader(t['upload_label'], type=["jpg", "jpeg", "png", "pdf"])
 
@@ -172,20 +177,20 @@ if is_eng:
 else:
     menu_dict = {
         1: ("✨ এআই ব্যাকগ্রাউন্ড রিমুভার ও কাস্টম ব্যাকগ্রাউন্ড স্টুডিও", "ব্যাকগ্রাউন্ড রিমুভ করে সলিড কালার কিংবা কম্পিউটার থেকে কাস্টম ছবি ব্যাকগ্রাউন্ডে সেট করুন।"),
-        2: ("📱 স্যামসাং S26 আলট্রা এআই অবজেক্ট এডিটর", "এআই প্রম্পট দিয়ে ছবির অবজেক্ট ও লাইটিং এডিট।"),
+        2: ("📱 স্যামসাং S26 আলট্রা এআই অবজেক্ট এডিটর", "এআই প্রম্পট দিয়ে ছবির অবজেক্ট ও লাইটিং এডিট।"),
         3: ("☀️ ইমেজ ব্রাইটনেস ও এনহ্যান্সার", "ছবির আলো ও কন্ট্রাস্ট পারফেক্ট করা।"),
         4: ("🆔 আইডি কার্ড ক্রপ ও সোজা করার টুল", "আইডি কার্ড ক্রপ ও নির্দিষ্ট কোণে ঘোরানো।"),
         5: ("🛂 পাসপোর্ট সাইজ ছবি শিট তৈরি (৪ কপি)", "এক ক্লিকে ৪ কপি পাসপোর্ট ছবি শিট তৈরি।"),
-        6: ("🎂 বয়স ক্যালকুলেটর (Age Calculator)", "নির্ভুল বয়স ও দিন-মাস হিসাব।"),
-        7: ("🧾 দোকানের ক্যাশ মেমো / রশিদ জেনারেটর", "গ্রাহকের বিক্রয় রশিদ ও ক্যাশ মেমো তৈরি।"),
-        8: ("🛡️ ডিজিটাল ওয়ারেন্টি কার্ড জেনারেটর", "পণ্যের ডিজিটাল ওয়ারেন্টি কার্ড তৈরি।"),
-        9: ("📜 নাগরিক সনদ (Citizenship Certificate) জেনারেটর", "ইউনিয়ন পরিষদের নাগরিক সনদপত্র তৈরি।"),
-        10: ("⚽ টুর্নামেন্ট আমন্ত্রণপত্র ও নিয়মাবলী (Badminton/Football)", "ফুটবল বা ব্যাডমিন্টন টুর্নামেন্ট নোটিশ তৈরি।"),
-        11: ("📏 ছবির সাইজ পরিবর্তন ও রিসাইজার", "পিক্সেল অনুযায়ী ছবির সাইজ ছোট-বড় করা।"),
+        6: ("🎂 বয়স ক্যালকুলেটর (Age Calculator)", "নির্ভুল বয়স ও দিন-মাস হিসাব।"),
+        7: ("🧾 দোকানের ক্যাশ মেমো / রশিদ জেনারেটর", "গ্রাহকের বিক্রয় রশিদ ও ক্যাশ মেমো তৈরি।"),
+        8: ("🛡️ ডিজিটাল ওয়ারেন্টি কার্ড জেনারেটর", "পণ্যের ডিজিটাল ওয়ারেন্টি কার্ড তৈরি।"),
+        9: ("📜 নাগরিক সনদ (Citizenship Certificate) জেনারেটর", "ইউনিয়ন পরিষদের নাগরিক সনদপত্র তৈরি।"),
+        10: ("⚽ টুর্নামেন্ট আমন্ত্রণপত্র ও নিয়মাবলী (Badminton/Football)", "ফুটবল বা ব্যাডমিন্টন টুর্নামেন্ট নোটিশ তৈরি।"),
+        11: ("📏 ছবির সাইজ পরিবর্তন ও রিসাইজার", "পিক্সেল অনুযায়ী ছবির সাইজ ছোট-বড় করা।"),
         12: ("⬛ সাদাকালো (Black & White) কনভার্টার", "কালার ছবিকে সাদাকালো করা।"),
         13: ("🔄 ছবি ঘোরানো (Rotate & Flip)", "ছবি বিভিন্ন এঙ্গেলে ঘোরানো।"),
-        14: ("🖼️ ছবি বর্ডার ও ফ্রেম যুক্ত করা", "ছবির চারপাশে সুন্দর বর্ডার ও ফ্রেম দেওয়া।"),
-        15: ("💧 ওয়াটারমার্ক যুক্ত করার টুল", "ছবিতে নিজের নাম বা লোগো ওয়াটারমার্ক দেওয়া।"),
+        14: ("🖼️ ছবি বর্ডার ও ফ্রেম যুক্ত করা", "ছবির চারপাশে সুন্দর বর্ডার ও ফ্রেম দেওয়া।"),
+        15: ("💧 ওয়াটারমার্ক যুক্ত করার টুল", "ছবিতে নিজের নাম বা লোগো ওয়াটারমার্ক দেওয়া।"),
         16: ("📄 পিডিএফ টেক্সট ও ছবি এক্সট্র্যাক্ট টুল", "পিডিএফ ফাইল থেকে টেক্সট আলাদা করা।")
     }
 
@@ -205,7 +210,6 @@ if app_mode == 1:
     if global_file is not None:
         file_extension = global_file.name.split('.')[-1].lower()
         if file_extension in ['jpg', 'jpeg', 'png']:
-            # ব্যাকগ্রাউন্ড পরিবর্তনের অপশন: সলিড কালার অথবা কম্পিউটার থেকে কাস্টম ছবি
             bg_mode = st.radio("Choose Background Type" if is_eng else "ব্যাকগ্রাউন্ডের ধরণ নির্বাচন করুন", ["Solid Color" if is_eng else "একক কালার (Solid Color)", "Custom Image from Computer" if is_eng else "কম্পিউটার থেকে কাস্টম ব্যাকগ্রাউন্ড ছবি"])
             
             custom_bg_file = None
@@ -222,7 +226,7 @@ if app_mode == 1:
             with col2:
                 if st.button("Remove Background & Apply Custom Studio" if is_eng else "ব্যাকগ্রাউন্ড রিমুভ ও কাস্টম ব্যাকগ্রাউন্ড সেট করুন", key="btn_rem_1"):
                     with st.spinner("Processing advanced AI edge refinement & custom background..." if is_eng else "উন্নত এআই প্রসেসিং ও কাস্টম ব্যাকগ্রাউন্ড সেটআপ চলছে..."):
-                        session = new_session("birefnet-general")
+                        session = get_rembg_session()
                         output_bytes = remove(global_file.getvalue(), session=session)
                         foreground_pil = Image.open(io.BytesIO(output_bytes)).convert("RGBA")
                         orig_pil = Image.open(global_file).convert("RGB").resize(foreground_pil.size)
@@ -250,7 +254,7 @@ if app_mode == 1:
                         final_image.save(buf, format="JPEG", quality=95)
                         st.download_button("📥 Download HD Image" if is_eng else "📥 HD ছবি ডাউনলোড করুন", buf.getvalue(), "custom_bg_removed_hd.jpg", "image/jpeg", key="dl_1")
         else:
-            st.warning("Please upload a valid image file." if is_eng else "দয়া করে একটি ছবি ফাইল আপলোড করুন।")
+            st.warning("Please upload a valid image file." if is_eng else "দয়া করে একটি ছবি ফাইল আপলোড করুন।")
     else:
         st.info("👋 **Welcome!** Please select a file above." if is_eng else "👋 **স্বাগতম!** উপরে ফাইল আপলোড করুন।")
 
@@ -330,7 +334,7 @@ elif app_mode == 5:
         st.warning("Please upload an image above.")
 
 elif app_mode == 6:
-    st.header("🎂 " + ("Age Calculator" if is_eng else "নিখুঁত বয়স ক্যালকুলেটর টুল"))
+    st.header("🎂 " + ("Age Calculator" if is_eng else "নিখুঁত বয়স ক্যালকুলেটর টুল"))
     col1, col2 = st.columns(2)
     with col1:
         birth_date = st.date_input("Select Birth Date", date(1995, 1, 1))
@@ -352,7 +356,7 @@ elif app_mode == 6:
             st.success(f"🎉 Age: **{years} Years, {months} Months, and {days} Days**")
 
 elif app_mode == 7:
-    st.header("🧾 " + ("Shop Cash Memo / Receipt Generator" if is_eng else "দোকানের বিক্রয় রশিদ (Cash Memo) জেনারেটর"))
+    st.header("🧾 " + ("Shop Cash Memo / Receipt Generator" if is_eng else "দোকানের বিক্রয় রশিদ (Cash Memo) জেনারেটর"))
     cust_name = st.text_input("Customer Name", "Md. Rahim Uddin")
     cust_phone = st.text_input("Customer Phone Number", "01700000000")
     col1, col2, col3 = st.columns(3)
@@ -438,7 +442,7 @@ elif app_mode == 9:
         st.success("Citizenship certificate generated!")
 
 elif app_mode == 10:
-    st.header("⚽ " + ("Tournament Invitation & Rules Generator" if is_eng else "টুর্নামেন্ট আমন্ত্রণপত্র ও নিয়মাবলী জেনারেটর"))
+    st.header("⚽ " + ("Tournament Invitation & Rules Generator" if is_eng else "টুর্নামেন্ট আমন্ত্রণপত্র ও নিয়মাবলী জেনারেটর"))
     t_type = st.selectbox("Select Tournament Type", ["Football Tournament", "Badminton Tournament"])
     col1, col2 = st.columns(2)
     with col1:
@@ -512,7 +516,7 @@ elif app_mode == 14:
         st.warning("Please upload an image above.")
 
 elif app_mode == 15:
-    st.header("💧 " + ("Watermark Adding Tool" if is_eng else "টেক্সট ওয়াটারমার্ক টুল"))
+    st.header("💧 " + ("Watermark Adding Tool" if is_eng else "টেক্সট ওয়াটারমার্ক টুল"))
     if global_file is not None:
         file_extension = global_file.name.split('.')[-1].lower()
         if file_extension in ['jpg', 'jpeg', 'png']:
@@ -554,7 +558,7 @@ col_a, col_b = st.columns(2)
 with col_a:
     st.markdown("""
     <div class="link-box">
-        <h4>🏛️ উন্মুক্ত বিশ্ববিদ্যালয় (Open University)</h4>
+        <h4>🏛️ উন্মুক্ত বিশ্ববিদ্যালয় (Open University)</h4>
         <p><b>লিংক:</b> <a href="https://www.bou.ac.bd/" target="_blank">BOU Official Website</a></p>
     </div>
     <div class="link-box">
@@ -562,11 +566,11 @@ with col_a:
         <p><b>লিংক:</b> <a href="https://bdris.gov.bd/" target="_blank">BDRIS Portal</a></p>
     </div>
     <div class="link-box">
-        <h4>📇 জাতীয় পরিচয়পত্র (NID Services)</h4>
+        <h4>📇 জাতীয় পরিচয়পত্র (NID Services)</h4>
         <p><b>লিংক:</b> <a href="https://services.nidw.gov.bd/" target="_blank">NID Card Portal</a></p>
     </div>
     <div class="link-box">
-        <h4>🎓 জাতীয় বিশ্ববিদ্যালয় (National University)</h4>
+        <h4>🎓 জাতীয় বিশ্ববিদ্যালয় (National University)</h4>
         <p><b>লিংক:</b> <a href="https://www.nu.ac.bd/" target="_blank">NU Portal & Admissions</a></p>
     </div>
     <div class="link-box">
@@ -578,7 +582,7 @@ with col_a:
         <p><b>লিংক:</b> <a href="https://eticket.railway.gov.bd/" target="_blank">Bangladesh Railway E-Ticket</a></p>
     </div>
     <div class="link-box">
-        <h4>🏫 পাবলিক বিশ্ববিদ্যালয় (Public Universities)</h4>
+        <h4>🏫 পাবলিক বিশ্ববিদ্যালয় (Public Universities)</h4>
         <p><b>লিংক:</b> <a href="https://uccas.gov.bd/" target="_blank">UG Admission Portal</a></p>
     </div>
     <div class="link-box">
@@ -599,54 +603,7 @@ with col_a:
     </div>
     <div class="link-box">
         <h4>⚡ বিদ্যুৎ (Electricity Bill Pay)</h4>
-        <p><b>লিংক:</b> <a href="https://www.bpdb.gov.bd/" target="_blank">BPDB & DESCO Bill Portal</a></p>
+        <p><b>লিংক:</b> <a href="https://www.bpdb.gov.bd/" target="_blank">BPDB Portal</a></p>
     </div>
-    """, unsafe_allow_html=True)
-
-with col_b:
-    st.markdown("""
-    <div class="link-box">
-        <h4>👵 ভাতা সংক্রান্ত (Social Safety Net Allowances)</h4>
-        <p><b>লিংক:</b> <a href="https://www.mis.bhata.gov.bd/" target="_blank">Old Age & Widow Allowance Portal</a></p>
-    </div>
-    <div class="link-box">
-        <h4>✈️ ভিসা (Visa Processing & Verification)</h4>
-        <p><b>লিংক:</b> <a href="https://www.visa.gov.bd/" target="_blank">Bangladesh Visa Portal</a></p>
-    </div>
-    <div class="link-box">
-        <h4>🗺️ ভূমি সংক্রান্ত (Land & e-Mutation)</h4>
-        <p><b>লিংক:</b> <a href="https://land.gov.bd/" target="_blank">Land e-Mutation & Khatian Portal</a></p>
-    </div>
-    <div class="link-box">
-        <h4>💳 ভ্যাট / ই-টিন (e-TIN & Income Tax)</h4>
-        <p><b>লিংক:</b> <a href="https://secure.incometax.gov.bd/" target="_blank">NBR e-TIN Registration Portal</a></p>
-    </div>
-    <div class="link-box">
-        <h4>🎖️ মুক্তিযোদ্ধা (Freedom Fighter Portal)</h4>
-        <p><b>লিংক:</b> <a href="http://www.molwa.gov.bd/" target="_blank">Ministry of Liberation War Affairs</a></p>
-    </div>
-    <div class="link-box">
-        <h4>🏥 মেডিকেল (Medical & Health Services)</h4>
-        <p><b>লিংক:</b> <a href="https://dghs.gov.bd/" target="_blank">DGHS Health Portal</a></p>
-    </div>
-    <div class="link-box">
-        <h4>📊 রেজাল্ট (Education Board Results)</h4>
-        <p><b>লিংক:</b> <a href="http://www.educationboardresults.gov.bd/" target="_blank">Education Board Result Portal</a></p>
-    </div>
-    <div class="link-box">
-        <h4>🚗 লাইসেন্স (BRTA Driving License)</h4>
-        <p><b>লিংক:</b> <a href="https://bsp.brta.gov.bd/" target="_blank">BRTA Service Portal</a></p>
-    </div>
-    <div class="link-box">
-        <h4>📚 শিক্ষা বোর্ড (Inter & Secondary Education Board)</h4>
-        <p><b>লিংক:</b> <a href="https://nctb.gov.bd/" target="_blank">NCTB & Education Boards</a></p>
-    </div>
-    <div class="link-box">
-        <h4>💼 সরকারি চাকরিজীবী (All-Jobs & Public Service)</h4>
-        <p><b>লিংক:</b> <a href="http://bpsc.teletalk.com.bd/" target="_blank">BPSC Portal & All Jobs</a></p>
-    </div>
-    <div class="link-box">
-        <h4>🛠️ স্টুডিও টুলস (Hasanur Studio Dashboard)</h4>
-        <p><b>লিংক:</b> <a href="#" target="_blank">Master Studio Tools (Active)</a></p>
     </div>
     """, unsafe_allow_html=True)
