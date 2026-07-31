@@ -4,3 +4,4 @@ numpy
 pillow
 rembg
 pypdf
+onnxruntime
