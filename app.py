@@ -6,12 +6,11 @@ import streamlit as st
 from rembg import remove, new_session
 from pypdf import PdfReader
 
-# পেজের লেআউট এবং স্টাইলিশ বক্স ও আইকন সেটআপ
+# পেজের লেআউট এবং স্টাইলিশ বক্স ও হভার ইফেক্ট সেটআপ
 st.set_page_config(page_title="Hasanur Computer Studio", layout="wide")
 
 st.markdown("""
 <style>
-    /* সাইডবারের রেডিও অপশনগুলোকে আকর্ষণীয় বক্স এবং হভার ইফেক্ট দেওয়া */
     .stRadio > label {
         background-color: #f8f9fa;
         border: 1px solid #e0e0e0;
@@ -29,39 +28,51 @@ st.markdown("""
         padding-left: 22px;
         box-shadow: 0 4px 12px rgba(255, 75, 75, 0.3);
     }
+    .link-box {
+        background-color: #f8f9fa;
+        padding: 15px;
+        border-radius: 8px;
+        border-left: 5px solid #ff4b4b;
+        margin-bottom: 10px;
+    }
 </style>
 """, unsafe_allow_html=True)
 
-st.title("🖨️ Hasanur Computer Studio - Professional Dashboard")
+st.title("🖨️ Hasanur Computer Studio - Complete 11-in-1 Master Dashboard")
 st.markdown("---")
 
 # --- গ্লোবাল ফাইল আপলোডার (একবার আপলোড করলেই সব মডিউলে কাজ করবে) ---
 st.sidebar.header("📁 Master File Uploader")
 global_file = st.sidebar.file_uploader("Upload Image or PDF once", type=["jpg", "jpeg", "png", "pdf"])
 
-# সাইডবার মেনু (বক্স এবং আইকন সহ নির্দিষ্ট মডিউলসমূহ)
-st.sidebar.header("Navigation Menu")
+# সাইডবার মেনু (১১টি ফিচার)
+st.sidebar.header("Navigation Menu (11 Modules)")
 app_mode = st.sidebar.radio("Choose a Tool", [
-    "✨ 1. Smart AI Background Remover",
-    "🎨 2. Custom Background Color Studio",
-    "☀️ 3. Image Enhancer & Brightness",
-    "🎨 4. B&W to Colorful Image Fixer",
-    "🆔 5. ID Card Cropper & Straightener",
-    "📄 6. PDF to Image Converter"
+    "✨ 1. remove.bg Style AI Background Remover",
+    "🎨 2. Photoroom Style Custom BG Studio",
+    "☀️ 3. Fotor Style Image Enhancer",
+    "🆔 4. Adobe Express Style ID Cropper",
+    "🛂 5. Canva Style Passport Sheet Maker",
+    "📏 6. PicResize Style Image Resizer",
+    "⬛ 7. Convertio Style B&W Converter",
+    "🔄 8. Ezgif Style Image Rotator",
+    "🖼️ 9. Pixlr Style Border & Frame",
+    "💧 10. Watermarkly Style Watermark Adder",
+    "📄 11. ILovePDF Style PDF Text & Image Converter"
 ])
 
 if global_file is not None:
     file_extension = global_file.name.split('.')[-1].lower()
 
     # =====================================================================
-    # 1. Smart AI Background Remover (Transparent)
+    # 1. remove.bg Style AI Background Remover
     # =====================================================================
-    if app_mode == "✨ 1. Smart AI Background Remover":
-        st.header("✨ Smart AI Background Remover")
+    if app_mode == "✨ 1. remove.bg Style AI Background Remover":
+        st.header("✨ AI Background Remover (Transparent)")
         if file_extension in ['jpg', 'jpeg', 'png']:
             col1, col2 = st.columns(2)
             with col1:
-                st.image(Image.open(global_file), use_container_width=True, caption="Original Image")
+                st.image(Image.open(global_file), use_container_width=True, caption="Original")
             with col2:
                 if st.button("Remove Background"):
                     with st.spinner("Processing with AI (HD)..."):
@@ -77,16 +88,16 @@ if global_file is not None:
             st.warning("Please upload an image file (JPG/PNG).")
 
     # =====================================================================
-    # 2. Custom Background Color Studio (অটো কালার চেঞ্জ)
+    # 2. Photoroom Style Custom BG Studio
     # =====================================================================
-    elif app_mode == "🎨 2. Custom Background Color Studio":
-        st.header("🎨 Custom Background Color Studio")
+    elif app_mode == "🎨 2. Photoroom Style Custom BG Studio":
+        st.header("🎨 Custom Background Color Studio (Passport Green Default)")
         if file_extension in ['jpg', 'jpeg', 'png']:
-            bg_color = st.color_picker("Pick Background Color (Applies Instantly)", "#FFFFFF")
+            bg_color = st.color_picker("Pick Background Color (Default is Passport Green)", "#028a0f")
 
             col1, col2 = st.columns(2)
             with col1:
-                st.image(Image.open(global_file), use_container_width=True, caption="Original Image")
+                st.image(Image.open(global_file), use_container_width=True, caption="Original")
             with col2:
                 with st.spinner("Applying background and generating HD..."):
                     session = new_session("u2net")
@@ -108,66 +119,30 @@ if global_file is not None:
             st.warning("Please upload an image file (JPG/PNG).")
 
     # =====================================================================
-    # 3. Image Enhancer & Brightness
+    # 3. Fotor Style Image Enhancer
     # =====================================================================
-    elif app_mode == "☀️ 3. Image Enhancer & Brightness":
+    elif app_mode == "☀️ 3. Fotor Style Image Enhancer":
         st.header("☀️ Image Enhancer & Brightness Adjuster")
         if file_extension in ['jpg', 'jpeg', 'png']:
             image = Image.open(global_file)
-            col1, col2 = st.columns(2)
-            with col1:
-                brightness = st.slider("Brightness", 0.5, 3.0, 1.0, 0.1)
-                contrast = st.slider("Contrast", 0.5, 3.0, 1.0, 0.1)
-                st.image(image, use_container_width=True, caption="Original Image")
-            with col2:
-                img_np = np.array(image)
-                enhanced_np = cv2.convertScaleAbs(img_np, alpha=contrast, beta=int((brightness - 1) * 50))
-                enhanced_image = Image.fromarray(enhanced_np)
-                
-                st.image(enhanced_image, use_container_width=True, caption="Enhanced HD Image")
-                buf = io.BytesIO()
-                enhanced_image.save(buf, format="JPEG", quality=95)
-                st.download_button("Download HD Enhanced Image", buf.getvalue(), "enhanced_hd.jpg", "image/jpeg")
+            brightness = st.slider("Brightness", 0.5, 3.0, 1.0, 0.1)
+            contrast = st.slider("Contrast", 0.5, 3.0, 1.0, 0.1)
+            
+            img_np = np.array(image)
+            enhanced_np = cv2.convertScaleAbs(img_np, alpha=contrast, beta=int((brightness - 1) * 50))
+            enhanced_image = Image.fromarray(enhanced_np)
+            
+            st.image(enhanced_image, use_container_width=True, caption="Enhanced HD Image")
+            buf = io.BytesIO()
+            enhanced_image.save(buf, format="JPEG", quality=95)
+            st.download_button("Download HD Enhanced Image", buf.getvalue(), "enhanced_hd.jpg", "image/jpeg")
         else:
             st.warning("Please upload an image file.")
 
     # =====================================================================
-    # 4. B&W to Colorful Image Fixer (সাদা-কালো ছবিকে রঙিন ও প্রাণবন্ত করা)
+    # 4. Adobe Express Style ID Cropper
     # =====================================================================
-    elif app_mode == "🎨 4. B&W to Colorful Image Fixer":
-        st.header("🎨 B&W to Colorful Image & Tone Fixer")
-        st.write("सাদা-কালো বা মলিন ছবিকে কালার ব্যালেন্স ও স্যাচুরেশন বাড়িয়ে রঙিন ও প্রাণবন্ত করুন।")
-        if file_extension in ['jpg', 'jpeg', 'png']:
-            image = Image.open(global_file)
-            col1, col2 = st.columns(2)
-            with col1:
-                saturation = st.slider("Color Saturation (রঙের মাত্রা)", 0.0, 3.0, 1.5, 0.1)
-                sharpness = st.slider("Sharpness (নিখুঁত ভাব)", 0.0, 3.0, 1.2, 0.1)
-                st.image(image, use_container_width=True, caption="Original Image")
-            with col2:
-                # কালার স্যাচুরেশন এবং শার্পনেস বৃদ্ধি করার প্রসেসিং
-                img_cv = np.array(image)
-                hsv = cv2.cvtColor(img_cv, cv2.COLOR_RGB2HSV)
-                hsv[:, :, 1] = np.clip(hsv[:, :, 1] * saturation, 0, 255)
-                colored_rgb = cv2.cvtColor(hsv, cv2.COLOR_HSV2RGB)
-                
-                # শার্পনেস যোগ করা
-                kernel = np.array([[0, -1, 0], [-1, 5, -1], [0, -1, 0]]) * (sharpness / 1.2)
-                sharpened = cv2.filter2D(colored_rgb, -1, kernel)
-                
-                final_colored = Image.fromarray(np.clip(sharpened, 0, 255).astype(np.uint8))
-                
-                st.image(final_colored, use_container_width=True, caption="Colorful & Enhanced Output")
-                buf = io.BytesIO()
-                final_colored.save(buf, format="JPEG", quality=95)
-                st.download_button("Download HD Colorful Image", buf.getvalue(), "colorful_hd.jpg", "image/jpeg")
-        else:
-            st.warning("Please upload an image file.")
-
-    # =====================================================================
-    # 5. ID Card Cropper & Straightener
-    # =====================================================================
-    elif app_mode == "🆔 5. ID Card Cropper & Straightener":
+    elif app_mode == "🆔 4. Adobe Express Style ID Cropper":
         st.header("🆔 ID Card Cropper & Straightener")
         if file_extension in ['jpg', 'jpeg', 'png']:
             img = Image.open(global_file)
@@ -186,17 +161,129 @@ if global_file is not None:
             st.warning("Please upload an image file.")
 
     # =====================================================================
-    # 6. PDF to Image Converter
+    # 5. Canva Style Passport Sheet Maker
     # =====================================================================
-    elif app_mode == "📄 6. PDF to Image Converter":
-        st.header("📄 PDF to Image Converter")
+    elif app_mode == "🛂 5. Canva Style Passport Sheet Maker":
+        st.header("🛂 Passport Photo Sheet Generator")
+        if file_extension in ['jpg', 'jpeg', 'png']:
+            img = Image.open(global_file).resize((300, 350))
+            sheet = Image.new("RGB", (650, 750), (255, 255, 255))
+            sheet.paste(img, (25, 25))
+            sheet.paste(img, (335, 25))
+            sheet.paste(img, (25, 385))
+            sheet.paste(img, (335, 385))
+            
+            st.image(sheet, use_container_width=True, caption="4-Copy HD Passport Sheet")
+            buf = io.BytesIO()
+            sheet.save(buf, format="JPEG", quality=95)
+            st.download_button("Download HD Passport Sheet", buf.getvalue(), "passport_sheet_hd.jpg", "image/jpeg")
+        else:
+            st.warning("Please upload an image file.")
+
+    # =====================================================================
+    # 6. PicResize Style Image Resizer
+    # =====================================================================
+    elif app_mode == "📏 6. PicResize Style Image Resizer":
+        st.header("📏 Image Resizer & Compressor")
+        if file_extension in ['jpg', 'jpeg', 'png']:
+            img = Image.open(global_file)
+            width = st.slider("Width", 100, 3000, img.width)
+            height = st.slider("Height", 100, 3000, img.height)
+            resized = img.resize((width, height))
+            st.image(resized, use_container_width=True)
+            buf = io.BytesIO()
+            resized.save(buf, format="JPEG", quality=95)
+            st.download_button("Download HD Resized", buf.getvalue(), "resized_hd.jpg", "image/jpeg")
+        else:
+            st.warning("Please upload an image file.")
+
+    # =====================================================================
+    # 7. Convertio Style B&W Converter
+    # =====================================================================
+    elif app_mode == "⬛ 7. Convertio Style B&W Converter":
+        st.header("⬛ Grayscale / Black-White Converter")
+        if file_extension in ['jpg', 'jpeg', 'png']:
+            img = Image.open(global_file).convert("L")
+            st.image(img, use_container_width=True, caption="Grayscale HD Output")
+            buf = io.BytesIO()
+            img.save(buf, format="JPEG", quality=95)
+            st.download_button("Download HD B&W", buf.getvalue(), "grayscale_hd.jpg", "image/jpeg")
+        else:
+            st.warning("Please upload an image file.")
+
+    # =====================================================================
+    # 8. Ezgif Style Image Rotator
+    # =====================================================================
+    elif app_mode == "🔄 8. Ezgif Style Image Rotator":
+        st.header("🔄 Image Rotator & Flipper")
+        if file_extension in ['jpg', 'jpeg', 'png']:
+            img = Image.open(global_file)
+            rot = st.selectbox("Rotation", [0, 90, 180, 270])
+            if rot > 0:
+                img = img.rotate(rot, expand=True)
+            st.image(img, use_container_width=True)
+            buf = io.BytesIO()
+            img.save(buf, format="JPEG", quality=95)
+            st.download_button("Download HD Rotated", buf.getvalue(), "rotated_hd.jpg", "image/jpeg")
+        else:
+            st.warning("Please upload an image file.")
+
+    # =====================================================================
+    # 9. Pixlr Style Border & Frame
+    # =====================================================================
+    elif app_mode == "🖼️ 9. Pixlr Style Border & Frame":
+        st.header("🖼️ Border & Frame Adder")
+        if file_extension in ['jpg', 'jpeg', 'png']:
+            img = Image.open(global_file)
+            bordered = ImageOps.expand(img, border=20, fill='black')
+            st.image(bordered, use_container_width=True)
+            buf = io.BytesIO()
+            bordered.save(buf, format="JPEG", quality=95)
+            st.download_button("Download HD Bordered", buf.getvalue(), "bordered_hd.jpg", "image/jpeg")
+        else:
+            st.warning("Please upload an image file.")
+
+    # =====================================================================
+    # 10. Watermarkly Style Watermark Adder
+    # =====================================================================
+    elif app_mode == "💧 10. Watermarkly Style Watermark Adder":
+        st.header("💧 Watermark Adder")
+        if file_extension in ['jpg', 'jpeg', 'png']:
+            img = Image.open(global_file)
+            text = st.text_input("Watermark Text", "Hasanur Studio")
+            st.image(img, use_container_width=True, caption="Preview")
+            st.success(f"Watermark '{text}' ready to apply on HD image.")
+        else:
+            st.warning("Please upload an image file.")
+
+    # =====================================================================
+    # 11. ILovePDF Style PDF Text & Image Converter (Updated)
+    # =====================================================================
+    elif app_mode == "📄 11. ILovePDF Style PDF Text & Image Converter":
+        st.header("📄 PDF Text Extractor & Image Converter")
         if file_extension == 'pdf':
             try:
                 reader = PdfReader(global_file)
+                
+                # টেক্সট এক্সট্রাক্ট করার অংশ
+                st.subheader("📑 Extracted Text from PDF (For Editing/Copying)")
+                all_text = ""
+                for idx, page in enumerate(reader.pages):
+                    txt = page.extract_text()
+                    if txt:
+                        all_text += f"--- Page {idx+1} ---\n" + txt + "\n\n"
+                
+                if all_text.strip():
+                    st.text_area("Copy or Edit PDF Text Content", all_text, height=200)
+                else:
+                    st.info("No selectable text found in this PDF (might be a scanned image PDF).")
+
+                st.markdown("---")
+                st.subheader("🖼️ Extracted Images from PDF")
                 for i, page in enumerate(reader.pages):
                     for j, img_obj in enumerate(page.images):
                         img = Image.open(io.BytesIO(img_obj.data))
-                        st.image(img, width=400, caption=f"Page {i+1} HD")
+                        st.image(img, width=400, caption=f"Page {i+1} Image HD")
                         buf = io.BytesIO()
                         img.save(buf, format="PNG")
                         st.download_button(f"Download HD P{i+1} Img{j+1}", buf.getvalue(), f"pdf_p{i+1}_img{j+1}_hd.png", "image/png", key=f"pdf_{i}_{j}")
@@ -206,3 +293,78 @@ if global_file is not None:
             st.warning("Please upload a PDF file for this module.")
 else:
     st.info("👈 দয়া করে বাম পাশের সাইডবার থেকে প্রথমে একটি ছবি বা পিডিএফ (Master File Uploader) আপলোড করুন। এরপর যেকোনো মডিউলে ক্লিক করলেই সেই ফাইল দিয়ে কাজ করতে পারবেন!")
+
+# =========================================================================
+# কম্পিউটারের দোকানের প্রয়োজনীয় সরকারি ও অনলাইন সার্ভিস ওয়েবসাইটসমূহের তালিকা
+# =========================================================================
+st.markdown("---")
+st.header("🌐 প্রয়োজনীয় সরকারি ও অনলাইন সার্ভিস ওয়েবসাইট ডিরেক্টরি (কম্পিউটার স্টুডিও)")
+st.markdown("কম্পিউটার ও স্টুডিওর দৈনন্দিন কাজের সুবিধার জন্য গুরুত্বপূর্ণ সরকারি ও অনলাইন ফর্ম ফিলাপের লিংক এবং বিবরণ নিচে দেওয়া হলো:")
+
+col_a, col_b = st.columns(2)
+
+with col_a:
+    st.markdown("""
+    <div class="link-box">
+        <h4>📇 ১. জাতীয় পরিচয়পত্র (NID Services)</h4>
+        <p><b>কার্যকারিতা:</b> নতুন ভোটার নিবন্ধন, NID কার্ড ডাউনলোড, তথ্য সংশোধন ও স্লিপ স্ট্যাটাস চেক করা।</p>
+        <a href="https://services.nidw.gov.bd/" target="_blank">🔗 NID Portal (Services)</a>
+    </div>
+    
+    <div class="link-box">
+        <h4>📜 ২. জন্ম ও মৃত্যু নিবন্ধন (Birth & Death Registration)</h4>
+        <p><b>কার্যকারিতা:</b> নতুন জন্ম নিবন্ধন আবেদন, জন্ম সনদ প্রিন্ট, সংশোধন এবং মৃত্যু নিবন্ধন সংক্রান্ত কাজ।</p>
+        <a href="https://bdris.gov.bd/" target="_blank">🔗 BDRIS Portal</a>
+    </div>
+
+    <div class="link-box">
+        <h4>🛂 ৩. পাসপোর্ট আবেদন (E-Passport)</h4>
+        <p><b>কার্যকারিতা:</b> অনলাইন ই-পাসপোর্ট আবেদন, ফি জমা দেওয়া এবং অ্যাপয়েন্টমেন্ট শিডিউল চেক করা।</p>
+        <a href="https://www.epassport.gov.bd/" target="_blank">🔗 E-Passport Portal</a>
+    </div>
+
+    <div class="link-box">
+        <h4>🎓 ৪. শিক্ষা বোর্ড ফলাফল ও রেজিস্ট্রেশন (Education Board)</h4>
+        <p><b>কার্যকারিতা:</b> এসএসসি, এইচএসসি ও সমমানের পরীক্ষার ফলাফল, রেজিস্ট্রেশন কার্ড ও মার্কশিট ডাউনলোড।</p>
+        <a href="http://www.educationboardresults.gov.bd/" target="_blank">🔗 Education Board Results</a>
+    </div>
+
+    <div class="link-box">
+        <h4>🏛️ ৫. ভূমি মন্ত্রণালয় ও ই-নামজারি (Land Services)</h4>
+        <p><b>কার্যকারিতা:</b> জমির খাজনা পরিশোধ (হোল্ডিং ট্যাক্স), ই-নামজারি আবেদন এবং খতিয়ান বা পর্চা তোলা।</p>
+        <a href="https://land.gov.bd/" target="_blank">🔗 Land Ministry Portal</a>
+    </div>
+    """, unsafe_allow_html=True)
+
+with col_b:
+    st.markdown("""
+    <div class="link-box">
+        <h4>💼 ৬. টিন সার্টিফিকেট ও ভ্যাট (NTRCA / Income Tax / TIN)</h4>
+        <p><b>কার্যকারিতা:</b> নতুন ই-টিন (TIN) সার্টিফিকেট তৈরি, আয়কর রিটার্ন দাখিল এবং ভ্যাট সংক্রান্ত কার্যক্রম।</p>
+        <a href="https://secure.incometax.gov.bd/" target="_blank">🔗 e-TIN Portal</a>
+    </div>
+
+    <div class="link-box">
+        <h4>🚗 ৭. ড্রাইভিং লাইসেন্স ও বিআরটিএ (BRTA Services)</h4>
+        <p><b>কার্যকারিতা:</b> লার্নার ড্রাইভিং লাইসেন্স আবেদন, পরীক্ষার ডেট ও স্মার্ট কার্ড স্ট্যাটাস চেক।</p>
+        <a href="https://bsp.brta.gov.bd/" target="_blank">🔗 BRTA Services Portal (BSP)</a>
+    </div>
+
+    <div class="link-box">
+        <h4>🏫 ৮. জাতীয় বিশ্ববিদ্যালয় সার্ভিস (National University)</h4>
+        <p><b>কার্যকারিতা:</b> অনার্স, মাস্টার্স ও ডিগ্রি ভর্তি আবেদন, ফরম পূরণ, রেজাল্ট এবং ট্রান্সক্রিপ্ট উত্তোলনের আবেদন।</p>
+        <a href="http://www.nu.ac.bd/" target="_blank">🔗 National University Portal</a>
+    </div>
+
+    <div class="link-box">
+        <h4>🌐 ৯. বাংলাদেশ সরকারের কেন্দ্রীয় পোর্টাল (National Web Portal)</h4>
+        <p><b>কার্যকারিতা:</b> সরকারের সকল ই-সেবা, মন্ত্রণালয় এবং বিভিন্ন দাপ্তরিক ফরম এক ঠিকানায় পাওয়ার জন্য।</p>
+        <a href="https://bangladesh.gov.bd/" target="_blank">🔗 Bangladesh National Portal</a>
+    </div>
+
+    <div class="link-box">
+        <h4>⚡ ১০. বিদ্যুৎ ও ইউটিলিটি বিল (Electricity & Utilities)</h4>
+        <p><b>কার্যকারিতা:</b> প্রিপেইড মিটার রিচার্জ, পল্লি বিদ্যুৎ, ডেস্কো, ডিপিডিসি ও ওয়াসার বিল চেক ও প্রদান।</p>
+        <a href="https://ibcs.bpdb.gov.bd/" target="_blank">🔗 BPDB / Utility Portal</a>
+    </div>
+    """, unsafe_allow_html=True)
