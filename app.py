@@ -3,7 +3,7 @@ import cv2
 import numpy as np
 from PIL import Image, ImageEnhance, ImageFilter
 import io
-from pypdf import PdfMerger, PdfReader, PdfWriter
+from pypdf import PdfReader, PdfWriter
 
 # rembg এরর হ্যান্ডেল করার জন্য নিরাপদ ইম্পোর্ট
 try:
@@ -99,7 +99,7 @@ if app_mode == "📷 ফটো প্রসেসিং ল্যাব":
                 with st.spinner("ফটোশপ ইঞ্জিন প্রসেস করছে..."):
                     if "১." in tool_option:
                         if not REMBG_AVAILABLE:
-                            st.error("⚠️ AI ইঞ্জিন লোড হচ্ছে।")
+                            st.error("⚠️ AI ব্যাকগ্রাউন্ড রিমুভার ইঞ্জিনটি লোড হচ্ছে।")
                         else:
                             h = bg_choice.lstrip('#')
                             bg_rgb = tuple(int(h[i:i+2], 16) for i in (0, 2, 4))
@@ -158,7 +158,7 @@ if app_mode == "📷 ফটো প্রসেসিং ল্যাব":
                             warped = cv2.warpPerspective(open_cv_image, M, (max_width, max_height))
                             processed_image = Image.fromarray(cv2.cvtColor(warped, cv2.COLOR_BGR2RGB))
                         else:
-                            st.warning("⚠️ আইডি কার্ড সনাক্ত করা যায়নি।")
+                            st.warning("⚠️ আইডি CARD সনাক্ত করা যায়নি।")
                             processed_image = base_image
                     elif "৫." in tool_option:
                         if rotate_angle != 0:
@@ -214,13 +214,15 @@ else:
         if pdf_files and len(pdf_files) >= 2:
             if st.button("🔗 পিডিএফ ফাইলগুলো একসাথে জোড়া দিন"):
                 with st.spinner("পিডিএফ মার্জ করা হচ্ছে..."):
-                    merger = PdfMerger()
+                    writer = PdfWriter()
                     for pdf in pdf_files:
-                        merger.append(pdf)
+                        reader = PdfReader(pdf)
+                        for page in reader.pages:
+                            writer.add_page(page)
                     
                     output_pdf = io.BytesIO()
-                    merger.write(output_pdf)
-                    merger.close()
+                    writer.write(output_pdf)
+                    writer.close()
                     
                     st.success("✅ সফলভাবে ফাইলগুলো জোড়া দেওয়া হয়েছে!")
                     st.download_button(
@@ -243,13 +245,11 @@ else:
             total_pages = len(reader.pages)
             st.success(f"📊 এই ফাইলটিতে মোট {total_pages}টি পেজ আছে।")
             
-            # কোন পেজটি বাদ দিতে চান তা সিলেক্ট করা (১ থেকে শুরু)
             page_to_delete = st.number_input(f"কোন নম্বর পেজটি বাদ দিতে চান? (১ থেকে {total_pages} এর মধ্যে)", min_value=1, max_value=total_pages, value=1)
             
             if st.button("❌ পেজ বাদ দিয়ে নতুন ফাইল তৈরি করুন"):
                 with st.spinner("পেজ বাদ দেওয়া হচ্ছে..."):
                     writer = PdfWriter()
-                    # পাইথনে পেজ ইনডেক্স ০ থেকে শুরু হয়, তাই ১ বিয়োগ করা হয়েছে
                     delete_index = page_to_delete - 1 
                     
                     for i in range(total_pages):
