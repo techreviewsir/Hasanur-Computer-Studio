@@ -139,9 +139,7 @@ st.markdown(f"""
 </div>
 """, unsafe_allow_html=True)
 
-# =====================================================================
-# ফাইল আপলোডার অপশনটি এখন হেডার লেখার ঠিক নিচে (মেইন স্ক্রিনের শুরুতে) বসানো হয়েছে
-# =====================================================================
+# ফাইল আপলোডার অপশনটি হেডার লেখার ঠিক নিচে বসানো হয়েছে
 st.markdown(f"### {t['upload_header']}")
 global_file = st.file_uploader(t['upload_label'], type=["jpg", "jpeg", "png", "pdf"])
 
@@ -154,43 +152,41 @@ st.sidebar.header(t['menu_header'])
 
 if is_eng:
     menu_dict = {
-        1: ("✨ AI Background Remover & HD Downloader", "Remove background, change color and download HD image."),
-        2: ("🎨 Custom Background & Color Studio", "Set studio quality custom background color or custom image from computer."),
-        3: ("📱 Samsung S26 Ultra AI Object Editor", "Edit object and lighting using AI prompts."),
-        4: ("☀️ Image Brightness & Enhancer", "Perfect image lighting and contrast."),
-        5: ("🆔 ID Card Crop & Rotate Tool", "Crop ID card and rotate at specific angles."),
-        6: ("🛂 Passport Size Photo Sheet (4 Copies)", "Generate 4-copy passport photo sheet in one click."),
-        7: ("🎂 Age Calculator", "Accurate age and day-month calculation."),
-        8: ("🧾 Shop Cash Memo / Receipt Generator", "Create customer sales receipt and cash memo."),
-        9: ("🛡️ Digital Warranty Card Generator", "Create digital warranty card for products."),
-        10: ("📜 Citizenship Certificate Generator", "Create union parishad citizenship certificate."),
-        11: ("⚽ Tournament Invitation & Rules (Football/Badminton)", "Create tournament notice and guidelines."),
-        12: ("📏 Image Size Changer & Resizer", "Resize images according to pixel measurements."),
-        13: ("⬛ Black & White Converter", "Convert color image to black and white."),
-        14: ("🔄 Image Rotate & Flip", "Rotate and flip images in various angles."),
-        15: ("🖼️ Image Border & Frame Tool", "Add beautiful borders and frames around images."),
-        16: ("💧 Watermark Adding Tool", "Add custom name or logo watermark to images."),
-        17: ("📄 PDF Text & Image Extract Tool", "Extract text content from PDF files.")
+        1: ("✨ AI Background Remover & Custom Background Studio", "Remove background, use solid color or custom image from computer and download HD image."),
+        2: ("📱 Samsung S26 Ultra AI Object Editor", "Edit object and lighting using AI prompts."),
+        3: ("☀️ Image Brightness & Enhancer", "Perfect image lighting and contrast."),
+        4: ("🆔 ID Card Crop & Rotate Tool", "Crop ID card and rotate at specific angles."),
+        5: ("🛂 Passport Size Photo Sheet (4 Copies)", "Generate 4-copy passport photo sheet in one click."),
+        6: ("🎂 Age Calculator", "Accurate age and day-month calculation."),
+        7: ("🧾 Shop Cash Memo / Receipt Generator", "Create customer sales receipt and cash memo."),
+        8: ("🛡️ Digital Warranty Card Generator", "Create digital warranty card for products."),
+        9: ("📜 Citizenship Certificate Generator", "Create union parishad citizenship certificate."),
+        10: ("⚽ Tournament Invitation & Rules (Football/Badminton)", "Create tournament notice and guidelines."),
+        11: ("📏 Image Size Changer & Resizer", "Resize images according to pixel measurements."),
+        12: ("⬛ Black & White Converter", "Convert color image to black and white."),
+        13: ("🔄 Image Rotate & Flip", "Rotate and flip images in various angles."),
+        14: ("🖼️ Image Border & Frame Tool", "Add beautiful borders and frames around images."),
+        15: ("💧 Watermark Adding Tool", "Add custom name or logo watermark to images."),
+        16: ("📄 PDF Text & Image Extract Tool", "Extract text content from PDF files.")
     }
 else:
     menu_dict = {
-        1: ("✨ এআই ব্যাকগ্রাউন্ড রিমুভার ও এইচডি ডাউনলোডার", "ছবির ব্যাকগ্রাউন্ড রিমুভ ও কালার পরিবর্তন এবং ডাউনলোড।"),
-        2: ("🎨 কাস্টম ব্যাকগ্রাউন্ড কালার ও ছবি স্টুডিও", "স্টুডিও কোয়ালিটি কালার কিংবা কম্পিউটার থেকে কাস্টম ব্যাকগ্রাউন্ড ছবি সেট করা।"),
-        3: ("📱 স্যামসাং S26 আলট্রা এআই অবজেক্ট এডিটর", "এআই প্রম্পট দিয়ে ছবির অবজেক্ট ও লাইটিং এডিট।"),
-        4: ("☀️ ইমেজ ব্রাইটনেস ও এনহ্যান্সার", "ছবির আলো ও কন্ট্রাস্ট পারফেক্ট করা।"),
-        5: ("🆔 আইডি কার্ড ক্রপ ও সোজা করার টুল", "আইডি কার্ড ক্রপ ও নির্দিষ্ট কোণে ঘোরানো।"),
-        6: ("🛂 পাসপোর্ট সাইজ ছবি শিট তৈরি (৪ কপি)", "এক ক্লিকে ৪ কপি পাসপোর্ট ছবি শিট তৈরি।"),
-        7: ("🎂 বয়স ক্যালকুলেটর (Age Calculator)", "নির্ভুল বয়স ও দিন-মাস হিসাব।"),
-        8: ("🧾 দোকানের ক্যাশ মেমো / রশিদ জেনারেটর", "গ্রাহকের বিক্রয় রশিদ ও ক্যাশ মেমো তৈরি।"),
-        9: ("🛡️ ডিজিটাল ওয়ারেন্টি কার্ড জেনারেটর", "পণ্যের ডিজিটাল ওয়ারেন্টি কার্ড তৈরি।"),
-        10: ("📜 নাগরিক সনদ (Citizenship Certificate) জেনারেটর", "ইউনিয়ন পরিষদের নাগরিক সনদপত্র তৈরি।"),
-        11: ("⚽ টুর্নামেন্ট আমন্ত্রণপত্র ও নিয়মাবলী (Badminton/Football)", "ফুটবল বা ব্যাডমিন্টন টুর্নামেন্ট নোটিশ তৈরি।"),
-        12: ("📏 ছবির সাইজ পরিবর্তন ও রিসাইজার", "পিক্সেল অনুযায়ী ছবির সাইজ ছোট-বড় করা।"),
-        13: ("⬛ সাদাকালো (Black & White) কনভার্টার", "কালার ছবিকে সাদাকালো করা।"),
-        14: ("🔄 ছবি ঘোরানো (Rotate & Flip)", "ছবি বিভিন্ন এঙ্গেলে ঘোরানো।"),
-        15: ("🖼️ ছবি বর্ডার ও ফ্রেম যুক্ত করা", "ছবির চারপাশে সুন্দর বর্ডার ও ফ্রেম দেওয়া।"),
-        16: ("💧 ওয়াটারমার্ক যুক্ত করার টুল", "ছবিতে নিজের নাম বা লোগো ওয়াটারমার্ক দেওয়া।"),
-        17: ("📄 পিডিএফ টেক্সট ও ছবি এক্সট্র্যাক্ট টুল", "পিডিএফ ফাইল থেকে টেক্সট আলাদা করা।")
+        1: ("✨ এআই ব্যাকগ্রাউন্ড রিমুভার ও কাস্টম ব্যাকগ্রাউন্ড স্টুডিও", "ব্যাকগ্রাউন্ড রিমুভ করে সলিড কালার কিংবা কম্পিউটার থেকে কাস্টম ছবি ব্যাকগ্রাউন্ডে সেট করুন।"),
+        2: ("📱 স্যামসাং S26 আলট্রা এআই অবজেক্ট এডিটর", "এআই প্রম্পট দিয়ে ছবির অবজেক্ট ও লাইটিং এডিট।"),
+        3: ("☀️ ইমেজ ব্রাইটনেস ও এনহ্যান্সার", "ছবির আলো ও কন্ট্রাস্ট পারফেক্ট করা।"),
+        4: ("🆔 আইডি কার্ড ক্রপ ও সোজা করার টুল", "আইডি কার্ড ক্রপ ও নির্দিষ্ট কোণে ঘোরানো।"),
+        5: ("🛂 পাসপোর্ট সাইজ ছবি শিট তৈরি (৪ কপি)", "এক ক্লিকে ৪ কপি পাসপোর্ট ছবি শিট তৈরি।"),
+        6: ("🎂 বয়স ক্যালকুলেটর (Age Calculator)", "নির্ভুল বয়স ও দিন-মাস হিসাব।"),
+        7: ("🧾 দোকানের ক্যাশ মেমো / রশিদ জেনারেটর", "গ্রাহকের বিক্রয় রশিদ ও ক্যাশ মেমো তৈরি।"),
+        8: ("🛡️ ডিজিটাল ওয়ারেন্টি কার্ড জেনারেটর", "পণ্যের ডিজিটাল ওয়ারেন্টি কার্ড তৈরি।"),
+        9: ("📜 নাগরিক সনদ (Citizenship Certificate) জেনারেটর", "ইউনিয়ন পরিষদের নাগরিক সনদপত্র তৈরি।"),
+        10: ("⚽ টুর্নামেন্ট আমন্ত্রণপত্র ও নিয়মাবলী (Badminton/Football)", "ফুটবল বা ব্যাডমিন্টন টুর্নামেন্ট নোটিশ তৈরি।"),
+        11: ("📏 ছবির সাইজ পরিবর্তন ও রিসাইজার", "পিক্সেল অনুযায়ী ছবির সাইজ ছোট-বড় করা।"),
+        12: ("⬛ সাদাকালো (Black & White) কনভার্টার", "কালার ছবিকে সাদাকালো করা।"),
+        13: ("🔄 ছবি ঘোরানো (Rotate & Flip)", "ছবি বিভিন্ন এঙ্গেলে ঘোরানো।"),
+        14: ("🖼️ ছবি বর্ডার ও ফ্রেম যুক্ত করা", "ছবির চারপাশে সুন্দর বর্ডার ও ফ্রেম দেওয়া।"),
+        15: ("💧 ওয়াটারমার্ক যুক্ত করার টুল", "ছবিতে নিজের নাম বা লোগো ওয়াটারমার্ক দেওয়া।"),
+        16: ("📄 পিডিএফ টেক্সট ও ছবি এক্সট্র্যাক্ট টুল", "পিডিএফ ফাইল থেকে টেক্সট আলাদা করা।")
     }
 
 for num, (item_name, desc) in menu_dict.items():
@@ -201,61 +197,22 @@ for num, (item_name, desc) in menu_dict.items():
 app_mode = st.session_state.app_mode
 
 # =====================================================================
-# মূল ফিচারসমূহ হ্যান্ডলিং (১ থেকে ১৭)
+# মূল ফিচারসমূহ হ্যান্ডলিং (১ থেকে ১৬)
 # =====================================================================
 
 if app_mode == 1:
-    st.header("✨ " + ("AI Background Remover & HD Downloader" if is_eng else "এআই ব্যাকগ্রাউন্ড রিমুভার ও এইচডি ডাউনলোডার"))
+    st.header("✨ " + ("AI Background Remover & Custom Background Studio" if is_eng else "এআই ব্যাকগ্রাউন্ড রিমুভার ও কাস্টম ব্যাকগ্রাউন্ড স্টুডিও"))
     if global_file is not None:
         file_extension = global_file.name.split('.')[-1].lower()
         if file_extension in ['jpg', 'jpeg', 'png']:
-            bg_color = st.color_picker("Choose Background Color" if is_eng else "ব্যাকগ্রাউন্ডের কালার পছন্দ করুন", "#0B50FA")
-            col1, col2 = st.columns(2)
-            with col1:
-                st.image(Image.open(global_file), use_container_width=True, caption="Original Image" if is_eng else "আসল ছবি")
-            with col2:
-                if st.button("Remove Background & Change Color" if is_eng else "ব্যাকগ্রাউন্ড রিমুভ ও কালার পরিবর্তন করুন", key="btn_rem_1"):
-                    with st.spinner("Processing advanced AI edge refinement..." if is_eng else "উন্নত এআই প্রসেসিং চলছে..."):
-                        session = new_session("birefnet-general")
-                        output_bytes = remove(global_file.getvalue(), session=session)
-                        foreground_pil = Image.open(io.BytesIO(output_bytes)).convert("RGBA")
-                        orig_pil = Image.open(global_file).convert("RGB").resize(foreground_pil.size)
-                        
-                        img_np = np.array(orig_pil).astype(np.float32) / 255.0
-                        alpha_np = np.array(foreground_pil.split()[-1]).astype(np.float32) / 255.0
-                        
-                        refined_fg_np = FB_blur_fusion_foreground_estimator_2(img_np, alpha_np)
-                        refined_fg_np = np.clip(refined_fg_np * 255, 0, 255).astype(np.uint8)
-                        
-                        alpha_uint8 = (alpha_np * 255).astype(np.uint8)
-                        foreground = Image.fromarray(np.dstack((refined_fg_np, alpha_uint8)), "RGBA")
-                        
-                        hex_code = bg_color.lstrip('#')
-                        bg_rgb = tuple(int(hex_code[i:i+2], 16) for i in (0, 2, 4))
-                        background = Image.new("RGBA", foreground.size, bg_rgb + (255,))
-                        final_image = Image.alpha_composite(background, foreground).convert("RGB")
-                        
-                        st.image(final_image, use_container_width=True, caption=f"Background Color: {bg_color}")
-                        buf = io.BytesIO()
-                        final_image.save(buf, format="JPEG", quality=95)
-                        st.download_button("📥 Download HD Image" if is_eng else "📥 HD ছবি ডাউনলোড করুন", buf.getvalue(), "bg_removed_hd.jpg", "image/jpeg", key="dl_1")
-        else:
-            st.warning("Please upload a valid image file." if is_eng else "দয়া করে একটি ছবি ফাইল আপলোড করুন।")
-    else:
-        st.info("👋 **Welcome!** Please select a file above." if is_eng else "👋 **স্বাগতম!** উপরে ফাইল আপলোড করুন।")
-
-elif app_mode == 2:
-    st.header("🎨 " + ("Custom Background & Color Studio" if is_eng else "কাস্টম ব্যাকগ্রাউন্ড কালার ও ছবি স্টুডিও"))
-    if global_file is not None:
-        file_extension = global_file.name.split('.')[-1].lower()
-        if file_extension in ['jpg', 'jpeg', 'png']:
+            # ব্যাকগ্রাউন্ড পরিবর্তনের অপশন: সলিড কালার অথবা কম্পিউটার থেকে কাস্টম ছবি
             bg_mode = st.radio("Choose Background Type" if is_eng else "ব্যাকগ্রাউন্ডের ধরণ নির্বাচন করুন", ["Solid Color" if is_eng else "একক কালার (Solid Color)", "Custom Image from Computer" if is_eng else "কম্পিউটার থেকে কাস্টম ব্যাকগ্রাউন্ড ছবি"])
             
             custom_bg_file = None
             bg_color = "#0B50FA"
             
             if "Color" in bg_mode or "কালার" in bg_mode:
-                bg_color = st.color_picker("Select Studio Background Color" if is_eng else "স্টুডিও ব্যাকগ্রাউন্ড কালার নির্বাচন করুন", "#0B50FA")
+                bg_color = st.color_picker("Select Background Color" if is_eng else "ব্যাকগ্রাউন্ডের কালার পছন্দ করুন", "#0B50FA")
             else:
                 custom_bg_file = st.file_uploader("Upload Custom Background Image from Computer" if is_eng else "কম্পিউটার থেকে কাস্টম ব্যাকগ্রাউন্ড ছবি আপলোড করুন", type=["jpg", "jpeg", "png"])
             
@@ -263,8 +220,8 @@ elif app_mode == 2:
             with col1:
                 st.image(Image.open(global_file), use_container_width=True, caption="Original Image" if is_eng else "আসল ছবি")
             with col2:
-                if st.button("Generate Custom Studio HD Image" if is_eng else "কাস্টম স্টুডিও HD ছবি তৈরি করুন", key="btn_studio_2"):
-                    with st.spinner("Processing studio background..." if is_eng else "স্টুডিও ব্যাকগ্রাউন্ড প্রসেসিং চলছে..."):
+                if st.button("Remove Background & Apply Custom Studio" if is_eng else "ব্যাকগ্রাউন্ড রিমুভ ও কাস্টম ব্যাকগ্রাউন্ড সেট করুন", key="btn_rem_1"):
+                    with st.spinner("Processing advanced AI edge refinement & custom background..." if is_eng else "উন্নত এআই প্রসেসিং ও কাস্টম ব্যাকগ্রাউন্ড সেটআপ চলছে..."):
                         session = new_session("birefnet-general")
                         output_bytes = remove(global_file.getvalue(), session=session)
                         foreground_pil = Image.open(io.BytesIO(output_bytes)).convert("RGBA")
@@ -288,14 +245,16 @@ elif app_mode == 2:
                             background = Image.new("RGBA", foreground.size, bg_rgb + (255,))
                             final_image = Image.alpha_composite(background, foreground).convert("RGB")
                         
-                        st.image(final_image, use_container_width=True, caption="Custom Background Result" if is_eng else "কাস্টম ব্যাকগ্রাউন্ড আউটপুট")
+                        st.image(final_image, use_container_width=True, caption="Custom Studio Background Output" if is_eng else "কাস্টম স্টুডিও ব্যাকগ্রাউন্ড আউটপুট")
                         buf = io.BytesIO()
                         final_image.save(buf, format="JPEG", quality=95)
-                        st.download_button("Download Custom Studio Image" if is_eng else "কাস্টম স্টুডিও ছবি ডাউনলোড করুন", buf.getvalue(), "custom_studio_hd.jpg", "image/jpeg", key="dl_2")
+                        st.download_button("📥 Download HD Image" if is_eng else "📥 HD ছবি ডাউনলোড করুন", buf.getvalue(), "custom_bg_removed_hd.jpg", "image/jpeg", key="dl_1")
+        else:
+            st.warning("Please upload a valid image file." if is_eng else "দয়া করে একটি ছবি ফাইল আপলোড করুন।")
     else:
-        st.warning("Please upload an image above." if is_eng else "দয়া করে উপরে একটি ছবি আপলোড করুন।")
+        st.info("👋 **Welcome!** Please select a file above." if is_eng else "👋 **স্বাগতম!** উপরে ফাইল আপলোড করুন।")
 
-elif app_mode == 3:
+elif app_mode == 2:
     st.header("📱 " + ("Samsung S26 Ultra AI Object Editor" if is_eng else "স্যামসাং S26 আলট্রা এআই অবজেক্ট ও প্রম্পট এডিটর"))
     if global_file is not None:
         file_extension = global_file.name.split('.')[-1].lower()
@@ -305,7 +264,7 @@ elif app_mode == 3:
                 st.image(Image.open(global_file), use_container_width=True, caption="Original Image")
             with col2:
                 prompt = st.text_input("Enter AI Command" if is_eng else "এআই কমান্ড লিখুন", "Enhance and refine object lighting")
-                if st.button("Start AI Processing" if is_eng else "এআই প্রসেসিং শুরু করুন", key="btn_ai_3"):
+                if st.button("Start AI Processing" if is_eng else "এআই প্রসেসিং শুরু করুন", key="btn_ai_2"):
                     with st.spinner(f"S26 Ultra AI engine processing '{prompt}'..."):
                         img = Image.open(global_file).convert("RGB")
                         img_np = np.array(img)
@@ -314,11 +273,11 @@ elif app_mode == 3:
                         st.image(final_ai_img, use_container_width=True, caption=f"AI Edit Output: {prompt}")
                         buf = io.BytesIO()
                         final_ai_img.save(buf, format="JPEG", quality=95)
-                        st.download_button("Download AI Edited Image" if is_eng else "এআই এডিটেড ছবি ডাউনলোড করুন", buf.getvalue(), "s26_ai_edited.jpg", "image/jpeg", key="dl_3")
+                        st.download_button("Download AI Edited Image" if is_eng else "এআই এডিটেড ছবি ডাউনলোড করুন", buf.getvalue(), "s26_ai_edited.jpg", "image/jpeg", key="dl_2")
     else:
         st.warning("Please upload an image above.")
 
-elif app_mode == 4:
+elif app_mode == 3:
     st.header("☀️ " + ("Image Brightness & Enhancer" if is_eng else "ছবির আলো ও কন্ট্রাস্ট ঠিক করুন"))
     if global_file is not None:
         file_extension = global_file.name.split('.')[-1].lower()
@@ -332,11 +291,11 @@ elif app_mode == 4:
             st.image(enhanced_image, use_container_width=True, caption="Enhanced Image")
             buf = io.BytesIO()
             enhanced_image.save(buf, format="JPEG", quality=95)
-            st.download_button("Download", buf.getvalue(), "enhanced.jpg", "image/jpeg", key="dl_4")
+            st.download_button("Download", buf.getvalue(), "enhanced.jpg", "image/jpeg", key="dl_3")
     else:
         st.warning("Please upload an image above.")
 
-elif app_mode == 5:
+elif app_mode == 4:
     st.header("🆔 " + ("ID Card Crop & Rotate Tool" if is_eng else "আইডি কার্ড ক্রপ ও রোটেশন টুল"))
     if global_file is not None:
         file_extension = global_file.name.split('.')[-1].lower()
@@ -348,11 +307,11 @@ elif app_mode == 5:
             st.image(img, use_container_width=True, caption="Preview")
             buf = io.BytesIO()
             img.save(buf, format="JPEG", quality=95)
-            st.download_button("Download ID Card", buf.getvalue(), "id_card.jpg", "image/jpeg", key="dl_5")
+            st.download_button("Download ID Card", buf.getvalue(), "id_card.jpg", "image/jpeg", key="dl_4")
     else:
         st.warning("Please upload an image above.")
 
-elif app_mode == 6:
+elif app_mode == 5:
     st.header("🛂 " + ("Passport Size Photo Sheet (4 Copies)" if is_eng else "পাসপোর্ট সাইজ ছবি শিট (৪ কপি)"))
     if global_file is not None:
         file_extension = global_file.name.split('.')[-1].lower()
@@ -366,18 +325,18 @@ elif app_mode == 6:
             st.image(sheet, use_container_width=True, caption="4-Copy Sheet")
             buf = io.BytesIO()
             sheet.save(buf, format="JPEG", quality=95)
-            st.download_button("Download Passport Sheet", buf.getvalue(), "passport_sheet.jpg", "image/jpeg", key="dl_6")
+            st.download_button("Download Passport Sheet", buf.getvalue(), "passport_sheet.jpg", "image/jpeg", key="dl_5")
     else:
         st.warning("Please upload an image above.")
 
-elif app_mode == 7:
+elif app_mode == 6:
     st.header("🎂 " + ("Age Calculator" if is_eng else "নিখুঁত বয়স ক্যালকুলেটর টুল"))
     col1, col2 = st.columns(2)
     with col1:
         birth_date = st.date_input("Select Birth Date", date(1995, 1, 1))
     with col2:
         target_date = st.date_input("Calculate Age Up To", date.today())
-    if st.button("Calculate Age", key="btn_age_7"):
+    if st.button("Calculate Age", key="btn_age_6"):
         if birth_date > target_date:
             st.error("Birth date cannot be in the future!")
         else:
@@ -392,7 +351,7 @@ elif app_mode == 7:
                 months += 12
             st.success(f"🎉 Age: **{years} Years, {months} Months, and {days} Days**")
 
-elif app_mode == 8:
+elif app_mode == 7:
     st.header("🧾 " + ("Shop Cash Memo / Receipt Generator" if is_eng else "দোকানের বিক্রয় রশিদ (Cash Memo) জেনারেটর"))
     cust_name = st.text_input("Customer Name", "Md. Rahim Uddin")
     cust_phone = st.text_input("Customer Phone Number", "01700000000")
@@ -407,7 +366,7 @@ elif app_mode == 8:
         item3 = st.text_input("Item 3 Name", "Online Application Fee")
         price3 = st.number_input("Item 3 Price (TK)", 0, 10000, 200)
     total_amount = price1 + price2 + price3
-    if st.button("Generate Cash Memo & Print Preview", key="btn_memo_8"):
+    if st.button("Generate Cash Memo & Print Preview", key="btn_memo_7"):
         memo_html = f"""
         <div style="background: white; padding: 25px; border-radius: 10px; border: 2px dashed #0B50FA; color: black;">
             <h2 style="text-align: center; color: #0B50FA; margin:0;">Hasanur Computer Studio</h2>
@@ -433,12 +392,12 @@ elif app_mode == 8:
         st.markdown(memo_html, unsafe_allow_html=True)
         st.success("Cash memo generated successfully!")
 
-elif app_mode == 9:
+elif app_mode == 8:
     st.header("🛡️ " + ("Digital Warranty Card Generator" if is_eng else "পণ্যের ডিজিটাল ওয়ারেন্টি কার্ড জেনারেটর"))
     p_name = st.text_input("Product Name & Model", "HP LaserJet Pro Printer")
     buyer_name = st.text_input("Buyer Name", "Md. Hasan Ali")
     w_period = st.selectbox("Warranty Period", ["1 Year", "2 Years", "3 Years", "6 Months", "Lifetime"])
-    if st.button("Generate Warranty Card", key="btn_warr_9"):
+    if st.button("Generate Warranty Card", key="btn_warr_8"):
         card_html = f"""
         <div style="background: linear-gradient(135deg, #1e3c72, #2a5298); padding: 30px; border-radius: 15px; color: white;">
             <h2 style="text-align: center; margin:0; letter-spacing: 2px;">WARRANTY CARD</h2>
@@ -453,7 +412,7 @@ elif app_mode == 9:
         st.markdown(card_html, unsafe_allow_html=True)
         st.success("Warranty card generated successfully!")
 
-elif app_mode == 10:
+elif app_mode == 9:
     st.header("📜 " + ("Citizenship Certificate Generator" if is_eng else "নাগরিক সনদপত্র জেনারেটর"))
     col1, col2 = st.columns(2)
     with col1:
@@ -464,7 +423,7 @@ elif app_mode == 10:
         c_village = st.text_input("Village / Area", "Dighirpar")
         c_union = st.text_input("Union / Municipality", "No. 2 Jhapa Union Parishad")
         c_upazila = st.text_input("Upazila & District", "Monirampur, Jashore")
-    if st.button("Preview Citizenship Certificate", key="btn_cert_10"):
+    if st.button("Preview Citizenship Certificate", key="btn_cert_9"):
         cert_html = f"""
         <div style="background: #ffffff; padding: 40px; border: 5px double #1e3c72; border-radius: 10px; color: #000;">
             <h3 style="text-align: center; margin: 0; color: #1e3c72;">Government of Bangladesh</h3>
@@ -478,7 +437,7 @@ elif app_mode == 10:
         st.markdown(cert_html, unsafe_allow_html=True)
         st.success("Citizenship certificate generated!")
 
-elif app_mode == 11:
+elif app_mode == 10:
     st.header("⚽ " + ("Tournament Invitation & Rules Generator" if is_eng else "টুর্নামেন্ট আমন্ত্রণপত্র ও নিয়মাবলী জেনারেটর"))
     t_type = st.selectbox("Select Tournament Type", ["Football Tournament", "Badminton Tournament"])
     col1, col2 = st.columns(2)
@@ -490,10 +449,10 @@ elif app_mode == 11:
         t_date = st.text_input("Date & Time", "15 February, 2026 | 3:00 PM")
         t_fee = st.text_input("Entry Fee", "1000 TK")
         t_prize = st.text_input("Prizes", "Champion: 5000 TK + Trophy")
-    if st.button("Generate Invitation", key="btn_tourn_11"):
+    if st.button("Generate Invitation", key="btn_tourn_10"):
         st.success("Tournament invitation generated successfully!")
 
-elif app_mode == 12:
+elif app_mode == 11:
     st.header("📏 " + ("Image Size Changer & Resizer" if is_eng else "ছবির সাইজ পরিবর্তন"))
     if global_file is not None:
         file_extension = global_file.name.split('.')[-1].lower()
@@ -505,11 +464,11 @@ elif app_mode == 12:
             st.image(resized, use_container_width=True)
             buf = io.BytesIO()
             resized.save(buf, format="JPEG", quality=95)
-            st.download_button("Download Resized Image", buf.getvalue(), "resized.jpg", "image/jpeg", key="dl_12")
+            st.download_button("Download Resized Image", buf.getvalue(), "resized.jpg", "image/jpeg", key="dl_11")
     else:
         st.warning("Please upload an image above.")
 
-elif app_mode == 13:
+elif app_mode == 12:
     st.header("⬛ " + ("Black & White Converter" if is_eng else "সাদাকালো ছবি কনভার্টার"))
     if global_file is not None:
         file_extension = global_file.name.split('.')[-1].lower()
@@ -518,11 +477,11 @@ elif app_mode == 13:
             st.image(img, use_container_width=True)
             buf = io.BytesIO()
             img.save(buf, format="JPEG", quality=95)
-            st.download_button("Download B&W Image", buf.getvalue(), "bw.jpg", "image/jpeg", key="dl_13")
+            st.download_button("Download B&W Image", buf.getvalue(), "bw.jpg", "image/jpeg", key="dl_12")
     else:
         st.warning("Please upload an image above.")
 
-elif app_mode == 14:
+elif app_mode == 13:
     st.header("🔄 " + ("Image Rotate & Flip" if is_eng else "ছবি ঘোরানোর টুল"))
     if global_file is not None:
         file_extension = global_file.name.split('.')[-1].lower()
@@ -534,11 +493,11 @@ elif app_mode == 14:
             st.image(img, use_container_width=True)
             buf = io.BytesIO()
             img.save(buf, format="JPEG", quality=95)
-            st.download_button("Download Rotated Image", buf.getvalue(), "rotated.jpg", "image/jpeg", key="dl_14")
+            st.download_button("Download Rotated Image", buf.getvalue(), "rotated.jpg", "image/jpeg", key="dl_13")
     else:
         st.warning("Please upload an image above.")
 
-elif app_mode == 15:
+elif app_mode == 14:
     st.header("🖼️ " + ("Add Image Border & Frame" if is_eng else "বর্ডার ও ফ্রেম যুক্ত করুন"))
     if global_file is not None:
         file_extension = global_file.name.split('.')[-1].lower()
@@ -548,11 +507,11 @@ elif app_mode == 15:
             st.image(bordered, use_container_width=True)
             buf = io.BytesIO()
             bordered.save(buf, format="JPEG", quality=95)
-            st.download_button("Download Bordered Image", buf.getvalue(), "bordered.jpg", "image/jpeg", key="dl_15")
+            st.download_button("Download Bordered Image", buf.getvalue(), "bordered.jpg", "image/jpeg", key="dl_14")
     else:
         st.warning("Please upload an image above.")
 
-elif app_mode == 16:
+elif app_mode == 15:
     st.header("💧 " + ("Watermark Adding Tool" if is_eng else "টেক্সট ওয়াটারমার্ক টুল"))
     if global_file is not None:
         file_extension = global_file.name.split('.')[-1].lower()
@@ -564,7 +523,7 @@ elif app_mode == 16:
     else:
         st.warning("Please upload an image above.")
 
-elif app_mode == 17:
+elif app_mode == 16:
     st.header("📄 " + ("PDF Text & Image Extract Tool" if is_eng else "পিডিএফ এক্সট্র্যাক্ট টুল"))
     if global_file is not None:
         file_extension = global_file.name.split('.')[-1].lower()
