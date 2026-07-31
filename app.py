@@ -88,20 +88,20 @@ if global_file is not None:
     file_extension = global_file.name.split('.')[-1].lower()
 
     # =====================================================================
-    # 1. remove.bg Style AI Background Remover (Default Blue)
+    # 1. remove.bg Style AI Background Remover (Default #0B50FA)
     # =====================================================================
     if app_mode == "✨ 1. remove.bg Style AI Background Remover":
-        st.header("✨ AI Background Remover (Default Blue / ডিফল্ট নীল ব্যাকগ্রাউন্ড)")
+        st.header("✨ AI Background Remover (Default Color: #0B50FA)")
         if file_extension in ['jpg', 'jpeg', 'png']:
-            bg_color = st.color_picker("Pick Background Color (Default is Blue)", "#0000FF")
+            bg_color = st.color_picker("Pick Background Color (Default #0B50FA)", "#0B50FA")
 
             col1, col2 = st.columns(2)
             with col1:
                 st.image(Image.open(global_file), use_container_width=True, caption="Original / আসল ছবি")
             with col2:
-                if st.button("Remove Background & Apply Blue"):
-                    with st.spinner("Processing with AI (HD)..."):
-                        session = new_session("u2net")
+                if st.button("Remove Background & Apply Custom Color"):
+                    with st.spinner("Processing with Advanced AI (HD)..."):
+                        session = new_session("u2net_human_seg")
                         output_bytes = remove(global_file.getvalue(), session=session)
                         foreground = Image.open(io.BytesIO(output_bytes)).convert("RGBA")
                         
@@ -115,24 +115,24 @@ if global_file is not None:
                         
                         buf = io.BytesIO()
                         final_image.save(buf, format="JPEG", quality=95)
-                        st.download_button("Download HD Blue Background Image", buf.getvalue(), "blue_bg_hd.jpg", "image/jpeg")
+                        st.download_button("Download HD Background Image", buf.getvalue(), "custom_bg_hd.jpg", "image/jpeg")
         else:
             st.warning("Please upload an image file (JPG/PNG).")
 
     # =====================================================================
-    # 2. Photoroom Style Custom BG Studio (Default Blue)
+    # 2. Photoroom Style Custom BG Studio (Default #0B50FA)
     # =====================================================================
     elif app_mode == "🎨 2. Photoroom Style Custom BG Studio":
-        st.header("🎨 Custom Background Color Studio (Default Blue / ডিফল্ট নীল)")
+        st.header("🎨 Custom Background Color Studio (Default Color: #0B50FA)")
         if file_extension in ['jpg', 'jpeg', 'png']:
-            bg_color = st.color_picker("Pick Background Color (Default is Blue)", "#0000FF")
+            bg_color = st.color_picker("Pick Background Color (Default #0B50FA)", "#0B50FA")
 
             col1, col2 = st.columns(2)
             with col1:
                 st.image(Image.open(global_file), use_container_width=True, caption="Original / আসল ছবি")
             with col2:
                 with st.spinner("Applying background and generating HD..."):
-                    session = new_session("u2net")
+                    session = new_session("u2net_human_seg")
                     output_bytes = remove(global_file.getvalue(), session=session)
                     foreground = Image.open(io.BytesIO(output_bytes)).convert("RGBA")
                     
@@ -394,7 +394,7 @@ with col_b:
     </div>
 
     <div class="link-box">
-        <h4>⚡ ১০. বিদ্যুৎ ও ইউটিলিটি বিল (Electricity & Utilities)</h4>
+        <h4>⚡ বিদ্যুৎ ও ইউটিলিটি বিল (Electricity & Utilities)</h4>
         <p><b>কার্যকারিতা:</b> প্রিপেইড মিটার রিচার্জ, পল্লি বিদ্যুৎ, ডেস্কো, ডিপিডিসি ও ওয়াসার বিল চেক ও প্রদান।</p>
         <a href="https://ibcs.bpdb.gov.bd/" target="_blank">🔗 BPDB / Utility Portal</a>
     </div>
