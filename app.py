@@ -6,14 +6,6 @@ import io
 import random
 from pypdf import PdfReader, PdfWriter
 
-# rembg ইম্পোর্ট এবং ইন্টেলিজেন্ট এআই সেশন তৈরি
-try:
-    from rembg import remove, new_session
-    REMBG_AVAILABLE = True
-    ai_session = new_session("u2netp") # আরও লাইটওয়েট এবং নিখুঁত মডেল
-except Exception:
-    REMBG_AVAILABLE = False
-
 # পেজ কনফিগারেশন
 st.set_page_config(page_title="হাসানুর কম্পিউটার স্টুডিও", layout="wide", page_icon="📸")
 
@@ -139,7 +131,7 @@ if lang_mode == "🇧🇩 বাংলা UI":
     apply_txt = "Apply (পরিবর্তন সেভ করুন)"
     
     b1, b2, b3, b4, b5, b6, b7, b8, b9, b10, b11 = (
-        "1. 🪄 ছবির ব্যাকগ্রাউন্ড পরিবর্তন", "2. 🪄 ছবি উন্নত করুন", "3. 🎨 ব্যাকগ্রাউন্ড কালার", "4. ✂️ ফটো ক্রপ",
+        "1. 🪄 স্টুডিও ছবি ফিক্সার ও লাইটিং", "2. 🪄 ছবি উন্নত করুন", "3. 🎨 কালার ও ব্রাইটনেস কন্ট্রোল", "4. ✂️ ফটো ক্রপ",
         "5. 🧽 অবজেক্ট রিমুভ", "6. 📐 বাঁকা আইডি কার্ড সোজা", "7. 📜 প্রতাপ ফটো ও প্রত্যয়ন", "8. 📝 সিভি/বায়োডাটা মেকার",
         "9. 🔗 পিডিএফ টুলস", "10. 🌐 অনলাইন সেবা ও লিঙ্ক", "📄 11. এ ফোর ডকুমেন্ট রিসাইজার"
     )
@@ -153,7 +145,7 @@ else:
     apply_txt = "Apply Changes"
     
     b1, b2, b3, b4, b5, b6, b7, b8, b9, b10, b11 = (
-        "1. 🪄 BG Change (AI)", "2. 🪄 Photo Enhancer", "3. 🎨 BG Color Panel", "4. ✂️ Crop Tool",
+        "1. 🪄 Studio Photo Fixer", "2. 🪄 Photo Enhancer", "3. 🎨 Color & Brightness", "4. ✂️ Crop Tool",
         "5. 🧽 Object Remover", "6. 📐 ID Card Fixer", "7. 📜 Forms & TC", "8. 📝 CV Maker",
         "9. 🔗 PDF Tools", "10. 🌐 Online Directory", "📄 11. A4 Document Resizer"
     )
@@ -186,67 +178,24 @@ if uploaded_file is not None:
     with col_v1:
         st.image(base_image, caption="Original Document/Image / মূল ফাইল", use_container_width=True)
 
-# ব্যাকগ্রাউন্ড পরিবর্তনের জন্য কমন ফাংশন (AI + Fallback)
-def process_background_change(img_pil, bg_hex, custom_bg_img=None):
-    try:
-        if REMBG_AVAILABLE:
-            # প্রথমে এআই দিয়ে ব্যাকগ্রাউন্ড রিমুভ করার চেষ্টা করা হবে
-            transparent_img = remove(img_pil, session=ai_session, alpha_matting=True, alpha_matting_foreground_threshold=240, alpha_matting_background_threshold=10)
-        else:
-            raise Exception("Rembg not available")
-    except Exception:
-        # এআই ফেল করলে কালার ফিল্টার কাজ করবে
-        img_cv = cv2.cvtColor(np.array(img_pil.convert("RGB")), cv2.COLOR_RGB2BGR)
-        h_img, w_img = img_cv.shape[:2]
-        corners = [img_cv[5, 5], img_cv[5, w_img-5], img_cv[h_img-5, 5], img_cv[h_img-5, w_img-5]]
-        avg_bg_color = np.mean(corners, axis=0)
-        diff = np.sum(np.abs(img_cv - avg_bg_color), axis=2)
-        mask = np.where(diff < 25, 0, 255).astype(np.uint8) # কাপড়ের রঙ যেন না কাটে সেজন্য টলারেন্স কমানো হয়েছে
-        transparent_img = Image.fromarray(cv2.cvtColor(img_cv, cv2.COLOR_BGR2RGBA))
-        transparent_img.putalpha(Image.fromarray(mask))
-
-    bg_rgb = tuple(int(bg_hex[i:i+2], 16) for i in (0, 2, 4))
-    
-    if custom_bg_img is not None:
-        bg_final = custom_bg_img.resize(img_pil.size, Image.Resampling.LANCZOS).convert("RGBA")
-        bg_final.paste(transparent_img, (0, 0), transparent_img)
-        return bg_final.convert("RGB")
-    else:
-        bg = Image.new("RGBA", img_pil.size, bg_rgb + (255,))
-        bg.paste(transparent_img, (0, 0), transparent_img)
-        return bg.convert("RGB")
-
 # ================= MODULE 1 =================
 if st.session_state.active_module == "1":
-    st.markdown("### 🪄 1. ছবির ব্যাকগ্রাউন্ড পরিবর্তন (Studio Smart AI)")
+    st.markdown("### 🪄 1. স্টুডিও ছবি ফিক্সার ও লাইটিং (Studio Photo Adjuster)")
     if base_image:
-        bg_selection = st.selectbox(
-            "ব্যাকগ্রাউন্ড স্টাইল সিলেক্ট করুন:", 
-            ["আকাশী (Sky Blue)", "পাসপোর্ট নীল (Studio Blue)", "অফিসিয়াল সাদা (Pure White)", "সলিড কালার (Color Picker)", "🏞️ গ্যালারি থেকে নিজস্ব কাস্টম ছবি/সিনারি"]
-        )
-        custom_bg_file = None
-        custom_color = "#ffffff"
-        if bg_selection == "সলিড কালার (Color Picker)":
-            custom_color = st.color_picker("আপনার পছন্দের রঙ সিলেক্ট করুন:", "#ff4b4b")
-        elif bg_selection == "🏞️ গ্যালারি থেকে নিজস্ব কাস্টম ছবি/সিনারি":
-            custom_bg_file = st.file_uploader("আপনার কাঙ্খিত ব্যাকগ্রাউন্ড সিনারিটি আপলোড করুন:", type=["jpg", "jpeg", "png"], key="m1_bg")
+        st.info("💡 এই টুলটি আপনার ছবির আসল কোয়ালিটি ও কাপড়ের রঙ শতভাগ ঠিক রেখে ব্রাইটনেস এবং শার্পনেস নিখুঁতভাবে বাড়িয়ে দেবে।")
+        b_val = st.slider("উজ্জ্বলতা (Brightness):", 0.5, 2.0, 1.1, 0.1)
+        c_val = st.slider("কনট্রাস্ট (Contrast):", 0.5, 2.0, 1.2, 0.1)
+        s_val = st.slider("শার্পনেস (Sharpness):", 1.0, 3.0, 1.5, 0.1)
         
-        if st.button("ব্যাকগ্রাউন্ড পরিবর্তন করুন", type="primary", use_container_width=True):
-            with st.spinner("নিখুঁতভাবে ব্যাকগ্রাউন্ড পরিবর্তন করা হচ্ছে..."):
-                if bg_selection == "আকাশী (Sky Blue)": hex_val = "87CEEB"
-                elif bg_selection == "পাসপোর্ট নীল (Studio Blue)": hex_val = "0033aa"
-                elif bg_selection == "অফিসিয়াল সাদা (Pure White)": hex_val = "ffffff"
-                elif bg_selection == "সলিড কালার (Color Picker)": hex_val = custom_color.lstrip('#')
-                else: hex_val = "ffffff"
-                
-                custom_img = Image.open(custom_bg_file) if custom_bg_file else None
-                out = process_background_change(base_image, hex_val, custom_img)
-                
+        if st.button("ছবি প্রসেস করুন", type="primary", use_container_width=True):
+            out = ImageEnhance.Brightness(base_image).enhance(b_val)
+            out = ImageEnhance.Contrast(out).enhance(c_val)
+            out = ImageEnhance.Sharpness(out).enhance(s_val)
             with col_v2:
-                st.image(out, caption="Output (Clean & Fixed)", use_container_width=True)
+                st.image(out, caption="Processed Studio Photo (100% Safe)", use_container_width=True)
                 buf = io.BytesIO()
                 out.save(buf, format="JPEG", quality=100, subsampling=0)
-                st.download_button("📥 ডাউনলোড করুন", data=buf.getvalue(), file_name="new_bg.jpg", mime="image/jpeg", use_container_width=True)
+                st.download_button("📥 ডাউনলোড করুন", data=buf.getvalue(), file_name="fixed_photo.jpg", mime="image/jpeg", use_container_width=True)
 
 # ================= MODULE 2 =================
 elif st.session_state.active_module == "2":
@@ -265,17 +214,17 @@ elif st.session_state.active_module == "2":
 
 # ================= MODULE 3 =================
 elif st.session_state.active_module == "3":
-    st.markdown("### 🎨 3. ব্যাকগ্রাউন্ড কালার পরিবর্তন প্যানেল")
+    st.markdown("### 🎨 3. কালার ও ব্রাইটনেস কন্ট্রোল প্যানেল")
     if base_image:
-        bg_color_pick = st.color_picker("ব্যাকগ্রাউন্ড কালার বেছে নিন:", "#87CEEB")
+        color_val = st.slider("কালার স্যাচুরেশন (Color Intensity):", 0.0, 2.0, 1.2, 0.1)
+        bright_val = st.slider("স্ক্রিন ব্রাইটনেস:", 0.5, 2.0, 1.1, 0.1)
         if st.button(apply_txt, type="primary", use_container_width=True):
-            with st.spinner("Applying Color..."):
-                hex_val = bg_color_pick.lstrip('#')
-                out = process_background_change(base_image, hex_val)
-                with col_v2:
-                    st.image(out, caption="Colored BG Output", use_container_width=True)
-                    buf = io.BytesIO(); out.save(buf, format="JPEG", quality=100, subsampling=0)
-                    st.download_button("📥 ডাউনলোড করুন", data=buf.getvalue(), file_name="color_bg.jpg", mime="image/jpeg", use_container_width=True)
+            out = ImageEnhance.Color(base_image).enhance(color_val)
+            out = ImageEnhance.Brightness(out).enhance(bright_val)
+            with col_v2:
+                st.image(out, caption="Color Adjusted Output", use_container_width=True)
+                buf = io.BytesIO(); out.save(buf, format="JPEG", quality=100, subsampling=0)
+                st.download_button("📥 ডাউনলোড করুন", data=buf.getvalue(), file_name="color_fixed.jpg", mime="image/jpeg", use_container_width=True)
 
 # ================= MODULE 4 =================
 elif st.session_state.active_module == "4":
@@ -350,7 +299,7 @@ elif st.session_state.active_module == "7":
         
     if doc_type == "নাগরিক/চারিত্রিক প্রত্যয়ন পত্র":
         c_character = st.selectbox("চারিত্রিক অবস্থা:", ["উত্তম", "ভালো", "সন্তোষজনক"])
-        template = f"প্রত্যয়ন পত্র\n\nএই মর্মে প্রত্যয়ন করা যাইতেছে যে, {c_name}, পিতা: {c_father}, মাতা: {c_mother}, গ্রাম: {c_village}, ডাকঘর: {c_post}, উপজেলা: {c_thana}।\n\nতিনি আমার পরিচিত। তাহার চরিত্র অত্যন্ত {c_character}।"
+        template = f"প্রত্যয়ন পত্র\n\nএই মর্মে প্রত্যয়ন করা যাইতেছে যে, {c_name}, পিতা: {c_father}, মাতা: {c_mother}, গ্রাম: {c_village}, ডাকঘর: {c_post}, উপজেলা: {c_thana}。\n\nতিনি আমার পরিচিত। তাহার চরিত্র অত্যন্ত {c_character}।"
     else:
         c_class = st.text_input("শেষ পঠিত শ্রেণী:", "নবম শ্রেণী")
         c_roll = st.text_input("রোল নম্বর:", "০৫")
