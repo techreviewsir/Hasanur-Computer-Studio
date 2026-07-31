@@ -24,25 +24,17 @@ st.markdown("""
     .contact-info { text-align: center; color: #38bdf8; font-size: 15px; margin-bottom: 25px; font-weight: bold; }
     .footer { text-align: center; margin-top: 60px; padding: 20px; color: #64748b; border-top: 1px solid #334155; font-size: 14px; }
     
-    /* 🔴 মডিউল বাটনগুলোর উপর মাউস রাখলে লাল কালার ও আন্ডারলাইন ইফেক্ট */
-    div.stButton > button {
+    /* সাইডবারের বাটনগুলোর স্টাইল */
+    section[data-testid="stSidebar"] div.stButton > button {
+        width: 100%;
+        text-align: left;
+        margin-bottom: 4px;
         transition: all 0.2s ease-in-out;
     }
-    div.stButton > button:hover {
-        background-color: #ef4444 !important; /* উজ্জ্বল লাল ব্যাকগ্রাউন্ড */
-        color: #ffffff !important;           /* সাদা টেক্সট */
-        border-color: #dc2626 !important;     /* লাল বর্ডার */
-        text-decoration: underline !important; /* লেখার নিচে আন্ডারলাইন */
-    }
-    
-    /* কুইক কালার চেঞ্জার বাটন স্টাইল */
-    .color-btn {
-        padding: 10px;
-        border-radius: 5px;
-        text-align: center;
-        font-weight: bold;
-        color: white;
-        margin-bottom: 10px;
+    section[data-testid="stSidebar"] div.stButton > button:hover {
+        background-color: #ef4444 !important;
+        color: #ffffff !important;
+        border-color: #dc2626 !important;
     }
     
     /* সার্ভিস লিঙ্কের জন্য কাস্টম বাটন স্টাইল */
@@ -83,17 +75,21 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# 🛠️ সাইডবার ড্যাশবোর্ড কন্ট্রোল ও ল্যাঙ্গুয়েজ সিলেকশন
+# সেশন স্টেট ইনিশিয়ালাইজেশন
+if 'active_module' not in st.session_state:
+    st.session_state.active_module = "1"
+
+# 🛠️ সাইডবার ড্যাশবোর্ড কন্ট্রোল, ল্যাঙ্গুয়েজ এবং মেনু গ্রিড
 st.sidebar.markdown("## 📊 Project Structure")
 lang_mode = st.sidebar.radio("🌐 Select Language / ভাষা নির্বাচন করুন:", ("🇧🇩 বাংলা UI", "🇬🇧 English UI"))
 st.sidebar.markdown("---")
 
-# ভাষা অনুযায়ী টেক্সট ভেরিয়েবল সেটআপ
+# ভাষা অনুযায়ী টেক্সট ও মেনু লেবেল সেটআপ
 if lang_mode == "🇧🇩 বাংলা UI":
     title_text = "📸 হাসানুর কম্পিউটার স্টুডিও"
     sub_text = "📍 মনিরামপুর, যশোর | অল-ইন-ওয়ান প্রফেশনাল ডিজিটাল ল্যাব ড্যাশবোর্ড"
     hotline_text = "📞 হটলাইন: 01743614359"
-    menu_title = "⚙️ কাজের বিভাগসমূহ (বাটন গ্রিড)"
+    sidebar_menu_title = "⚙️ কাজের বিভাগসমূহ"
     footer_text = "© ২০২৬ হাসানুর কম্পিউটার স্টুডিও, মনিরামপুর, যশোর। অল রাইটস রিজার্ভড।"
     upload_msg = "এডিট করার জন্য আপনার ছবিটি এখানে আপলোড করুন..."
     apply_txt = "Apply (পরিবর্তন সেভ করুন)"
@@ -107,7 +103,7 @@ else:
     title_text = "📸 Hasanur Computer Studio"
     sub_text = "📍 Monirampur, Jashore | All-in-One Professional Digital Lab Dashboard"
     hotline_text = "📞 Hotline: 01743614359"
-    menu_title = "⚙️ Work Modules (Button Grid)"
+    sidebar_menu_title = "⚙️ Work Modules"
     footer_text = "© 2026 Hasanur Computer Studio, Monirampur, Jashore. All Rights Reserved."
     upload_msg = "Upload your image here to edit..."
     apply_txt = "Apply Changes"
@@ -118,54 +114,37 @@ else:
         "9. 🔗 PDF Tools", "10. 🌐 Online Directory"
     )
 
+# সাইডবারে কাজের বিভাগসমূহের বাটনগুলো রেন্ডারিং
+st.sidebar.markdown(f"### {sidebar_menu_title}")
+
+if st.sidebar.button(b1, use_container_width=True, type="primary" if st.session_state.active_module == "1" else "secondary"):
+    st.session_state.active_module = "1"
+if st.sidebar.button(b2, use_container_width=True, type="primary" if st.session_state.active_module == "2" else "secondary"):
+    st.session_state.active_module = "2"
+if st.sidebar.button(b3, use_container_width=True, type="primary" if st.session_state.active_module == "3" else "secondary"):
+    st.session_state.active_module = "3"
+if st.sidebar.button(b4, use_container_width=True, type="primary" if st.session_state.active_module == "4" else "secondary"):
+    st.session_state.active_module = "4"
+if st.sidebar.button(b5, use_container_width=True, type="primary" if st.session_state.active_module == "5" else "secondary"):
+    st.session_state.active_module = "5"
+if st.sidebar.button(b6, use_container_width=True, type="primary" if st.session_state.active_module == "6" else "secondary"):
+    st.session_state.active_module = "6"
+if st.sidebar.button(b7, use_container_width=True, type="primary" if st.session_state.active_module == "7" else "secondary"):
+    st.session_state.active_module = "7"
+if st.sidebar.button(b8, use_container_width=True, type="primary" if st.session_state.active_module == "8" else "secondary"):
+    st.session_state.active_module = "8"
+if st.sidebar.button(b9, use_container_width=True, type="primary" if st.session_state.active_module == "9" else "secondary"):
+    st.session_state.active_module = "9"
+if st.sidebar.button(b10, use_container_width=True, type="primary" if st.session_state.active_module == "10" else "secondary"):
+    st.session_state.active_module = "10"
+
 # হেডার ও স্টুডিও ব্র্যান্ডিং রেন্ডারিং
 st.markdown(f"<h1>{title_text}</h1>", unsafe_allow_html=True)
 st.markdown(f"<div class='subtitle'>{sub_text}</div>", unsafe_allow_html=True)
 st.markdown(f"<div class='contact-info'>{hotline_text}</div>", unsafe_allow_html=True)
-
-# 🎛️ মূল স্ক্রিনে বাটন সিস্টেমের মেনু গ্রিড তৈরি
-if 'active_module' not in st.session_state:
-    st.session_state.active_module = "1"
-
-st.markdown(f"### {menu_title}")
-row1_col1, row1_col2, row1_col3, row1_col4, row1_col5 = st.columns(5)
-row2_col1, row2_col2, row2_col3, row2_col4, row2_col5 = st.columns(5)
-
-with row1_col1:
-    if st.button(b1, use_container_width=True, type="primary" if st.session_state.active_module == "1" else "secondary"):
-        st.session_state.active_module = "1"
-with row1_col2:
-    if st.button(b2, use_container_width=True, type="primary" if st.session_state.active_module == "2" else "secondary"):
-        st.session_state.active_module = "2"
-with row1_col3:
-    if st.button(b3, use_container_width=True, type="primary" if st.session_state.active_module == "3" else "secondary"):
-        st.session_state.active_module = "3"
-with row1_col4:
-    if st.button(b4, use_container_width=True, type="primary" if st.session_state.active_module == "4" else "secondary"):
-        st.session_state.active_module = "4"
-with row1_col5:
-    if st.button(b5, use_container_width=True, type="primary" if st.session_state.active_module == "5" else "secondary"):
-        st.session_state.active_module = "5"
-
-with row2_col1:
-    if st.button(b6, use_container_width=True, type="primary" if st.session_state.active_module == "6" else "secondary"):
-        st.session_state.active_module = "6"
-with row2_col2:
-    if st.button(b7, use_container_width=True, type="primary" if st.session_state.active_module == "7" else "secondary"):
-        st.session_state.active_module = "7"
-with row2_col3:
-    if st.button(b8, use_container_width=True, type="primary" if st.session_state.active_module == "8" else "secondary"):
-        st.session_state.active_module = "8"
-with row2_col4:
-    if st.button(b9, use_container_width=True, type="primary" if st.session_state.active_module == "9" else "secondary"):
-        st.session_state.active_module = "9"
-with row2_col5:
-    if st.button(b10, use_container_width=True, type="primary" if st.session_state.active_module == "10" else "secondary"):
-        st.session_state.active_module = "10"
-
 st.markdown("---")
 
-# ইমেজ ফাইল আপলোডার গ্লোবাল হ্যান্ডলিং (ফটো মডিউল ১, ২, ৩, ৪, ৫, 6 এর জন্য)
+# ইমেজ ফাইল আপলোডার গ্লোবাল হ্যান্ডলিং (ফটো মডিউলগুলোর জন্য)
 is_photo_module = st.session_state.active_module in ["1", "2", "3", "4", "5", "6"]
 uploaded_file = st.file_uploader(upload_msg, type=["jpg", "jpeg", "png"]) if is_photo_module else None
 
@@ -177,7 +156,7 @@ if uploaded_file is not None:
         st.image(base_image, caption="Original Image / মূল ছবি", use_container_width=True)
 
 # ====================================================================
-# MODULE 1: 📐 বাঁকা আইডি কার্ড ও ডকুমেন্ট সোজা করার টুল
+# MODULE 1: 📐 বাঁকা আইডি কার্ড ও ডকুমেন্ট সোজা করার টুল (HD FIXED)
 # ====================================================================
 if st.session_state.active_module == "1":
     st.markdown("### 📐 1. বাঁকা আইডি কার্ড ও ডকুমেন্ট সোজা করার টুল (Persp-AI)")
@@ -199,22 +178,28 @@ if st.session_state.active_module == "1":
             bottom_right_x = st.slider("বটম-রাইট X (নিচের ডান কোণ)", 0, w, int(w*0.95))
             bottom_right_y = st.slider("বটম-রাইট Y", 0, h, int(h*0.95))
             
-        if st.button("সোজা করুন (Transform ID Card)", type="primary", use_container_width=True):
-            pts1 = np.float32([[top_left_x, top_left_y], [top_right_x, top_right_y], 
-                               [bottom_left_x, bottom_left_y], [bottom_right_x, bottom_right_y]])
-            pts2 = np.float32([[0, 0], [w, 0], [0, h], [w, h]])
-            
-            matrix = cv2.getPerspectiveTransform(pts1, pts2)
-            result_np = cv2.warpPerspective(img_np, matrix, (w, h))
-            out = Image.fromarray(result_np)
-            
-            with col_v2:
-                st.image(out, caption="সোজা করা আইডি কার্ড", use_container_width=True)
-                buf = io.BytesIO(); out.save(buf, format="JPEG")
-                st.download_button("📥 ডাউনলোড করুন", data=buf.getvalue(), file_name="fixed_id_card.jpg", use_container_width=True)
+        pts1 = np.float32([[top_left_x, top_left_y], [top_right_x, top_right_y], 
+                           [bottom_left_x, bottom_left_y], [bottom_right_x, bottom_right_y]])
+        pts2 = np.float32([[0, 0], [w, 0], [0, h], [w, h]])
+        
+        matrix = cv2.getPerspectiveTransform(pts1, pts2)
+        result_np = cv2.warpPerspective(img_np, matrix, (w, h))
+        out = Image.fromarray(result_np)
+        
+        with col_v2:
+            st.image(out, caption="সোজা করা আইডি কার্ড (Preview)", use_container_width=True)
+            buf = io.BytesIO()
+            out.save(buf, format="JPEG", quality=100, subsampling=0)
+            st.download_button(
+                label="📥 সোজা করা HD আইডি কার্ড ডাউনলোড করুন", 
+                data=buf.getvalue(), 
+                file_name="hasanur_studio_fixed_id.jpg", 
+                mime="image/jpeg",
+                use_container_width=True
+            )
 
 # ====================================================================
-# MODULE 2: ✂️ Crop Tool
+# MODULE 2: ✂️ Crop Tool (HD DOWNLOAD ENABLED)
 # ====================================================================
 elif st.session_state.active_module == "2":
     st.markdown("### ✂️ 2. Crop Tool")
@@ -229,11 +214,18 @@ elif st.session_state.active_module == "2":
                 out = base_image.resize((600, 400), Image.Resampling.LANCZOS)
             with col_v2:
                 st.image(out, caption="Cropped Output", use_container_width=True)
-                buf = io.BytesIO(); out.save(buf, format="JPEG")
-                st.download_button("📥 Download Result", data=buf.getvalue(), file_name="cropped.jpg", use_container_width=True)
+                buf = io.BytesIO()
+                out.save(buf, format="JPEG", quality=100, subsampling=0)
+                st.download_button(
+                    label="📥 ক্রপ করা HD ছবি ডাউনলোড করুন", 
+                    data=buf.getvalue(), 
+                    file_name="cropped_hd.jpg", 
+                    mime="image/jpeg",
+                    use_container_width=True
+                )
 
 # ====================================================================
-# MODULE 3: 🪄 ফটো রুম এআই (PhotoRoom AI Background Changer) - UPDATED
+# MODULE 3: 🪄 ফটো রুম এআই (PhotoRoom AI Background Changer - HD)
 # ====================================================================
 elif st.session_state.active_module == "3":
     st.markdown("### 🪄 3. ফটো রুম এআই (PhotoRoom AI Background Changer)")
@@ -241,39 +233,32 @@ elif st.session_state.active_module == "3":
         if REMBG_AVAILABLE:
             st.success("⚡ PhotoRoom AI ইঞ্জিন প্রস্তুত! আপলোড করা ছবির ব্যাকগ্রাউন্ড স্বয়ংক্রিয়ভাবে রিমুভ করা হয়েছে।")
             
-            # ব্যাকগ্রাউন্ড রিমুভ করা ট্রান্সপারেন্ট ছবি জেনারেট করা
             with st.spinner("Removing background seamlessly..."):
                 transparent_img = remove(base_image)
             
             st.markdown("##### 🎨 এক ক্লিকে ব্যাকগ্রাউন্ডের কালার পরিবর্তন করুন (Quick Color Picker):")
-            
-            # কুইক ব্যাকগ্রাউন্ড চেঞ্জার অপশন
             bg_selection = st.selectbox(
-                "জনপ্রিয় স্টুডিও কালার সিলেক্ট করুন:", 
-                ["স্বচ্ছ (Transparent/PNG)", "আকাgenerate আকাশী (Sky Blue)", "পাসপোর্ট নীল (Studio Blue)", "অফিসিয়াল সাদা (Pure White)", "কাস্টম কালার (Custom Color)"]
+                "জনপ্রিয় স্টুডিও কালার সিলেক্ট করুন:", 
+                ["স্বচ্ছ (Transparent/PNG)", "আকাশী (Sky Blue)", "পাসপোর্ট নীল (Studio Blue)", "অফিসিয়াল সাদা (Pure White)", "কাস্টম কালার (Custom Color)"]
             )
             
-            # কাস্টম কালার সিলেক্টর (যদি ইউজার কাস্টম সিলেক্ট করে)
             custom_color = "#ffffff"
             if bg_selection == "কাস্টম কালার (Custom Color)":
                 custom_color = st.color_picker("আপনার পছন্দের রঙ সিলেক্ট করুন:", "#ff4b4b")
             
-            # বর্ডার মসৃণ করার স্লাইডার
             smoothness = st.slider("বর্ডার বা কিনারার মসৃণতা (Edge Smoothing Level):", min_value=0, max_value=5, value=1)
             
             if st.button("ফটো রুম আউটপুট তৈরি করুন", type="primary", use_container_width=True):
-                # এজ স্মুথিং প্রসেসিং
                 if smoothness > 0:
                     alpha = transparent_img.split()[-1]
                     smoothed_alpha = alpha.filter(ImageFilter.GaussianBlur(smoothness))
                     transparent_img.putalpha(smoothed_alpha)
                 
-                # কালার লজিক অ্যাপ্লাই করা
                 if bg_selection == "স্বচ্ছ (Transparent/PNG)":
                     out = transparent_img
-                    file_ext = "PNG"; mime_type = "image/png"; filename = "photoroom_transparent.png"
+                    file_ext = "PNG"; mime_type = "image/png"; filename = "photoroom_hd.png"
                 else:
-                    if bg_selection == "আকাgenerate আকাশী (Sky Blue)":
+                    if bg_selection == "আকাশী (Sky Blue)":
                         hex_val = "87CEEB"
                     elif bg_selection == "পাসপোর্ট নীল (Studio Blue)":
                         hex_val = "0033aa"
@@ -286,17 +271,27 @@ elif st.session_state.active_module == "3":
                     bg = Image.new("RGBA", base_image.size, bg_rgb + (255,))
                     bg.paste(transparent_img, (0, 0), transparent_img)
                     out = bg.convert("RGB")
-                    file_ext = "JPEG"; mime_type = "image/jpeg"; filename = "photoroom_output.jpg"
+                    file_ext = "JPEG"; mime_type = "image/jpeg"; filename = "photoroom_hd.jpg"
                 
                 with col_v2:
-                    st.image(out, caption="PhotoRoom AI Output", use_container_width=True)
-                    buf = io.BytesIO(); out.save(buf, format=file_ext)
-                    st.download_button("📥 ডাউনলোড ফটো রুম ইমেজ", data=buf.getvalue(), file_name=filename, mime=mime_type, use_container_width=True)
+                    st.image(out, caption="PhotoRoom AI HD Output", use_container_width=True)
+                    buf = io.BytesIO()
+                    if file_ext == "PNG":
+                        out.save(buf, format=file_ext)
+                    else:
+                        out.save(buf, format=file_ext, quality=100, subsampling=0)
+                    st.download_button(
+                        label="📥 ডাউনলোড ফটো রুম HD ইমেজ", 
+                        data=buf.getvalue(), 
+                        file_name=filename, 
+                        mime=mime_type, 
+                        use_container_width=True
+                    )
         else:
             st.error("দুঃখিত, আপনার সিস্টেমে rembg AI ইঞ্জিনটি ইনস্টল করা নেই।")
 
 # ====================================================================
-# MODULE 4: 🪄 En-Real & Enhan-AI
+# MODULE 4: 🪄 En-Real & Enhan-AI (HD DOWNLOAD ENABLED)
 # ====================================================================
 elif st.session_state.active_module == "4":
     st.markdown("### 🪄 4. En-Real & Enhan-AI Photo Enhancer")
@@ -310,16 +305,23 @@ elif st.session_state.active_module == "4":
                 out = ImageEnhance.Brightness(img_c).enhance(1.1)
             with col_v2:
                 st.image(out, caption="Enhanced Output", use_container_width=True)
-                buf = io.BytesIO(); out.save(buf, format="JPEG")
-                st.download_button("📥 Download Result", data=buf.getvalue(), file_name="enhanced.jpg", use_container_width=True)
+                buf = io.BytesIO()
+                out.save(buf, format="JPEG", quality=100, subsampling=0)
+                st.download_button(
+                    label="📥 উন্নত করা HD ছবি ডাউনলোড করুন", 
+                    data=buf.getvalue(), 
+                    file_name="enhanced_hd.jpg", 
+                    mime="image/jpeg",
+                    use_container_width=True
+                )
 
 # ====================================================================
-# MODULE 5: 🎨 BG-First & BG-AI
+# MODULE 5: 🎨 BG-First & BG-AI (HD DOWNLOAD ENABLED)
 # ====================================================================
 elif st.session_state.active_module == "5":
     st.markdown("### 🎨 5. BG-First & BG-AI Background Panel")
     if base_image:
-        bg_mode = st.radio("Method / পদ্ধতি:", ("BG-First (Remove BG Transparent)", "BG-AI (Custom Solid Color BG)"))
+        bg_mode = st.radio("Method / Micro-Tech:", ("BG-First (Remove BG Transparent)", "BG-AI (Custom Solid Color BG)"))
         bg_color = st.color_picker("পাসপোর্ট ছবির ব্যাকগ্রাউন্ড কালার সিলেক্ট করুন (যেমন: আকাশী):", "#87CEEB")
         
         st.markdown("##### 🛠️ নিখুঁত ফিনিশিং সেটিংস (Edge Smoothness):")
@@ -337,7 +339,7 @@ elif st.session_state.active_module == "5":
                     
                     if "BG-First" in bg_mode:
                         out = transparent
-                        file_ext = "PNG"; mime_type = "image/png"; filename = "transparent.png"
+                        file_ext = "PNG"; mime_type = "image/png"; filename = "transparent_hd.png"
                     else:
                         h_val = bg_color.lstrip('#')
                         bg_rgb = tuple(int(h_val[i:i+2], 16) for i in (0, 2, 4))
@@ -345,17 +347,27 @@ elif st.session_state.active_module == "5":
                         bg = Image.new("RGBA", base_image.size, bg_rgb + (255,))
                         bg.paste(transparent, (0, 0), transparent)
                         out = bg.convert("RGB")
-                        file_ext = "JPEG"; mime_type = "image/jpeg"; filename = "passport_photo.jpg"
+                        file_ext = "JPEG"; mime_type = "image/jpeg"; filename = "passport_photo_hd.jpg"
                         
                     with col_v2:
                         st.image(out, caption="Perfect Finished Passport Photo", use_container_width=True)
-                        buf = io.BytesIO(); out.save(buf, format=file_ext)
-                        st.download_button("📥 Download Photo", data=buf.getvalue(), file_name="passport_photo.jpg", mime=mime_type, use_container_width=True)
+                        buf = io.BytesIO()
+                        if file_ext == "PNG":
+                            out.save(buf, format=file_ext)
+                        else:
+                            out.save(buf, format=file_ext, quality=100, subsampling=0)
+                        st.download_button(
+                            label="📥 পাসপোর্ট সাইজ HD ছবি ডাউনলোড করুন", 
+                            data=buf.getvalue(), 
+                            file_name=filename, 
+                            mime=mime_type, 
+                            use_container_width=True
+                        )
             else:
                 st.error("AI engine is unavailable on this system.")
 
 # ====================================================================
-# MODULE 6: 🧽 Erase & Restore Tool
+# MODULE 6: 🧽 Erase & Restore Tool (HD DOWNLOAD ENABLED)
 # ====================================================================
 elif st.session_state.active_module == "6":
     st.markdown("### 🧽 6. Erase & Restore Tool")
@@ -368,8 +380,15 @@ elif st.session_state.active_module == "6":
                 out = base_image
             with col_v2:
                 st.image(out, caption="Processed Image", use_container_width=True)
-                buf = io.BytesIO(); out.save(buf, format="JPEG")
-                st.download_button("📥 Download Image", data=buf.getvalue(), file_name="edited.jpg", use_container_width=True)
+                buf = io.BytesIO()
+                out.save(buf, format="JPEG", quality=100, subsampling=0)
+                st.download_button(
+                    label="📥 সম্পাদিত HD ছবি ডাউনলোড করুন", 
+                    data=buf.getvalue(), 
+                    file_name="edited_hd.jpg", 
+                    mime="image/jpeg",
+                    use_container_width=True
+                )
 
 # ====================================================================
 # MODULE 7: 📜 প্রত্যয়ন পত্র ও ছাড়পত্র ফরম জেনারেটর
@@ -441,7 +460,7 @@ elif st.session_state.active_module == "8":
         cv_name = st.text_input("পূর্ণ নাম (Full Name):", "হাসানুর রহমান")
         cv_email = st.text_input("ইমেইল (Email):", "hasanur@example.com")
         cv_phone = st.text_input("মোবাইল (Mobile):", "01743614359")
-        cv_edu = st.text_area("শিক্ষাগত যোগ্যতা (Education):", "১. এসএসসি - জিপিএ ৫.০০ (২০১৮)\n২. এইচএসসি - জিপিএ ৪.৮ো (২০২০)")
+        cv_edu = st.text_area("শিক্ষাগত যোগ্যতা (Education):", "১. এসএসসি - জিপিএ ৫.০০ (২০১৮)\n২. এইচএসসি - জিপিএ ৪.৮০ (২০২০)")
     with col_c2:
         cv_skills = st.text_area("দক্ষতা (Skills):", "কম্পিউটার টাইপিং, গ্রাফিক্স ডিজাইন, ইন্টারনেট ব্রাউজিং ও অনলাইন অ্যাপ্লিকেশন")
         cv_exp = st.text_area("অভিজ্ঞতা (Experience):", "হাসানুর কম্পিউটার স্টুডিওতে ৩ বছরের ডিজিটাল সার্ভিস প্রদানের অভিজ্ঞতা।")
@@ -517,7 +536,7 @@ elif st.session_state.active_module == "9":
 else:
     st.markdown("### 🌐 10. অল-ইন-ওয়ান অনলাইন সেবা, অ্যাপ্লিকেশন ও লিঙ্ক ডিরেক্টরি")
     
-    st.markdown("<div class='header-link'>🛂 পাসপোর্ট ও ভিসা ট্র্যাকিং পোর্টাল</div>", unsafe_allow_html=True)
+    st.markdown("<div class='header-link'>🛂 পাসপোর্ট ও visa ট্র্যাকিং পোর্টাল</div>", unsafe_allow_html=True)
     passport_links = {
         "ই-পাসপোর্ট নতুন আবেদন": "https://www.epassport.gov.bd",
         "পাসপোর্ট স্ট্যাটাস চেক": "https://www.epassport.gov.bd/landing",
