@@ -1,12 +1,6 @@
 streamlit
 opencv-python-headless
 numpy
-rembg
-pillow
-streamlit
-opencv-python-headless
-numpy
 pillow
 rembg
-pypdf
 pypdf
