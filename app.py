@@ -6,88 +6,91 @@ import streamlit as st
 from rembg import remove, new_session
 from pypdf import PdfReader
 
-# পেজের লেআউট এবং কাস্টম হভার স্টাইল (CSS) সেটআপ
+# পেজের লেআউট এবং স্টাইলিশ বক্স ও আইকন সেটআপ
 st.set_page_config(page_title="Hasanur Computer Studio", layout="wide")
 
 st.markdown("""
 <style>
-    /* সাইডবারের রেডিও বাটন বা অপশনগুলোর জন্য প্রিমিয়াম হভার এবং স্টাইল */
+    /* সাইডবারের রেডিও অপশনগুলোকে আকর্ষণীয় বক্স এবং হভার ইফেক্ট দেওয়া */
     .stRadio > label {
-        background-color: #f0f2f6;
-        padding: 10px 15px;
-        border-radius: 8px;
-        margin-bottom: 5px;
+        background-color: #f8f9fa;
+        border: 1px solid #e0e0e0;
+        padding: 12px 18px;
+        border-radius: 10px;
+        margin-bottom: 8px;
         transition: all 0.3s ease;
-        font-weight: 500;
+        font-weight: 600;
+        color: #333333;
     }
     .stRadio > label:hover {
         background-color: #ff4b4b;
         color: white;
-        padding-left: 20px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        border-color: #ff4b4b;
+        padding-left: 22px;
+        box-shadow: 0 4px 12px rgba(255, 75, 75, 0.3);
     }
 </style>
 """, unsafe_allow_html=True)
 
-st.title("🖨️ Hasanur Computer Studio - Interactive 11-in-1 Dashboard")
+st.title("🖨️ Hasanur Computer Studio - Professional Dashboard")
 st.markdown("---")
 
-# সাইডবার মেনু (হভার ইফেক্টযুক্ত রেডিও বাটন মোড)
-st.sidebar.header("Navigation Menu (11 Modules)")
+# --- গ্লোবাল ফাইল আপলোডার (একবার আপলোড করলেই সব মডিউলে কাজ করবে) ---
+st.sidebar.header("📁 Master File Uploader")
+global_file = st.sidebar.file_uploader("Upload Image or PDF once", type=["jpg", "jpeg", "png", "pdf"])
+
+# সাইডবার মেনু (বক্স এবং আইকন সহ নির্দিষ্ট মডিউলসমূহ)
+st.sidebar.header("Navigation Menu")
 app_mode = st.sidebar.radio("Choose a Tool", [
-    "1. Smart AI Background Remover",
-    "2. Custom Background Color Studio",
-    "3. Image Enhancer & Brightness",
-    "4. ID Card Cropper & Straightener",
-    "5. Passport Photo Maker (4-in-1)",
-    "6. Image Resizer & Compressor",
-    "7. Grayscale & Black-White Converter",
-    "8. Image Rotator & Flipper",
-    "9. Border & Frame Adder",
-    "10. Watermark Adder",
-    "11. PDF to Image Converter"
+    "✨ 1. Smart AI Background Remover",
+    "🎨 2. Custom Background Color Studio",
+    "☀️ 3. Image Enhancer & Brightness",
+    "🎨 4. B&W to Colorful Image Fixer",
+    "🆔 5. ID Card Cropper & Straightener",
+    "📄 6. PDF to Image Converter"
 ])
 
-# =====================================================================
-# 1. Smart AI Background Remover
-# =====================================================================
-if app_mode == "1. Smart AI Background Remover":
-    st.header("✨ Smart AI Background Remover (Transparent)")
-    uploaded_file = st.file_uploader("Upload Image", type=["jpg", "jpeg", "png"], key="m1")
+if global_file is not None:
+    file_extension = global_file.name.split('.')[-1].lower()
 
-    if uploaded_file is not None:
-        col1, col2 = st.columns(2)
-        with col1:
-            st.image(Image.open(uploaded_file), use_container_width=True, caption="Original")
-        with col2:
-            if st.button("Remove Background"):
-                with st.spinner("Processing with AI..."):
+    # =====================================================================
+    # 1. Smart AI Background Remover (Transparent)
+    # =====================================================================
+    if app_mode == "✨ 1. Smart AI Background Remover":
+        st.header("✨ Smart AI Background Remover")
+        if file_extension in ['jpg', 'jpeg', 'png']:
+            col1, col2 = st.columns(2)
+            with col1:
+                st.image(Image.open(global_file), use_container_width=True, caption="Original Image")
+            with col2:
+                if st.button("Remove Background"):
+                    with st.spinner("Processing with AI (HD)..."):
+                        session = new_session("u2net")
+                        output_bytes = remove(global_file.getvalue(), session=session)
+                        out_img = Image.open(io.BytesIO(output_bytes))
+                        st.image(out_img, use_container_width=True, caption="Transparent Output")
+                        
+                        buf = io.BytesIO()
+                        out_img.save(buf, format="PNG")
+                        st.download_button("Download HD Transparent PNG", buf.getvalue(), "transparent_hd.png", "image/png")
+        else:
+            st.warning("Please upload an image file (JPG/PNG).")
+
+    # =====================================================================
+    # 2. Custom Background Color Studio (অটো কালার চেঞ্জ)
+    # =====================================================================
+    elif app_mode == "🎨 2. Custom Background Color Studio":
+        st.header("🎨 Custom Background Color Studio")
+        if file_extension in ['jpg', 'jpeg', 'png']:
+            bg_color = st.color_picker("Pick Background Color (Applies Instantly)", "#FFFFFF")
+
+            col1, col2 = st.columns(2)
+            with col1:
+                st.image(Image.open(global_file), use_container_width=True, caption="Original Image")
+            with col2:
+                with st.spinner("Applying background and generating HD..."):
                     session = new_session("u2net")
-                    output_bytes = remove(uploaded_file.getvalue(), session=session)
-                    out_img = Image.open(io.BytesIO(output_bytes))
-                    st.image(out_img, use_container_width=True, caption="Transparent Output")
-                    
-                    buf = io.BytesIO()
-                    out_img.save(buf, format="PNG")
-                    st.download_button("Download Transparent PNG", buf.getvalue(), "transparent.png", "image/png")
-
-# =====================================================================
-# 2. Custom Background Color Studio
-# =====================================================================
-elif app_mode == "2. Custom Background Color Studio":
-    st.header("🎨 Custom Background Color Studio")
-    uploaded_file = st.file_uploader("Upload Image", type=["jpg", "jpeg", "png"], key="m2")
-    bg_color = st.color_picker("Pick Background Color", "#FFFFFF")
-
-    if uploaded_file is not None:
-        col1, col2 = st.columns(2)
-        with col1:
-            st.image(Image.open(uploaded_file), use_container_width=True, caption="Original")
-        with col2:
-            if st.button("Change Background"):
-                with st.spinner("Processing..."):
-                    session = new_session("u2net")
-                    output_bytes = remove(uploaded_file.getvalue(), session=session)
+                    output_bytes = remove(global_file.getvalue(), session=session)
                     foreground = Image.open(io.BytesIO(output_bytes)).convert("RGBA")
                     
                     hex_code = bg_color.lstrip('#')
@@ -96,166 +99,110 @@ elif app_mode == "2. Custom Background Color Studio":
                     background = Image.new("RGBA", foreground.size, bg_rgb + (255,))
                     final_image = Image.alpha_composite(background, foreground).convert("RGB")
                     
-                    st.image(final_image, use_container_width=True, caption="Custom Background Output")
+                    st.image(final_image, use_container_width=True, caption=f"Background Color: {bg_color}")
                     
                     buf = io.BytesIO()
-                    final_image.save(buf, format="JPEG")
-                    st.download_button("Download Studio Image", buf.getvalue(), "custom_bg.jpg", "image/jpeg")
+                    final_image.save(buf, format="JPEG", quality=95)
+                    st.download_button("Download HD Studio Image", buf.getvalue(), "custom_bg_hd.jpg", "image/jpeg")
+        else:
+            st.warning("Please upload an image file (JPG/PNG).")
 
-# =====================================================================
-# 3. Image Enhancer & Brightness
-# =====================================================================
-elif app_mode == "3. Image Enhancer & Brightness":
-    st.header("☀️ Image Enhancer & Brightness Adjuster")
-    uploaded_file = st.file_uploader("Upload Image", type=["jpg", "jpeg", "png"], key="m3")
+    # =====================================================================
+    # 3. Image Enhancer & Brightness
+    # =====================================================================
+    elif app_mode == "☀️ 3. Image Enhancer & Brightness":
+        st.header("☀️ Image Enhancer & Brightness Adjuster")
+        if file_extension in ['jpg', 'jpeg', 'png']:
+            image = Image.open(global_file)
+            col1, col2 = st.columns(2)
+            with col1:
+                brightness = st.slider("Brightness", 0.5, 3.0, 1.0, 0.1)
+                contrast = st.slider("Contrast", 0.5, 3.0, 1.0, 0.1)
+                st.image(image, use_container_width=True, caption="Original Image")
+            with col2:
+                img_np = np.array(image)
+                enhanced_np = cv2.convertScaleAbs(img_np, alpha=contrast, beta=int((brightness - 1) * 50))
+                enhanced_image = Image.fromarray(enhanced_np)
+                
+                st.image(enhanced_image, use_container_width=True, caption="Enhanced HD Image")
+                buf = io.BytesIO()
+                enhanced_image.save(buf, format="JPEG", quality=95)
+                st.download_button("Download HD Enhanced Image", buf.getvalue(), "enhanced_hd.jpg", "image/jpeg")
+        else:
+            st.warning("Please upload an image file.")
 
-    if uploaded_file is not None:
-        image = Image.open(uploaded_file)
-        brightness = st.slider("Brightness", 0.5, 3.0, 1.0, 0.1)
-        contrast = st.slider("Contrast", 0.5, 3.0, 1.0, 0.1)
-        
-        img_np = np.array(image)
-        enhanced_np = cv2.convertScaleAbs(img_np, alpha=contrast, beta=int((brightness - 1) * 50))
-        enhanced_image = Image.fromarray(enhanced_np)
-        
-        st.image(enhanced_image, use_container_width=True, caption="Enhanced Image")
-        buf = io.BytesIO()
-        enhanced_image.save(buf, format="JPEG")
-        st.download_button("Download Enhanced", buf.getvalue(), "enhanced.jpg", "image/jpeg")
+    # =====================================================================
+    # 4. B&W to Colorful Image Fixer (সাদা-কালো ছবিকে রঙিন ও প্রাণবন্ত করা)
+    # =====================================================================
+    elif app_mode == "🎨 4. B&W to Colorful Image Fixer":
+        st.header("🎨 B&W to Colorful Image & Tone Fixer")
+        st.write("सাদা-কালো বা মলিন ছবিকে কালার ব্যালেন্স ও স্যাচুরেশন বাড়িয়ে রঙিন ও প্রাণবন্ত করুন।")
+        if file_extension in ['jpg', 'jpeg', 'png']:
+            image = Image.open(global_file)
+            col1, col2 = st.columns(2)
+            with col1:
+                saturation = st.slider("Color Saturation (রঙের মাত্রা)", 0.0, 3.0, 1.5, 0.1)
+                sharpness = st.slider("Sharpness (নিখুঁত ভাব)", 0.0, 3.0, 1.2, 0.1)
+                st.image(image, use_container_width=True, caption="Original Image")
+            with col2:
+                # কালার স্যাচুরেশন এবং শার্পনেস বৃদ্ধি করার প্রসেসিং
+                img_cv = np.array(image)
+                hsv = cv2.cvtColor(img_cv, cv2.COLOR_RGB2HSV)
+                hsv[:, :, 1] = np.clip(hsv[:, :, 1] * saturation, 0, 255)
+                colored_rgb = cv2.cvtColor(hsv, cv2.COLOR_HSV2RGB)
+                
+                # শার্পনেস যোগ করা
+                kernel = np.array([[0, -1, 0], [-1, 5, -1], [0, -1, 0]]) * (sharpness / 1.2)
+                sharpened = cv2.filter2D(colored_rgb, -1, kernel)
+                
+                final_colored = Image.fromarray(np.clip(sharpened, 0, 255).astype(np.uint8))
+                
+                st.image(final_colored, use_container_width=True, caption="Colorful & Enhanced Output")
+                buf = io.BytesIO()
+                final_colored.save(buf, format="JPEG", quality=95)
+                st.download_button("Download HD Colorful Image", buf.getvalue(), "colorful_hd.jpg", "image/jpeg")
+        else:
+            st.warning("Please upload an image file.")
 
-# =====================================================================
-# 4. ID Card Cropper & Straightener
-# =====================================================================
-elif app_mode == "4. ID Card Cropper & Straightener":
-    st.header("🆔 ID Card Cropper & Straightener")
-    uploaded_file = st.file_uploader("Upload ID Card", type=["jpg", "jpeg", "png"], key="m4")
-
-    if uploaded_file is not None:
-        img = Image.open(uploaded_file)
-        w, h = img.size
-        rotation = st.slider("Rotate", -180, 180, 0)
-        if rotation != 0:
-            img = img.rotate(rotation, expand=True)
+    # =====================================================================
+    # 5. ID Card Cropper & Straightener
+    # =====================================================================
+    elif app_mode == "🆔 5. ID Card Cropper & Straightener":
+        st.header("🆔 ID Card Cropper & Straightener")
+        if file_extension in ['jpg', 'jpeg', 'png']:
+            img = Image.open(global_file)
             w, h = img.size
-            
-        cropped = img.crop((0, 0, w, h))
-        st.image(cropped, use_container_width=True, caption="ID Card Preview")
-        buf = io.BytesIO()
-        cropped.save(buf, format="JPEG")
-        st.download_button("Download ID Card", buf.getvalue(), "id_card.jpg", "image/jpeg")
+            rotation = st.slider("Rotate", -180, 180, 0)
+            if rotation != 0:
+                img = img.rotate(rotation, expand=True)
+                w, h = img.size
+                
+            cropped = img.crop((0, 0, w, h))
+            st.image(cropped, use_container_width=True, caption="ID Card HD Preview")
+            buf = io.BytesIO()
+            cropped.save(buf, format="JPEG", quality=95)
+            st.download_button("Download HD ID Card", buf.getvalue(), "id_card_hd.jpg", "image/jpeg")
+        else:
+            st.warning("Please upload an image file.")
 
-# =====================================================================
-# 5. Passport Photo Maker (4-in-1)
-# =====================================================================
-elif app_mode == "5. Passport Photo Maker (4-in-1)":
-    st.header("🛂 Passport Photo Sheet Generator")
-    uploaded_file = st.file_uploader("Upload Passport Photo", type=["jpg", "jpeg", "png"], key="m5")
-
-    if uploaded_file is not None:
-        img = Image.open(uploaded_file).resize((300, 350))
-        sheet = Image.new("RGB", (650, 750), (255, 255, 255))
-        sheet.paste(img, (25, 25))
-        sheet.paste(img, (335, 25))
-        sheet.paste(img, (25, 385))
-        sheet.paste(img, (335, 385))
-        
-        st.image(sheet, use_container_width=True, caption="4-Copy Passport Sheet")
-        buf = io.BytesIO()
-        sheet.save(buf, format="JPEG")
-        st.download_button("Download Passport Sheet", buf.getvalue(), "passport_sheet.jpg", "image/jpeg")
-
-# =====================================================================
-# 6. Image Resizer & Compressor
-# =====================================================================
-elif app_mode == "6. Image Resizer & Compressor":
-    st.header("📏 Image Resizer")
-    uploaded_file = st.file_uploader("Upload Image", type=["jpg", "jpeg", "png"], key="m6")
-
-    if uploaded_file is not None:
-        img = Image.open(uploaded_file)
-        width = st.slider("Width", 100, 2000, img.width)
-        height = st.slider("Height", 100, 2000, img.height)
-        resized = img.resize((width, height))
-        st.image(resized, use_container_width=True)
-        buf = io.BytesIO()
-        resized.save(buf, format="JPEG")
-        st.download_button("Download Resized", buf.getvalue(), "resized.jpg", "image/jpeg")
-
-# =====================================================================
-# 7. Grayscale & Black-White Converter
-# =====================================================================
-elif app_mode == "7. Grayscale & Black-White Converter":
-    st.header("⬛ Grayscale / B&W Converter")
-    uploaded_file = st.file_uploader("Upload Image", type=["jpg", "jpeg", "png"], key="m7")
-
-    if uploaded_file is not None:
-        img = Image.open(uploaded_file).convert("L")
-        st.image(img, use_container_width=True, caption="Grayscale Output")
-        buf = io.BytesIO()
-        img.save(buf, format="JPEG")
-        st.download_button("Download B&W", buf.getvalue(), "grayscale.jpg", "image/jpeg")
-
-# =====================================================================
-# 8. Image Rotator & Flipper
-# =====================================================================
-elif app_mode == "8. Image Rotator & Flipper":
-    st.header("🔄 Image Rotator & Flipper")
-    uploaded_file = st.file_uploader("Upload Image", type=["jpg", "jpeg", "png"], key="m8")
-
-    if uploaded_file is not None:
-        img = Image.open(uploaded_file)
-        rot = st.selectbox("Rotation", [0, 90, 180, 270])
-        if rot > 0:
-            img = img.rotate(rot, expand=True)
-        st.image(img, use_container_width=True)
-        buf = io.BytesIO()
-        img.save(buf, format="JPEG")
-        st.download_button("Download Rotated", buf.getvalue(), "rotated.jpg", "image/jpeg")
-
-# =====================================================================
-# 9. Border & Frame Adder
-# =====================================================================
-elif app_mode == "9. Border & Frame Adder":
-    st.header("🖼️ Border & Frame Adder")
-    uploaded_file = st.file_uploader("Upload Image", type=["jpg", "jpeg", "png"], key="m9")
-
-    if uploaded_file is not None:
-        img = Image.open(uploaded_file)
-        bordered = ImageOps.expand(img, border=20, fill='black')
-        st.image(bordered, use_container_width=True)
-        buf = io.BytesIO()
-        bordered.save(buf, format="JPEG")
-        st.download_button("Download Bordered", buf.getvalue(), "bordered.jpg", "image/jpeg")
-
-# =====================================================================
-# 10. Watermark Adder
-# =====================================================================
-elif app_mode == "10. Watermark Adder":
-    st.header("💧 Watermark Adder")
-    uploaded_file = st.file_uploader("Upload Image", type=["jpg", "jpeg", "png"], key="m10")
-    text = st.text_input("Watermark Text", "Hasanur Studio")
-
-    if uploaded_file is not None:
-        img = Image.open(uploaded_file)
-        st.image(img, use_container_width=True, caption="Preview")
-        st.success(f"Watermark '{text}' ready to apply.")
-
-# =====================================================================
-# 11. PDF to Image Converter
-# =====================================================================
-elif app_mode == "11. PDF to Image Converter":
-    st.header("📄 PDF to Image Converter")
-    uploaded_pdf = st.file_uploader("Upload PDF", type=["pdf"], key="m11")
-
-    if uploaded_pdf is not None:
-        try:
-            reader = PdfReader(uploaded_pdf)
-            for i, page in enumerate(reader.pages):
-                for j, img_obj in enumerate(page.images):
-                    img = Image.open(io.BytesIO(img_obj.data))
-                    st.image(img, width=400, caption=f"Page {i+1}")
-                    buf = io.BytesIO()
-                    img.save(buf, format="PNG")
-                    st.download_button(f"Download P{i+1} Img{j+1}", buf.getvalue(), f"pdf_p{i+1}_img{j+1}.png", "image/png", key=f"pdf_{i}_{j}")
-        except Exception as e:
-            st.error(f"Error: {e}")
+    # =====================================================================
+    # 6. PDF to Image Converter
+    # =====================================================================
+    elif app_mode == "📄 6. PDF to Image Converter":
+        st.header("📄 PDF to Image Converter")
+        if file_extension == 'pdf':
+            try:
+                reader = PdfReader(global_file)
+                for i, page in enumerate(reader.pages):
+                    for j, img_obj in enumerate(page.images):
+                        img = Image.open(io.BytesIO(img_obj.data))
+                        st.image(img, width=400, caption=f"Page {i+1} HD")
+                        buf = io.BytesIO()
+                        img.save(buf, format="PNG")
+                        st.download_button(f"Download HD P{i+1} Img{j+1}", buf.getvalue(), f"pdf_p{i+1}_img{j+1}_hd.png", "image/png", key=f"pdf_{i}_{j}")
+            except Exception as e:
+                st.error(f"Error: {e}")
+        else:
+            st.warning("Please upload a PDF file for this module.")
+else:
+    st.info("👈 দয়া করে বাম পাশের সাইডবার থেকে প্রথমে একটি ছবি বা পিডিএফ (Master File Uploader) আপলোড করুন। এরপর যেকোনো মডিউলে ক্লিক করলেই সেই ফাইল দিয়ে কাজ করতে পারবেন!")
