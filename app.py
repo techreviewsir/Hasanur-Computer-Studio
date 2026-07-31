@@ -203,19 +203,10 @@ if st.session_state.active_module == "1":
             elif bg_selection == "🏞️ গ্যালারি থেকে নিজস্ব কাস্টম ছবি/সিনারি":
                 custom_bg_file = st.file_uploader("আপনার কাঙ্খিত ব্যাকগ্রাউন্ড সিনারিটি আপলোড করুন:", type=["jpg", "jpeg", "png"], key="m1_bg")
             
-            # বডি কেটে যাওয়া রোধ করার জন্য মাস্ক সেন্সিটিভিটি স্লাইডার
-            ai_sensitivity = st.slider("বডি সুরক্ষা ও মাস্ক সেন্সিটিভিটি (Sensitivity):", min_value=1, max_value=20, value=5, step=1)
-            
             if st.button("ব্যাকগ্রাউন্ড পরিবর্তন করুন", type="primary", use_container_width=True):
-                with st.spinner("বডি সঠিকভাবে ডিটেক্ট করে ব্যাকগ্রাউন্ড রিমুভ করা হচ্ছে..."):
-                    transparent_img = remove(
-                        base_image, 
-                        session=ai_session, 
-                        alpha_matting=True, 
-                        alpha_matting_foreground_threshold=240,
-                        alpha_matting_background_threshold=10,
-                        alpha_matting_erode_size=ai_sensitivity
-                    )
+                with st.spinner("বডি ও পোশাক সঠিকভাবে ডিটেক্ট করে ব্যাকগ্রাউন্ড রিমুভ করা হচ্ছে..."):
+                    # পুরো বডি ও হিজাব ঠিক রাখার জন্য alpha_matting বন্ধ রাখা হয়েছে
+                    transparent_img = remove(base_image, session=ai_session, alpha_matting=False)
                 
                 if bg_selection == "স্বচ্ছ (Transparent/PNG)":
                     out = transparent_img; file_ext = "PNG"; mime_type = "image/png"; filename = "bg_removed.png"
@@ -234,7 +225,7 @@ if st.session_state.active_module == "1":
                     out = bg.convert("RGB"); file_ext = "JPEG"; mime_type = "image/jpeg"; filename = "new_bg.jpg"
                 
                 with col_v2:
-                    st.image(out, caption="Output (Fixed Body)", use_container_width=True)
+                    st.image(out, caption="Output (Full Body Fixed)", use_container_width=True)
                     buf = io.BytesIO()
                     if file_ext == "PNG": out.save(buf, format=file_ext)
                     else: out.save(buf, format=file_ext, quality=100, subsampling=0)
@@ -262,11 +253,10 @@ elif st.session_state.active_module == "3":
     st.markdown("### 🎨 3. ব্যাকগ্রাউন্ড কালার পরিবর্তন প্যানেল")
     if base_image:
         bg_color_pick = st.color_picker("ব্যাকগ্রাউন্ড কালার বেছে নিন:", "#87CEEB")
-        smoothness = st.slider("বর্ডার মসৃণতা:", 0, 20, 8, 2)
         if st.button(apply_txt, type="primary", use_container_width=True):
             if REMBG_AVAILABLE:
                 with st.spinner("Applying Color..."):
-                    transparent = remove(base_image, session=ai_session, alpha_matting=True, alpha_matting_erode_size=smoothness)
+                    transparent = remove(base_image, session=ai_session, alpha_matting=False)
                     h_val = bg_color_pick.lstrip('#')
                     bg_rgb = tuple(int(h_val[i:i+2], 16) for i in (0, 2, 4))
                     bg = Image.new("RGBA", base_image.size, bg_rgb + (255,))
