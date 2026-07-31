@@ -6,14 +6,6 @@ import io
 import random
 from pypdf import PdfReader, PdfWriter
 
-# rembg এরর হ্যান্ডেল করার জন্য নিরাপদ ইম্পোর্ট এবং ইন্টেলিজেন্ট এআই সেশন তৈরি
-try:
-    from rembg import remove, new_session
-    REMBG_AVAILABLE = True
-    ai_session = new_session("u2net")
-except Exception:
-    REMBG_AVAILABLE = False
-
 # পেজ কনফিগারেশন
 st.set_page_config(page_title="হাসানুর কম্পিউটার স্টুডিও", layout="wide", page_icon="📸")
 
@@ -41,7 +33,6 @@ st.markdown("""
     .contact-info { text-align: center; color: #38bdf8; font-size: 15px; margin-bottom: 25px; font-weight: bold; }
     .footer { text-align: center; margin-top: 60px; padding: 20px; color: #64748b; border-top: 1px solid #334155; font-size: 14px; }
     
-    /* ছোট সাইডবার স্ট্যাটাস বক্স */
     .sidebar-counter {
         background: #1e293b;
         border: 1px solid #334155;
@@ -189,49 +180,66 @@ if uploaded_file is not None:
 
 # ================= MODULE 1 =================
 if st.session_state.active_module == "1":
-    st.markdown("### 🪄 1. ছবির ব্যাকগ্রাউন্ড পরিবর্তন (PhotoRoom AI)")
+    st.markdown("### 🪄 1. ছবির ব্যাকগ্রাউন্ড পরিবর্তন (Studio Smart BG)")
     if base_image:
-        if REMBG_AVAILABLE:
-            bg_selection = st.selectbox(
-                "ব্যাকগ্রাউন্ড স্টাইল সিলেক্ট করুন:", 
-                ["স্বচ্ছ (Transparent/PNG)", "আকাশী (Sky Blue)", "পাসপোর্ট নীল (Studio Blue)", "অফিসিয়াল সাদা (Pure White)", "সলিড কালার (Color Picker)", "🏞️ গ্যালারি থেকে নিজস্ব কাস্টম ছবি/সিনারি"]
-            )
-            custom_bg_file = None
-            custom_color = "#ffffff"
-            if bg_selection == "সলিড কালার (Color Picker)":
-                custom_color = st.color_picker("আপনার পছন্দের রঙ সিলেক্ট করুন:", "#ff4b4b")
-            elif bg_selection == "🏞️ গ্যালারি থেকে নিজস্ব কাস্টম ছবি/সিনারি":
-                custom_bg_file = st.file_uploader("আপনার কাঙ্খিত ব্যাকগ্রাউন্ড সিনারিটি আপলোড করুন:", type=["jpg", "jpeg", "png"], key="m1_bg")
-            
-            if st.button("ব্যাকগ্রাউন্ড পরিবর্তন করুন", type="primary", use_container_width=True):
-                with st.spinner("বডি ও পোশাক সঠিকভাবে ডিটেক্ট করে ব্যাকগ্রাউন্ড রিমুভ করা হচ্ছে..."):
-                    # পুরো বডি ও হিজাব ঠিক রাখার জন্য alpha_matting বন্ধ রাখা হয়েছে
-                    transparent_img = remove(base_image, session=ai_session, alpha_matting=False)
+        bg_selection = st.selectbox(
+            "ব্যাকগ্রাউন্ড স্টাইল সিলেক্ট করুন:", 
+            ["আকাশী (Sky Blue)", "পাসপোর্ট নীল (Studio Blue)", "অফিসিয়াল সাদা (Pure White)", "সলিড কালার (Color Picker)", "🏞️ গ্যালারি থেকে নিজস্ব কাস্টম ছবি/সিনারি"]
+        )
+        custom_bg_file = None
+        custom_color = "#ffffff"
+        if bg_selection == "সলিড কালার (Color Picker)":
+            custom_color = st.color_picker("আপনার পছন্দের রঙ সিলেক্ট করুন:", "#ff4b4b")
+        elif bg_selection == "🏞️ গ্যালারি থেকে নিজস্ব কাস্টম ছবি/সিনারি":
+            custom_bg_file = st.file_uploader("আপনার কাঙ্খিত ব্যাকগ্রাউন্ড সিনারিটি আপলোড করুন:", type=["jpg", "jpeg", "png"], key="m1_bg")
+        
+        if st.button("ব্যাকগ্রাউন্ড পরিবর্তন করুন", type="primary", use_container_width=True):
+            with st.spinner("সম্পূর্ণ বডি অক্ষত রেখে ব্যাকগ্রাউন্ড পরিবর্তন করা হচ্ছে..."):
+                img_cv = cv2.cvtColor(np.array(base_image.convert("RGB")), cv2.COLOR_RGB2BGR)
                 
-                if bg_selection == "স্বচ্ছ (Transparent/PNG)":
-                    out = transparent_img; file_ext = "PNG"; mime_type = "image/png"; filename = "bg_removed.png"
-                elif bg_selection == "🏞️ গ্যালারি থেকে নিজস্ব কাস্টম ছবি/সিনারি" and custom_bg_file is not None:
-                    bg_custom = Image.open(custom_bg_file).resize(base_image.size, Image.Resampling.LANCZOS).convert("RGBA")
-                    bg_custom.paste(transparent_img, (0, 0), transparent_img)
-                    out = bg_custom.convert("RGB"); file_ext = "JPEG"; mime_type = "image/jpeg"; filename = "custom_bg.jpg"
-                else:
-                    if bg_selection == "আকাশী (Sky Blue)": hex_val = "87CEEB"
-                    elif bg_selection == "পাসপোর্ট নীল (Studio Blue)": hex_val = "0033aa"
-                    elif bg_selection == "অফিসিয়াল সাদা (Pure White)": hex_val = "ffffff"
-                    else: hex_val = custom_color.lstrip('#')
-                    bg_rgb = tuple(int(hex_val[i:i+2], 16) for i in (0, 2, 4))
-                    bg = Image.new("RGBA", base_image.size, bg_rgb + (255,))
-                    bg.paste(transparent_img, (0, 0), transparent_img)
-                    out = bg.convert("RGB"); file_ext = "JPEG"; mime_type = "image/jpeg"; filename = "new_bg.jpg"
+                # ছবির চার কোণ থেকে ব্যাকগ্রাউন্ডের রঙ স্যাম্পল নিয়ে রিমুভ করার স্মার্ট টেকনিক (বডি কাটবে না)
+                h_img, w_img = img_cv.shape[:2]
+                corners = [img_cv[10, 10], img_cv[10, w_img-10], img_cv[h_img-10, 10], img_cv[h_img-10, w_img-10]]
+                avg_bg_color = np.mean(corners, axis=0)
                 
-                with col_v2:
-                    st.image(out, caption="Output (Full Body Fixed)", use_container_width=True)
-                    buf = io.BytesIO()
-                    if file_ext == "PNG": out.save(buf, format=file_ext)
-                    else: out.save(buf, format=file_ext, quality=100, subsampling=0)
-                    st.download_button("📥 ডাউনলোড করুন", data=buf.getvalue(), file_name=filename, mime=mime_type, use_container_width=True)
-        else:
-            st.error("rembg মডিউল ইনস্টল করা নেই।")
+                # কালার টলারেন্স দিয়ে ব্যাকগ্রাউন্ড আলাদা করা
+                diff = np.sum(np.abs(img_cv - avg_bg_color), axis=2)
+                mask = np.where(diff < 45, 0, 255).astype(np.uint8)
+                
+                # নয়েজ কমানোর জন্য মরফোলজিক্যাল অপারেশন
+                kernel = np.ones((3,3), np.uint8)
+                mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel)
+                mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)
+                
+                # নতুন ব্যাকগ্রাউন্ড তৈরি
+                if bg_selection == "আকাশী (Sky Blue)": hex_val = "87CEEB"
+                elif bg_selection == "পাসপোর্ট নীল (Studio Blue)": hex_val = "0033aa"
+                elif bg_selection == "অফিসিয়াল সাদা (Pure White)": hex_val = "ffffff"
+                elif bg_selection == "সলিড কালার (Color Picker)": hex_val = custom_color.lstrip('#')
+                else: hex_val = "ffffff"
+                
+                bg_rgb = tuple(int(hex_val[i:i+2], 16) for i in (0, 2, 4))
+                bg_img = np.full_like(img_cv, bg_rgb[::-1], dtype=np.uint8)
+                
+                # মাস্ক দিয়ে ফোরগ্রাউন্ড ও ব্যাকগ্রাউন্ড ব্লেন্ড করা
+                mask_3ch = cv2.cvtColor(mask, cv2.COLOR_GRAY2BGR) / 255.0
+                foreground = img_cv.astype(float) * mask_3ch
+                background = bg_img.astype(float) * (1 - mask_3ch)
+                out_np = np.clip(foreground + background, 0, 255).astype(np.uint8)
+                
+                out = Image.fromarray(cv2.cvtColor(out_np, cv2.COLOR_BGR2RGB))
+                
+                if bg_selection == "🏞️ গ্যালারি থেকে নিজস্ব কাস্টম ছবি/সিনারি" and custom_bg_file is not None:
+                    bg_custom = Image.open(custom_bg_file).resize(base_image.size, Image.Resampling.LANCZOS).convert("RGB")
+                    alpha_mask = Image.fromarray(mask).convert("L")
+                    bg_custom.paste(base_image.convert("RGB"), (0, 0), alpha_mask)
+                    out = bg_custom
+
+            with col_v2:
+                st.image(out, caption="Output (Full Body Protected)", use_container_width=True)
+                buf = io.BytesIO()
+                out.save(buf, format="JPEG", quality=100, subsampling=0)
+                st.download_button("📥 ডাউনলোড করুন", data=buf.getvalue(), file_name="new_bg.jpg", mime="image/jpeg", use_container_width=True)
 
 # ================= MODULE 2 =================
 elif st.session_state.active_module == "2":
@@ -254,18 +262,29 @@ elif st.session_state.active_module == "3":
     if base_image:
         bg_color_pick = st.color_picker("ব্যাকগ্রাউন্ড কালার বেছে নিন:", "#87CEEB")
         if st.button(apply_txt, type="primary", use_container_width=True):
-            if REMBG_AVAILABLE:
-                with st.spinner("Applying Color..."):
-                    transparent = remove(base_image, session=ai_session, alpha_matting=False)
-                    h_val = bg_color_pick.lstrip('#')
-                    bg_rgb = tuple(int(h_val[i:i+2], 16) for i in (0, 2, 4))
-                    bg = Image.new("RGBA", base_image.size, bg_rgb + (255,))
-                    bg.paste(transparent, (0, 0), transparent)
-                    out = bg.convert("RGB")
-                    with col_v2:
-                        st.image(out, caption="Colored BG Output", use_container_width=True)
-                        buf = io.BytesIO(); out.save(buf, format="JPEG", quality=100, subsampling=0)
-                        st.download_button("📥 ডাউনলোড করুন", data=buf.getvalue(), file_name="color_bg.jpg", mime="image/jpeg", use_container_width=True)
+            with st.spinner("Applying Color..."):
+                img_cv = cv2.cvtColor(np.array(base_image.convert("RGB")), cv2.COLOR_RGB2BGR)
+                h_img, w_img = img_cv.shape[:2]
+                corners = [img_cv[10, 10], img_cv[10, w_img-10], img_cv[h_img-10, 10], img_cv[h_img-10, w_img-10]]
+                avg_bg_color = np.mean(corners, axis=0)
+                
+                diff = np.sum(np.abs(img_cv - avg_bg_color), axis=2)
+                mask = np.where(diff < 45, 0, 255).astype(np.uint8)
+                
+                hex_val = bg_color_pick.lstrip('#')
+                bg_rgb = tuple(int(hex_val[i:i+2], 16) for i in (0, 2, 4))
+                bg_img = np.full_like(img_cv, bg_rgb[::-1], dtype=np.uint8)
+                
+                mask_3ch = cv2.cvtColor(mask, cv2.COLOR_GRAY2BGR) / 255.0
+                foreground = img_cv.astype(float) * mask_3ch
+                background = bg_img.astype(float) * (1 - mask_3ch)
+                out_np = np.clip(foreground + background, 0, 255).astype(np.uint8)
+                
+                out = Image.fromarray(cv2.cvtColor(out_np, cv2.COLOR_BGR2RGB))
+                with col_v2:
+                    st.image(out, caption="Colored BG Output", use_container_width=True)
+                    buf = io.BytesIO(); out.save(buf, format="JPEG", quality=100, subsampling=0)
+                    st.download_button("📥 ডাউনলোড করুন", data=buf.getvalue(), file_name="color_bg.jpg", mime="image/jpeg", use_container_width=True)
 
 # ================= MODULE 4 =================
 elif st.session_state.active_module == "4":
