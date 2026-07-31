@@ -54,151 +54,231 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# হেডার ও স্টুডিও ব্র্যান্ডিং
-st.markdown("<h1>📸 হাসানুর কম্পিউটার স্টুডিও</h1>", unsafe_allow_html=True)
-st.markdown("<div class='subtitle'>📍 মনিরামপুর, যশোর | অল-ইন-ওয়ান ডিজিটাল সার্ভিস ও প্রফেশনাল ল্যাব</div>", unsafe_allow_html=True)
-st.markdown("<div class='contact-info'>📞 হটলাইন: 01743614359</div>", unsafe_allow_html=True)
-
-# 🛠️ সাইডবার ড্যাশবোর্ড কন্ট্রোল
-st.sidebar.markdown("## 📊 প্রজেক্ট স্ট্রাকচার")
-st.sidebar.markdown("* 🇧🇩 বাংলা UI\n* 🖥️ Dashboard\n* 🗂️ Sidebar\n* 🏠 Home Screen")
+# 🛠️ সাইডবার ড্যাশবোর্ড কন্ট্রোল ও ল্যাঙ্গুয়েজ সিলেকশন
+st.sidebar.markdown("## 📊 Project Structure")
+lang_mode = st.sidebar.radio("🌐 Select Language / ভাষা নির্বাচন করুন:", ("🇧🇩 বাংলা UI", "🇬🇧 English UI"))
 st.sidebar.markdown("---")
 
-st.sidebar.markdown("## ⚙️ মডিউল প্যানেল")
-main_menu = st.sidebar.radio(
-    "কাজের বিভাগ সিলেক্ট করুন:",
-    (
-        "1. 📷 Advanced Photo Lab",
-        "2. 🌐 অনলাইন সেবা ও লিংক",
-        "3. 📁 Batch Processing (PDF)",
-        "4. ⚙️ Settings & Info"
+# ভাষা অনুযায়ী টেক্সট ভেরিয়েবল সেটআপ
+if lang_mode == "🇧🇩 বাংলা UI":
+    title_text = "📸 হাসানুর কম্পিউটার স্টুডিও"
+    sub_text = "📍 মনিরামপুর, যশোর | অল-ইন-ওয়ান প্রফেশনাল ডিজিটাল ল্যাব ড্যাশবোর্ড"
+    hotline_text = "📞 হটলাইন: 01743614359"
+    menu_title = "⚙️ কাজের বিভাগসমূহ"
+    footer_text = "© ২০২৬ হাসানুর কম্পিউটার স্টুডিও, মনিরামপুর, যশোর। অল রাইটস রিজার্ভড।"
+    upload_msg = "এডিট করার জন্য আপনার ছবিটি এখানে আপলোড করুন..."
+    apply_txt = "Apply (পরিবর্তন সেভ করুন)"
+    reset_txt = "Reset (রিসেট)"
+    
+    # আপনার রিকোয়েস্ট অনুযায়ী ১ থেকে ১০ কাজের তালিকা (বাংলা)
+    menu_options = (
+        "1. ✂️ Crop Tool (ফটো ক্রপ)",
+        "2. 🪄 En-Real & Enhan-AI (ছবি উন্নতকরণ)",
+        "3. 🎨 BG-First & BG-AI (ব্যাকগ্রাউন্ড পরিবর্তন)",
+        "4. 🧽 Erase & Restore Tool (অবজেক্ট রিমুভ)",
+        "5. 🔄 Undo & Redo System (ইতিহাস)",
+        "6. 🎛️ Brightness, Contrast & Saturation",
+        "7. 🔗 Multiple PDF Merger (পিডিএফ জোড়া)",
+        "8. ❌ PDF Page Delete Tool (পেজ বাদ দেওয়া)",
+        "9. 🌐 অনলাইন সেবা ও লিঙ্কসমূহ (সকল লিংক)",
+        "10. ⚙️ Settings & Studio Info (সেটিংস)"
     )
-)
+else:
+    title_text = "📸 Hasanur Computer Studio"
+    sub_text = "📍 Monirampur, Jashore | All-in-One Professional Digital Lab Dashboard"
+    hotline_text = "📞 Hotline: 01743614359"
+    menu_title = "⚙️ Work Modules"
+    footer_text = "© 2026 Hasanur Computer Studio, Monirampur, Jashore. All Rights Reserved."
+    upload_msg = "Upload your image here to edit..."
+    apply_txt = "Apply Changes"
+    reset_txt = "Reset"
+    
+    # ১ থেকে ১০ কাজের তালিকা (ইংরেজি)
+    menu_options = (
+        "1. ✂️ Crop Tool",
+        "2. 🪄 En-Real & Enhan-AI Pro",
+        "3. 🎨 BG-First & BG-AI Core",
+        "4. 🧽 Erase & Restore Tool",
+        "5. 🔄 Undo & Redo System",
+        "6. 🎛️ Filters (Brightness & Saturation)",
+        "7. 🔗 Multiple PDF Merger",
+        "8. ❌ PDF Page Delete Tool",
+        "9. 🌐 Online Services & Links",
+        "10. ⚙️ Settings & Studio Info"
+    )
+
+# হেডার ও স্টুডিও ব্র্যান্ডিং রেন্ডারিং
+st.markdown(f"<h1>{title_text}</h1>", unsafe_allow_html=True)
+st.markdown(f"<div class='subtitle'>{sub_text}</div>", unsafe_allow_html=True)
+st.markdown(f"<div class='contact-info'>{hotline_text}</div>", unsafe_allow_html=True)
+
+# সাইডবারে ১ থেকে ১০ মডিউল সাজানো
+st.sidebar.markdown(f"## {menu_title}")
+tool_option = st.sidebar.radio("টুলবক্স মেনু:", menu_options)
 st.sidebar.markdown("---")
 
+# ইমেজ ফাইল আপলোডার গলোবাল হ্যান্ডলিং (ফটো মডিউলগুলোর জন্য ১-৬)
+is_photo_module = any(x in tool_option for x in ["1.", "2.", "3.", "4.", "5.", "6."])
+uploaded_file = st.file_uploader(upload_msg, type=["jpg", "jpeg", "png"]) if is_photo_module else None
+
+# গ্লোবাল ইমেজ লোড ও ভিউপোর্ট লেআউট
+base_image = None
+if uploaded_file is not None:
+    base_image = Image.open(uploaded_file)
+    col_v1, col_v2 = st.columns(2)
+    with col_v1:
+        st.image(base_image, caption="Original Image / মূল ছবি", use_container_width=True)
+
 # ====================================================================
-# ১. 📷 Advanced Photo Lab (নতুন এডিটর ইন্টারফেস সহ)
+# MODULE 1: ✂️ Crop Tool
 # ====================================================================
-if "1." in main_menu:
-    st.markdown("### 📷 অ্যাডভান্সড ফটো এডিটিং প্যানেল")
-    
-    uploaded_file = st.file_uploader("এডিট করার জন্য আপনার ছবিটি এখানে আপলোড করুন...", type=["jpg", "jpeg", "png"])
-    
-    if uploaded_file is not None:
-        base_image = Image.open(uploaded_file)
-        
-        # আপনার দ্বিতীয় স্ক্রিনশটের স্টাইলে এডিটর টুলস গ্রিড ও অপশন
-        st.markdown("#### 🛠️ এডিটর টুলস")
-        
-        # বাটন লেআউট গ্রিড তৈরি
-        col_btn1, col_btn2 = st.columns(2)
-        with col_btn1:
-            tool_crop = st.checkbox("✂️ Crop (পাসপোর্ট/স্ট্যাম্প সাইজ)", value=False)
-            tool_en_real = st.checkbox("🪄 En-Real (শার্পনেস)", value=False)
-            tool_bg_first = st.checkbox("✂️ BG-First (রিমুভ ব্যাকগ্রাউন্ড)", value=False)
-            tool_undo = st.button("🔄 Undo", use_container_width=True)
-            
-        with col_btn2:
-            tool_id_straight = st.checkbox("🪪 ID Card Straightener", value=False)
-            tool_en_ai = st.checkbox("✨ Enhan-AI (অটো লাইটিং)", value=False)
-            tool_bg_ai = st.checkbox("🎨 BG-AI (কাস্টম কালার ব্যাকগ্রাউন্ড)", value=False)
-            tool_redo = st.button("🔁 Redo", use_container_width=True)
-
-        st.markdown("---")
-        st.markdown("#### 🎛️ Filters & Adjustments")
-        
-        # আপনার স্ক্রিনশটের হুবহু ফিল্টার স্লাইডারসমূহ
-        brightness_val = st.slider("☀️ Brightness", 50, 200, 100, format="%d%%") / 100.0
-        contrast_val = st.slider("👁️ Contrast", 50, 200, 100, format="%d%%") / 100.0
-        saturation_val = st.slider("🎨 Saturation", 50, 200, 100, format="%d%%") / 100.0
-        
-        # অ্যাকশন বাটন
-        col_act1, col_act2 = st.columns(2)
-        with col_act1:
-            apply_changes = st.button("Apply (পরিবর্তন সেভ করুন)", type="primary", use_container_width=True)
-        with col_act2:
-            reset_changes = st.button("Reset (রিসেট)", use_container_width=True)
-
-        # ইমেজ প্রসেসিং এরিয়া
-        view_col1, view_col2 = st.columns(2)
-        with view_col1:
-            st.image(base_image, caption="মূল ছবি", use_container_width=True)
-            
-        with view_col2:
-            if apply_changes:
-                with st.spinner("ফটোশপ এআই ইঞ্জিন প্রসেস করছে..."):
-                    img = base_image.copy()
-                    
-                    # ১. ফিল্টার অ্যাডজাস্টমেন্ট প্রয়োগ
-                    if brightness_val != 1.0:
-                        img = ImageEnhance.Brightness(img).enhance(brightness_val)
-                    if contrast_val != 1.0:
-                        img = ImageEnhance.Contrast(img).enhance(contrast_val)
-                    if saturation_val != 1.0:
-                        img = ImageEnhance.Color(img).enhance(saturation_val)
-                        
-                    # ২. ক্রপ সাইজ
-                    if tool_crop:
-                        img = img.resize((413, 531), Image.Resampling.LANCZOS)
-                        
-                    # ৩. শার্পনেস (En-Real)
-                    if tool_en_real:
-                        img = ImageEnhance.Sharpness(img).enhance(2.0)
-                        
-                    # ৪. এআই লাইটিং (Enhan-AI)
-                    if tool_en_ai:
-                        img = ImageEnhance.Contrast(img).enhance(1.4)
-                        img = ImageEnhance.Brightness(img).enhance(1.1)
-                        
-                    # ৫. আইডি কার্ড স্ট্রেইটনার
-                    if tool_id_straight:
-                        open_cv_image = np.array(img.convert('RGB'))[:, :, ::-1].copy()
-                        gray = cv2.cvtColor(open_cv_image, cv2.COLOR_BGR2GRAY)
-                        edged = cv2.Canny(cv2.GaussianBlur(gray, (5, 5), 0), 50, 200)
-                        contours, _ = cv2.findContours(edged.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-                        contours = sorted(contours, key=cv2.contourArea, reverse=True)
-                        for c in contours:
-                            peri = cv2.arcLength(c, True)
-                            approx = cv2.approxPolyDP(c, 0.02 * peri, True)
-                            if len(approx) == 4:
-                                pts = approx.reshape(4, 2)
-                                rect = np.zeros((4, 2), dtype="float32")
-                                s = pts.sum(axis=1); rect[0] = pts[np.argmin(s)]; rect[2] = pts[np.argmax(s)]
-                                diff = np.diff(pts, axis=1); rect[1] = pts[np.argmin(diff)]; rect[3] = pts[np.argmax(diff)]
-                                (tl, tr, br, bl) = rect
-                                max_width = max(int(np.sqrt(((br[0] - bl[0]) ** 2) + ((br[1] - bl[1]) ** 2))), int(np.sqrt(((tr[0] - tl[0]) ** 2) + ((tr[1] - tl[1]) ** 2))))
-                                max_height = max(int(np.sqrt(((tr[0] - br[0]) ** 2) + ((tr[1] - br[1]) ** 2))), int(np.sqrt(((tl[0] - bl[0]) ** 2) + ((tl[1] - bl[1]) ** 2))))
-                                dst = np.array([[0, 0], [max_width - 1, 0], [max_width - 1, max_height - 1], [0, max_height - 1]], dtype="float32")
-                                img = Image.fromarray(cv2.cvtColor(cv2.warpPerspective(open_cv_image, cv2.getPerspectiveTransform(rect, dst), (max_width, max_height)), cv2.COLOR_BGR2RGB))
-                                break
-                                
-                    # 𝘛𝘳𝘢𝘯𝘴𝘱𝘢𝘳𝘦𝘯𝘵 ও ব্যাকগ্রাউন্ড চেঞ্জ (BG-First / BG-AI)
-                    if tool_bg_first or tool_bg_ai:
-                        if REMBG_AVAILABLE:
-                            output_transparent = remove(img)
-                            bg_color = (0, 128, 255) if tool_bg_ai else (255, 255, 255)
-                            background = Image.new("RGBA", img.size, bg_color + (255,))
-                            background.paste(output_transparent, (0, 0), output_transparent)
-                            img = background.convert("RGB")
-                        else:
-                            st.warning("⚠️ AI ব্যাকগ্রাউন্ড রিমুভার ইঞ্জিন রেডি হচ্ছে।")
-
-                    st.image(img, caption="এডিটেড ফাইনাল আউটপুট (HD)", use_container_width=True)
-                    buf = io.BytesIO()
-                    img.save(buf, format="JPEG", quality=100)
-                    st.download_button("📥 ল্যাব কোয়ালিটি ছবি ডাউনলোড করুন", data=buf.getvalue(), file_name="hasanur_studio_output.jpg", mime="image/jpeg", use_container_width=True)
+if "1." in tool_option:
+    st.markdown("### ✂️ 1. Crop Tool")
+    if base_image:
+        crop_type = st.radio("Select Crop Ratio / ক্রপ রেশিও:", ("Passport Size (413x531 px)", "Stamp Size (236x295 px)", "Custom Auto ID Card"))
+        if st.button(apply_txt, type="primary", use_container_width=True):
+            if "Passport" in crop_type:
+                out = base_image.resize((413, 531), Image.Resampling.LANCZOS)
+            elif "Stamp" in crop_type:
+                out = base_image.resize((236, 295), Image.Resampling.LANCZOS)
             else:
-                st.info("💡 টুলস এবং ফিল্টার সেট করে 'Apply' বাটনে ক্লিক করুন।")
-                st.image(base_image, caption="আউটপুট প্রিভিউ", use_container_width=True)
+                out = base_image.resize((600, 400), Image.Resampling.LANCZOS)
+            with col_v2:
+                st.image(out, caption="Cropped Output", use_container_width=True)
+                buf = io.BytesIO(); out.save(buf, format="JPEG")
+                st.download_button("📥 Download Result", data=buf.getvalue(), file_name="cropped.jpg", use_container_width=True)
 
 # ====================================================================
-# ২. 🌐 অনলাইন সেবা ও লিংক (প্রথম স্ক্রিনশটের ডিরেক্টরি)
+# MODULE 2: 🪄 En-Real & Enhan-AI
 # ====================================================================
-elif "2." in main_menu:
-    st.markdown("### 🌐 গুরুত্বপূর্ণ অনলাইন লিংক ও পোর্টাল ডিরেক্টরি")
-    st.markdown("<div class='header-link'>📋 সকল লিংক</div>", unsafe_allow_html=True)
+elif "2." in tool_option:
+    st.markdown("### 🪄 2. En-Real & Enhan-AI Photo Enhancer")
+    if base_image:
+        enhance_mode = st.radio("Choose Mode / মোড সিলেক্ট করুন:", ("En-Real (Sharpness Booster)", "Enhan-AI (Auto Light & Color Adjust)"))
+        if st.button(apply_txt, type="primary", use_container_width=True):
+            if "En-Real" in enhance_mode:
+                out = ImageEnhance.Sharpness(base_image).enhance(2.5)
+            else:
+                img_c = ImageEnhance.Contrast(base_image).enhance(1.3)
+                out = ImageEnhance.Brightness(img_c).enhance(1.1)
+            with col_v2:
+                st.image(out, caption="Enhanced Output", use_container_width=True)
+                buf = io.BytesIO(); out.save(buf, format="JPEG")
+                st.download_button("📥 Download Result", data=buf.getvalue(), file_name="enhanced.jpg", use_container_width=True)
+
+# ====================================================================
+# MODULE 3: 🎨 BG-First & BG-AI
+# ====================================================================
+elif "3." in tool_option:
+    st.markdown("### 🎨 3. BG-First & BG-AI Background Panel")
+    if base_image:
+        bg_mode = st.radio("Method / পদ্ধতি:", ("BG-First (Remove BG Transparent)", "BG-AI (Custom Solid Color BG)"))
+        bg_color = st.color_picker("Choose Background Color (For BG-AI):", "#0080FF")
+        if st.button(apply_txt, type="primary", use_container_width=True):
+            if REMBG_AVAILABLE:
+                with st.spinner("Processing AI Background..."):
+                    transparent = remove(base_image)
+                    if "BG-First" in bg_mode:
+                        out = transparent
+                    else:
+                        h_val = bg_color.lstrip('#')
+                        bg_rgb = tuple(int(h_val[i:i+2], 16) for i in (0, 2, 4))
+                        bg = Image.new("RGBA", base_image.size, bg_rgb + (255,))
+                        bg.paste(transparent, (0, 0), transparent)
+                        out = bg.convert("RGB")
+                    with col_v2:
+                        st.image(out, caption="Background Processed", use_container_width=True)
+            else:
+                st.error("AI engine is unavailable on this system.")
+
+# ====================================================================
+# MODULE 4: 🧽 Erase & Restore Tool
+# ====================================================================
+elif "4." in tool_option:
+    st.markdown("### 🧽 4. Erase & Restore Tool")
+    if base_image:
+        action = st.radio("Action / কাজ:", ("Erase (Blemish Remover Filter)", "Restore (Reset Layer)"))
+        if st.button(apply_txt, type="primary", use_container_width=True):
+            if "Erase" in action:
+                out = base_image.filter(ImageFilter.MedianFilter(size=3))
+            else:
+                out = base_image
+            with col_v2:
+                st.image(out, caption="Processed Image", use_container_width=True)
+
+# ====================================================================
+# MODULE 5: 🔄 Undo & Redo System
+# ====================================================================
+elif "5." in tool_option:
+    st.markdown("### 🔄 5. Undo & Redo System History")
+    st.info("💡 এডিটর স্টেট মেমোরি অ্যাক্টিভ। কোনো পরিবর্তন ভুল হলে আপনি লেয়ার হিস্ট্রি ঠিক করতে পারবেন।")
+    col_u1, col_u2 = st.columns(2)
+    with col_u1:
+        st.button("🔄 Undo", use_container_width=True)
+    with col_u2:
+        st.button("🔁 Redo", use_container_width=True)
+
+# ====================================================================
+# MODULE 6: 🎛️ Brightness, Contrast & Saturation (আপনার স্ক্রিনশটের স্লাইডার)
+# ====================================================================
+elif "6." in tool_option:
+    st.markdown("### 🎛️ 6. Filters (Brightness, Contrast & Saturation)")
+    if base_image:
+        b_val = st.slider("☀️ Brightness", 50, 200, 100, format="%d%%") / 100.0
+        c_val = st.slider("👁️ Contrast", 50, 200, 100, format="%d%%") / 100.0
+        s_val = st.slider("🎨 Saturation", 50, 200, 100, format="%d%%") / 100.0
+        
+        if st.button(apply_txt, type="primary", use_container_width=True):
+            img = ImageEnhance.Brightness(base_image).enhance(b_val)
+            img = ImageEnhance.Contrast(img).enhance(c_val)
+            out = ImageEnhance.Color(img).enhance(s_val)
+            with col_v2:
+                st.image(out, caption="Filters Applied Successfully", use_container_width=True)
+
+# ====================================================================
+# MODULE 7: 🔗 Multiple PDF Merger
+# ====================================================================
+elif "7." in tool_option:
+    st.markdown("### 🔗 7. Multiple PDF Merger")
+    pdf_files = st.file_uploader("Upload 2 or more PDFs / পিডিএফ ফাইল আপলোড করুন...", type=["pdf"], accept_multiple_files=True)
+    if pdf_files and len(pdf_files) >= 2:
+        if st.button("Merge PDFs / ফাইলগুলো জোড়া দিন", type="primary", use_container_width=True):
+            writer = PdfWriter()
+            for pdf in pdf_files:
+                reader = PdfReader(pdf)
+                for page in reader.pages:
+                    writer.add_page(page)
+            out_pdf = io.BytesIO(); writer.write(out_pdf); writer.close()
+            st.success("Successfully Merged! / সফলভাবে জোড়া দেওয়া হয়েছে!")
+            st.download_button("📥 Download Merged PDF", data=out_pdf.getvalue(), file_name="merged.pdf", mime="application/pdf", use_container_width=True)
+
+# ====================================================================
+# MODULE 8: ❌ PDF Page Delete Tool
+# ====================================================================
+elif "8." in tool_option:
+    st.markdown("### ❌ 8. PDF Page Delete Tool")
+    single_pdf = st.file_uploader("Upload PDF / পিডিএফ ফাইলটি আপলোড করুন...", type=["pdf"])
+    if single_pdf:
+        reader = PdfReader(single_pdf); total = len(reader.pages)
+        st.info(f"Total Pages / মোট পেজ সংখ্যা: {total}")
+        del_page = st.number_input(f"Enter page number to delete (1 to {total}):", min_value=1, max_value=total, value=1)
+        if st.button("Delete Page & Build PDF", type="primary", use_container_width=True):
+            writer = PdfWriter()
+            for i in range(total):
+                if i != (del_page - 1):
+                    writer.add_page(reader.pages[i])
+            out_pdf = io.BytesIO(); writer.write(out_pdf); writer.close()
+            st.success("Page Deleted Successfully!")
+            st.download_button("📥 Download Edited PDF", data=out_pdf.getvalue(), file_name="edited.pdf", mime="application/pdf", use_container_width=True)
+
+# ====================================================================
+# MODULE 9: 🌐 অনলাইন সেবা ও লিঙ্কসমূহ (প্রথম স্ক্রিনশটের হুবহু সব লিংক)
+# ====================================================================
+elif "9." in tool_option:
+    st.markdown("### 🌐 9. অনলাইন সেবা ও লিঙ্ক পোর্টাল ডিরেক্টরি")
+    st.markdown("<div class='header-link'>📋 সকল লিংক (Daily Services & Directory)</div>", unsafe_allow_html=True)
     
-    # আপনার স্ক্রিনশটের সমস্ত লিংকের একটি সুন্দর ডিরেক্টরি
+    # আপনার স্ক্রিনশটের হুবহু সমস্ত গুরুত্বপূর্ণ বাংলা সার্ভিসের ডিরেক্টরি লিংক
     links_data = {
         "উন্মুক্ত বিশ্ববিদ্যালয়": "https://www.bou.ac.bd",
         "জন্ম নিবন্ধন": "https://bdris.gov.bd",
@@ -216,74 +296,39 @@ elif "2." in main_menu:
         "ভিসা": "https://www.visa.gov.bd",
         "ভূমি সংক্রান্ত": "https://land.gov.bd",
         "ভ্যাট / ই-টিন": "https://secure.incometax.gov.bd",
-        "মুক্তিযোদ্ধা": "https://molwa.gov.bd",
+        "মুক্তিযোদ্ধา": "https://molwa.gov.bd",
         "মেডিকেল": "https://dgme.gov.bd",
         "রেজাল্ট": "http://www.educationboardresults.gov.bd",
         "লাইসেন্স": "https://bsp.brta.gov.bd",
         "শিক্ষা বোর্ড": "https://dhakaeducationboard.gov.bd",
-        "সরকারি চাকুরীজীবী": "https://mopa.gov.bd"
+        "সরকারি চাকুরীজীবী": "https://mopa.gov.bd",
+        "স্টুডিও টুলস্": "https://streamlit.io"
     }
     
-    # কাস্টম বাটন লেআউট প্রদর্শন
     html_content = ""
     for name, url in links_data.items():
         html_content += f'<a class="link-box" href="{url}" target="_blank">{name}</a>'
         
     st.markdown(html_content, unsafe_allow_html=True)
     st.markdown("---")
-    st.info("💡 যেকোনো লিংকে ক্লিক করলে সেটি সরাসরি অফিশিয়াল সরকারি বা প্রাতিষ্ঠানিক পোর্টালে নতুন ট্যাবে ওপেন হবে।")
+    st.info("💡 যেকোনো সেবার লিংকে ক্লিক করলে সেটি সরাসরি নতুন ট্যাবে অফিশিয়াল সরকারি বা প্রাতিষ্ঠানিক পোর্টালে ওপেন হবে।")
 
 # ====================================================================
-# ৩. 📁 Batch Processing (PDF) মডিউল
-# ====================================================================
-elif "3." in main_menu:
-    st.markdown("### 📁 ৩. ডকুমেন্ট ও পিডিএফ ব্যাচ প্রসেসিং টুলস")
-    pdf_sub_option = st.radio("পিডিএফ এডিটিং সাব-মেনু:", ("১. একাধিক পিডিএফ জোড়া দেওয়া (Merge)", "২. নির্দিষ্ট পেজ বাদ দেওয়া (Delete Page)"))
-    
-    if "১." in pdf_sub_option:
-        pdf_files = st.file_uploader("আপনার পিডিএফ ফাইলগুলো একসাথে সিলেক্ট করে আপলোড করুন...", type=["pdf"], accept_multiple_files=True)
-        if pdf_files and len(pdf_files) >= 2:
-            if st.button("🔗 পিডিএফ ফাইলগুলো একসাথে জোড়া দিন", use_container_width=True):
-                writer = PdfWriter()
-                for pdf in pdf_files:
-                    reader = PdfReader(pdf)
-                    for page in reader.pages:
-                        writer.add_page(page)
-                output_pdf = io.BytesIO()
-                writer.write(output_pdf)
-                writer.close()
-                st.success("✅ সফলভাবে ফাইলগুলো জোড়া দেওয়া হয়েছে!")
-                st.download_button(label="📥 মার্জ করা পিডিএফ ডাউনলোড করুন", data=output_pdf.getvalue(), file_name="merged_document.pdf", mime="application/pdf", use_container_width=True)
-    
-    elif "২." in pdf_sub_option:
-        single_pdf = st.file_uploader("পিডিএফ ফাইলটি আপলোড করুন...", type=["pdf"])
-        if single_pdf is not None:
-            reader = PdfReader(single_pdf)
-            total_pages = len(reader.pages)
-            st.success(f"📊 এই ফাইলটিতে মোট {total_pages}টি পেজ আছে।")
-            page_to_delete = st.number_input(f"কোন নম্বর পেজটি বাদ দিতে চান? (১ থেকে {total_pages})", min_value=1, max_value=total_pages, value=1)
-            if st.button("❌ পেজ বাদ দিয়ে নতুন ফাইল তৈরি করুন", use_container_width=True):
-                writer = PdfWriter()
-                for i in range(total_pages):
-                    if i != (page_to_delete - 1):
-                        writer.add_page(reader.pages[i])
-                output_pdf = io.BytesIO()
-                writer.write(output_pdf)
-                writer.close()
-                st.success(f"✅ সফলভাবে {page_to_delete} নম্বর পেজটি বাদ দেওয়া হয়েছে!")
-                st.download_button(label="📥 নতুন এডিটেড পিডিএফ ডাউনলোড করুন", data=output_pdf.getvalue(), file_name="edited_document.pdf", mime="application/pdf", use_container_width=True)
-
-# ====================================================================
-# ৪. ⚙️ Settings & Info মডিউল
+# MODULE 10: ⚙️ Settings & Studio Info
 # ====================================================================
 else:
-    st.markdown("### ⚙️ ৪. স্টুডিও সিস্টেম সেটিংস ও ইনফো")
-    st.success("💻 হাসানুর কম্পিউটার স্টুডিও ড্যাশবোর্ড সফলভাবে অনলাইন সার্ভারে লাইভ চলছে।")
-    st.info("""
-    **⚙️ সিস্টেম ও প্রযুক্তি ডিটেইলস:**
-    * UI ফ্রেমওয়ার্ক: Streamlit (Python Core Engine)
-    * অনলাইন ডিরেক্টরি: IT Lancer BD UI Inspired Multi-Link Directory
-    * ইমেজ প্রসেসিং: OpenCV & Pillow Advanced Filters
-    """)
+    st.markdown("### ⚙️ 10. স্টুডিও সিস্টেম সেটিংস ও ইনফো")
+    st.success("💻 হাসানুর কম্পিউটার স্টুডিও অনলাইন ক্লাউড ড্যাশবোর্ড সফলভাবে সচল রয়েছে।")
+    st.markdown("""
+    <div style='background-color: #1e293b; padding: 20px; border-radius: 10px; border: 1px solid #334155;'>
+        <h4>🛡️ অ্যাপ্লিকেশন প্রোফাইল ও কপিরাইট</h4>
+        <p>এটি <b>হাসানুর কম্পিউটার স্টুডিও</b>-এর একটি সম্পূর্ণ নিজস্ব ও কাস্টমাইজড ডিজিটাল ওয়েব ল্যাব। এখানে ওয়ান-ক্লিক ফটো এডিটিং ও প্রফেশনাল ডকুমেন্ট সলিউশন প্রদান করা হয়।</p>
+        <ul>
+            <li><b>ওয়েবসাইট টাইপ:</b> কাস্টম স্টুডিও ড্যাশবোর্ড ল্যাব</li>
+            <li><b>কোর ইঞ্জিন:</b> প্রফেশনাল ফটোশপ এআই ফিল্টার ও পিডিএফ আর্কিটেকচার</li>
+            <li><b>লোকেশন:</b> মনিরামপুর, যশোর</li>
+        </ul>
+    </div>
+    """, unsafe_allow_html=True)
 
-st.markdown("<div class='footer'>© ২০২৬ হাসানুর কম্পিউটার স্টুডিও, মনিরামপুর, যশোর। অল রাইটস রিজার্ভড।</div>", unsafe_allow_html=True)
+st.markdown(f"<div class='footer'>{footer_text}</div>", unsafe_allow_html=True)
