@@ -25,69 +25,109 @@ def FB_blur_fusion_foreground_estimator(image, F, B, alpha, r=90):
     F = np.clip(F, 0, 1)
     return F, blurred_B
 
-# পেজের লেআউট এবং কাস্টম স্টাইল সেটআপ
+# পেজের লেআউট সেটআপ
 st.set_page_config(page_title="হাসানুর কম্পিউটার স্টুডিও / Hasanur Computer Studio", layout="wide")
 
-st.markdown("""
+# =====================================================================
+# থিম এবং ভাষা সিলেকশন (সাইডবার কন্ট্রোল)
+# =====================================================================
+st.sidebar.header("⚙️ সেটিংস / Settings")
+lang = st.sidebar.selectbox("ভাষা / Language", ["বাংলা (Bengali)", "English"])
+theme = st.sidebar.selectbox("থিম / Theme", ["Light Theme ☀️", "Dark Theme 🌙"])
+
+is_eng = (lang == "English")
+is_dark = ("Dark" in theme)
+
+# ডাইনামিক সিএসএস (লাইট ও ডার্ক থিমের জন্য)
+if is_dark:
+    bg_main = "#0e1117"
+    sidebar_bg = "#161b22"
+    text_color = "#c9d1d9"
+    btn_bg = "#21262d"
+    btn_text = "#e6edf3"
+    btn_border = "#30363d"
+    link_bg = "#1f242c"
+    header_gradient = "linear-gradient(135deg, #1f4068, #162447)"
+else:
+    bg_main = "#ffffff"
+    sidebar_bg = "#fcfcfc"
+    text_color = "#333333"
+    btn_bg = "#ffffff"
+    btn_text = "#333333"
+    btn_border = "#e0e0e0"
+    link_bg = "#f8f9fa"
+    header_gradient = "linear-gradient(135deg, #0B50FA, #ff4b4b)"
+
+st.markdown(f"""
 <style>
-    /* সাইডবার সবসময় দৃশ্যমান ও বড় রাখার জন্য */
-    [data-testid="stSidebar"] {
+    /* মেইন পেজ ব্যাকগ্রাউন্ড এবং টেক্সট কালার */
+    .stApp {{
+        background-color: {bg_main};
+        color: {text_color};
+    }}
+    
+    /* সাইডবারের স্টাইল */
+    [data-testid="stSidebar"] {{
         min-width: 380px !important;
         max-width: 410px !important;
-        background-color: #fcfcfc;
-    }
+        background-color: {sidebar_bg} !important;
+    }}
     
-    .link-box {
-        background-color: #f8f9fa;
+    .link-box {{
+        background-color: {link_bg};
         padding: 15px;
         border-radius: 8px;
         border-left: 5px solid #ff4b4b;
         margin-bottom: 10px;
-    }
-    .studio-header {
-        background: linear-gradient(135deg, #0B50FA, #ff4b4b);
+        color: {text_color};
+    }}
+    
+    .studio-header {{
+        background: {header_gradient};
         padding: 22px;
         border-radius: 12px;
         color: white;
         text-align: center;
         margin-bottom: 20px;
         box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-    }
+    }}
     
-    /* সাইডবার বাটনগুলোর স্টাইল এবং হোভার (Hover) কালারিং ইফেক্ট */
-    .stButton > button {
-        width: 100%;
-        text-align: left;
-        background-color: #ffffff;
-        color: #333333;
-        border: 1px solid #e0e0e0;
+    /* সাইডবার বাটনগুলোর টেক্সট বক্স ফিটিং স্টাইল (মাল্টিলাইন এবং টেক্সট র‍্যাপ) */
+    .stButton > button {{
+        width: 100% !important;
+        height: auto !important;
+        min-height: 48px !important;
+        white-space: normal !important;
+        word-wrap: break-word !important;
+        text-align: left !important;
+        background-color: {btn_bg};
+        color: {btn_text};
+        border: 1px solid {btn_border};
         border-radius: 8px;
-        padding: 10px 15px;
+        padding: 10px 12px !important;
         font-weight: 600;
         font-size: 13px;
         margin-bottom: 5px;
         transition: all 0.3s ease;
         box-shadow: 0 2px 5px rgba(0,0,0,0.02);
-    }
-    .stButton > button:hover {
+        display: block !important;
+    }}
+    .stButton > button div {{
+        white-space: normal !important;
+        word-wrap: break-word !important;
+        width: 100% !important;
+    }}
+    .stButton > button:hover {{
         background: linear-gradient(135deg, #0B50FA, #ff4b4b) !important;
         color: white !important;
         border-color: #0B50FA !important;
-        padding-left: 20px;
+        padding-left: 15px !important;
         box-shadow: 0 4px 15px rgba(11, 80, 250, 0.4);
-    }
+    }}
 </style>
 """, unsafe_allow_html=True)
 
-# =====================================================================
 # ভাষা ডিকশনারি (বাংলা এবং ইংরেজি অনুবাদ)
-# =====================================================================
-st.sidebar.header("🌐 ভাষা পরিবর্তন / Language Switcher")
-lang = st.sidebar.selectbox("ভাষা নির্বাচন করুন / Select Language", ["বাংলা (Bengali)", "English"])
-
-is_eng = (lang == "English")
-
-# মাল্টি-ল্যাঙ্গুয়েজ টেক্সট ডাটাবেস
 t = {
     "title": "Hasanur Computer Studio" if is_eng else "🖨️ হাসানুর কম্পিউটার স্টুডিও",
     "address": "<b>Address:</b> Dighirpar, Monirampur, Jashore | <b>Mobile:</b> 01743-614359" if is_eng else "<b>ঠিকানা:</b> দিঘীরপাড়, মনিরামপুর, যশোর | <b>মোবাইল:</b> ০১৭৪৩-৬১৪৩৫৯",
@@ -133,7 +173,7 @@ if is_eng:
         8: ("🧾 Shop Cash Memo / Receipt Generator", "Create customer sales receipt and cash memo."),
         9: ("🛡️ Digital Warranty Card Generator", "Create digital warranty card for products."),
         10: ("📜 Citizenship Certificate Generator", "Create union parishad citizenship certificate."),
-        11: ("⚽ Tournament Invitation & Rules (Football/Cricket/Badminton)", "Create tournament notice and guidelines."),
+        11: ("⚽ Tournament Invitation & Rules (Football/Badminton)", "Create tournament notice and guidelines."),
         12: ("📏 Image Size Changer & Resizer", "Resize images according to pixel measurements."),
         13: ("⬛ Black & White Converter", "Convert color image to black and white."),
         14: ("🔄 Image Rotate & Flip", "Rotate and flip images in various angles."),
@@ -163,9 +203,9 @@ else:
     }
 
 for num, (item_name, desc) in menu_dict.items():
-    if st.sidebar.button(item_name):
+    if st.sidebar.button(item_name, key=f"menu_btn_{num}"):
         st.session_state.app_mode = num
-    st.sidebar.markdown(f"<p style='font-size:11px; color:gray; margin-top:-5px; margin-bottom:8px;'>ℹ️ {desc}</p>", unsafe_allow_html=True)
+    st.sidebar.markdown(f"<p style='font-size:11px; color:gray; margin-top:-3px; margin-bottom:8px;'>ℹ️ {desc}</p>", unsafe_allow_html=True)
 
 app_mode = st.session_state.app_mode
 
@@ -201,7 +241,7 @@ if app_mode == 1:
             with col1:
                 st.image(Image.open(global_file), use_container_width=True, caption="Original Image" if is_eng else "আসল ছবি (Original)")
             with col2:
-                if st.button("Remove Background & Change Color" if is_eng else "ব্যাকগ্রাউন্ড রিমুভ ও কালার পরিবর্তন করুন"):
+                if st.button("Remove Background & Change Color" if is_eng else "ব্যাকগ্রাউন্ড রিমুভ ও কালার পরিবর্তন করুন", key="btn_rem_1"):
                     with st.spinner("Processing advanced AI edge refinement..." if is_eng else "উন্নত এআই এজ রিফাইনিং প্রসেসিং চলছে..."):
                         session = new_session("birefnet-general")
                         output_bytes = remove(global_file.getvalue(), session=session)
@@ -225,7 +265,7 @@ if app_mode == 1:
                         st.image(final_image, use_container_width=True, caption=f"Background Color: {bg_color}" if is_eng else f"ব্যাকগ্রাউন্ড কালার: {bg_color}")
                         buf = io.BytesIO()
                         final_image.save(buf, format="JPEG", quality=95)
-                        st.download_button("📥 Download HD Image" if is_eng else "📥 HD ছবি ডাউনলোড করুন", buf.getvalue(), "bg_removed_hd.jpg", "image/jpeg")
+                        st.download_button("📥 Download HD Image" if is_eng else "📥 HD ছবি ডাউনলোড করুন", buf.getvalue(), "bg_removed_hd.jpg", "image/jpeg", key="dl_1")
         else:
             st.warning("Please upload a valid image file (jpg, jpeg, png)." if is_eng else "দয়া করে একটি ছবি (jpg, jpeg, png) ফাইল আপলোড করুন।")
     else:
@@ -264,7 +304,7 @@ elif app_mode == 2:
                     st.image(final_image, use_container_width=True, caption=f"Studio Background Color: {bg_color}" if is_eng else f"স্টুডিও ব্যাকগ্রাউন্ড কালার: {bg_color}")
                     buf = io.BytesIO()
                     final_image.save(buf, format="JPEG", quality=95)
-                    st.download_button("Download Studio HD Image" if is_eng else "স্টুডিও HD ছবি ডাউনলোড করুন", buf.getvalue(), "studio_hd.jpg", "image/jpeg")
+                    st.download_button("Download Studio HD Image" if is_eng else "স্টুডিও HD ছবি ডাউনলোড করুন", buf.getvalue(), "studio_hd.jpg", "image/jpeg", key="dl_2")
     else:
         st.warning("Please upload an image from the sidebar." if is_eng else "দয়া করে বাম পাশের সাইডবার থেকে একটি ছবি আপলোড করুন।")
 
@@ -278,7 +318,7 @@ elif app_mode == 3:
                 st.image(Image.open(global_file), use_container_width=True, caption="Original Image" if is_eng else "মূল ছবি")
             with col2:
                 prompt = st.text_input("Enter AI Command" if is_eng else "এআই কমান্ড লিখুন", "Enhance and refine object lighting")
-                if st.button("Start AI Processing" if is_eng else "এআই প্রসেসিং শুরু করুন"):
+                if st.button("Start AI Processing" if is_eng else "এআই প্রসেসিং শুরু করুন", key="btn_ai_3"):
                     with st.spinner(f"S26 Ultra AI engine processing '{prompt}'..." if is_eng else f"S26 আলট্রা এআই ইঞ্জিন '{prompt}' নিয়ে কাজ করছে..."):
                         img = Image.open(global_file).convert("RGB")
                         img_np = np.array(img)
@@ -288,7 +328,7 @@ elif app_mode == 3:
                         st.image(final_ai_img, use_container_width=True, caption=f"AI Edit Output: {prompt}" if is_eng else f"এআই এডিট আউটপুট: {prompt}")
                         buf = io.BytesIO()
                         final_ai_img.save(buf, format="JPEG", quality=95)
-                        st.download_button("Download AI Edited Image" if is_eng else "এআই এডিটেড ছবি ডাউনলোড করুন", buf.getvalue(), "s26_ai_edited.jpg", "image/jpeg")
+                        st.download_button("Download AI Edited Image" if is_eng else "এআই এডিটেড ছবি ডাউনলোড করুন", buf.getvalue(), "s26_ai_edited.jpg", "image/jpeg", key="dl_3")
     else:
         st.warning("Please upload an image from the sidebar." if is_eng else "দয়া করে বাম পাশের সাইডবার থেকে একটি ছবি আপলোড করুন।")
 
@@ -306,7 +346,7 @@ elif app_mode == 4:
             st.image(enhanced_image, use_container_width=True, caption="Enhanced Image" if is_eng else "এনহ্যান্স করা ছবি")
             buf = io.BytesIO()
             enhanced_image.save(buf, format="JPEG", quality=95)
-            st.download_button("Download" if is_eng else "ডাউনলোড করুন", buf.getvalue(), "enhanced.jpg", "image/jpeg")
+            st.download_button("Download" if is_eng else "ডাউনলোড করুন", buf.getvalue(), "enhanced.jpg", "image/jpeg", key="dl_4")
     else:
         st.warning("Please upload an image from the sidebar." if is_eng else "দয়া করে বাম পাশের সাইডবার থেকে একটি ছবি আপলোড করুন।")
 
@@ -322,7 +362,7 @@ elif app_mode == 5:
             st.image(img, use_container_width=True, caption="Preview" if is_eng else "প্রিভিউ")
             buf = io.BytesIO()
             img.save(buf, format="JPEG", quality=95)
-            st.download_button("Download ID Card" if is_eng else "আইডি কার্ড ডাউনলোড", buf.getvalue(), "id_card.jpg", "image/jpeg")
+            st.download_button("Download ID Card" if is_eng else "আইডি কার্ড ডাউনলোড", buf.getvalue(), "id_card.jpg", "image/jpeg", key="dl_5")
     else:
         st.warning("Please upload an image from the sidebar." if is_eng else "দয়া করে বাম পাশের সাইডবার থেকে একটি ছবি আপলোড করুন।")
 
@@ -340,7 +380,7 @@ elif app_mode == 6:
             st.image(sheet, use_container_width=True, caption="4-Copy Sheet" if is_eng else "৪ কপি শিট")
             buf = io.BytesIO()
             sheet.save(buf, format="JPEG", quality=95)
-            st.download_button("Download Passport Sheet" if is_eng else "পাসপোর্ট শিট ডাউনলোড", buf.getvalue(), "passport_sheet.jpg", "image/jpeg")
+            st.download_button("Download Passport Sheet" if is_eng else "পাসপোর্ট শিট ডাউনলোড", buf.getvalue(), "passport_sheet.jpg", "image/jpeg", key="dl_6")
     else:
         st.warning("Please upload an image from the sidebar." if is_eng else "দয়া করে বাম পাশের সাইডবার থেকে একটি ছবি আপলোড করুন।")
 
@@ -352,7 +392,7 @@ elif app_mode == 7:
     with col2:
         target_date = st.date_input("Calculate Age Up To" if is_eng else "যে তারিখ পর্যন্ত বয়স বের করতে চান", date.today())
         
-    if st.button("Calculate Age" if is_eng else "বয়স হিসাব করুন"):
+    if st.button("Calculate Age" if is_eng else "বয়স হিসাব করুন", key="btn_age_7"):
         if birth_date > target_date:
             st.error("Birth date cannot be in the future!" if is_eng else "জন্ম তারিখ বর্তমান বা ভবিষ্যতের তারিখ হতে পারে না!")
         else:
@@ -387,7 +427,7 @@ elif app_mode == 8:
         
     total_amount = price1 + price2 + price3
     
-    if st.button("Generate Cash Memo & Print Preview" if is_eng else "ক্যাশ মেমো তৈরি ও প্রিন্ট প্রিভিউ"):
+    if st.button("Generate Cash Memo & Print Preview" if is_eng else "ক্যাশ মেমো তৈরি ও প্রিন্ট প্রিভিউ", key="btn_memo_8"):
         st.markdown("---")
         memo_html = f"""
         <div style="background: white; padding: 25px; border-radius: 10px; border: 2px dashed #0B50FA; color: black;">
@@ -421,7 +461,7 @@ elif app_mode == 9:
     buyer_name = st.text_input("Buyer Name" if is_eng else "ক্রেতার নাম", "Md. Hasan Ali")
     w_period = st.selectbox("Warranty Period" if is_eng else "ওয়ারেন্টি মেয়াদ", ["1 Year" if is_eng else "১ বছর", "2 Years" if is_eng else "২ বছর", "3 Years" if is_eng else "৩ বছর", "6 Months" if is_eng else "৬ মাস", "Lifetime" if is_eng else "লাইফটাইম"])
     
-    if st.button("Generate Warranty Card" if is_eng else "ওয়ারেন্টি কার্ড জেনারেট করুন"):
+    if st.button("Generate Warranty Card" if is_eng else "ওয়ারেন্টি কার্ড জেনারেট করুন", key="btn_warr_9"):
         card_html = f"""
         <div style="background: linear-gradient(135deg, #1e3c72, #2a5298); padding: 30px; border-radius: 15px; color: white; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
             <h2 style="text-align: center; margin:0; letter-spacing: 2px;">WARRANTY CARD</h2>
@@ -452,7 +492,7 @@ elif app_mode == 10:
         c_union = st.text_input("Union / Municipality" if is_eng else "ইউনিয়ন / পৌরসভা", "No. 2 Jhapa Union Parishad")
         c_upazila = st.text_input("Upazila & District" if is_eng else "উপজেলা ও জেলা", "Monirampur, Jashore")
         
-    if st.button("Preview Citizenship Certificate" if is_eng else "নাগরিক সনদ প্রিভিউ করুন"):
+    if st.button("Preview Citizenship Certificate" if is_eng else "নাগরিক সনদ প্রিভিউ করুন", key="btn_cert_10"):
         cert_html = f"""
         <div style="background: #ffffff; padding: 40px; border: 5px double #1e3c72; border-radius: 10px; color: #000;">
             <div style="text-align: center;">
@@ -488,7 +528,7 @@ elif app_mode == 11:
         t_fee = st.text_input("Entry Fee (TK)" if is_eng else "এন্ট্রি ফি (টাকা)", "1000 TK per team")
         t_prize = st.text_input("Prizes" if is_eng else "পুরস্কার", "Champion: 5000 TK + Trophy / Runner-up: 3000 TK + Trophy")
 
-    if st.button("Generate Invitation & Rules" if is_eng else "আমন্ত্রণপত্র ও নিয়মাবলী তৈরি করুন"):
+    if st.button("Generate Invitation & Rules" if is_eng else "আমন্ত্রণপত্র ও নিয়মাবলী তৈরি করুন", key="btn_tourn_11"):
         st.markdown("---")
         if "Football" in t_type or "ফুটবল" in t_type:
             rules_list = """
@@ -572,7 +612,7 @@ elif app_mode == 12:
             st.image(resized, use_container_width=True)
             buf = io.BytesIO()
             resized.save(buf, format="JPEG", quality=95)
-            st.download_button("Download Resized Image" if is_eng else "রিসাইজ ছবি ডাউনলোড", buf.getvalue(), "resized.jpg", "image/jpeg")
+            st.download_button("Download Resized Image" if is_eng else "রিসাইজ ছবি ডাউনলোড", buf.getvalue(), "resized.jpg", "image/jpeg", key="dl_12")
     else:
         st.warning("Please upload an image from the sidebar." if is_eng else "দয়া করে বাম পাশের সাইডবার থেকে একটি ছবি আপলোড করুন।")
 
@@ -585,7 +625,7 @@ elif app_mode == 13:
             st.image(img, use_container_width=True)
             buf = io.BytesIO()
             img.save(buf, format="JPEG", quality=95)
-            st.download_button("Download B&W Image" if is_eng else "সাদাকালো ছবি ডাউনলোড", buf.getvalue(), "bw.jpg", "image/jpeg")
+            st.download_button("Download B&W Image" if is_eng else "সাদাকালো ছবি ডাউনলোড", buf.getvalue(), "bw.jpg", "image/jpeg", key="dl_13")
     else:
         st.warning("Please upload an image from the sidebar." if is_eng else "দয়া করে বাম পাশের সাইডবার থেকে একটি ছবি আপলোড করুন।")
 
@@ -601,7 +641,7 @@ elif app_mode == 14:
             st.image(img, use_container_width=True)
             buf = io.BytesIO()
             img.save(buf, format="JPEG", quality=95)
-            st.download_button("Download Rotated Image" if is_eng else "ঘোরানো ছবি ডাউনলোড", buf.getvalue(), "rotated.jpg", "image/jpeg")
+            st.download_button("Download Rotated Image" if is_eng else "ঘোরানো ছবি ডাউনলোড", buf.getvalue(), "rotated.jpg", "image/jpeg", key="dl_14")
     else:
         st.warning("Please upload an image from the sidebar." if is_eng else "দয়া করে বাম পাশের সাইডবার থেকে একটি ছবি আপলোড করুন।")
 
@@ -615,7 +655,7 @@ elif app_mode == 15:
             st.image(bordered, use_container_width=True)
             buf = io.BytesIO()
             bordered.save(buf, format="JPEG", quality=95)
-            st.download_button("Download Bordered Image" if is_eng else "বর্ডারযুক্ত ছবি ডাউনলোড", buf.getvalue(), "bordered.jpg", "image/jpeg")
+            st.download_button("Download Bordered Image" if is_eng else "বর্ডারযুক্ত ছবি ডাউনলোড", buf.getvalue(), "bordered.jpg", "image/jpeg", key="dl_15")
     else:
         st.warning("Please upload an image from the sidebar." if is_eng else "দয়া করে বাম পাশের সাইডবার থেকে একটি ছবি আপলোড করুন।")
 
