@@ -6,6 +6,14 @@ import io
 import random
 from pypdf import PdfReader, PdfWriter
 
+# rembg ইম্পোর্ট এবং ইন্টেলিজেন্ট এআই সেশন তৈরি
+try:
+    from rembg import remove, new_session
+    REMBG_AVAILABLE = True
+    ai_session = new_session("u2netp") # আরও লাইটওয়েট এবং নিখুঁত মডেল
+except Exception:
+    REMBG_AVAILABLE = False
+
 # পেজ কনফিগারেশন
 st.set_page_config(page_title="হাসানুর কম্পিউটার স্টুডিও", layout="wide", page_icon="📸")
 
@@ -145,7 +153,7 @@ else:
     apply_txt = "Apply Changes"
     
     b1, b2, b3, b4, b5, b6, b7, b8, b9, b10, b11 = (
-        "1. 🪄 BG Change (PhotoRoom)", "2. 🪄 Photo Enhancer", "3. 🎨 BG Color Panel", "4. ✂️ Crop Tool",
+        "1. 🪄 BG Change (AI)", "2. 🪄 Photo Enhancer", "3. 🎨 BG Color Panel", "4. ✂️ Crop Tool",
         "5. 🧽 Object Remover", "6. 📐 ID Card Fixer", "7. 📜 Forms & TC", "8. 📝 CV Maker",
         "9. 🔗 PDF Tools", "10. 🌐 Online Directory", "📄 11. A4 Document Resizer"
     )
@@ -178,9 +186,39 @@ if uploaded_file is not None:
     with col_v1:
         st.image(base_image, caption="Original Document/Image / মূল ফাইল", use_container_width=True)
 
+# ব্যাকগ্রাউন্ড পরিবর্তনের জন্য কমন ফাংশন (AI + Fallback)
+def process_background_change(img_pil, bg_hex, custom_bg_img=None):
+    try:
+        if REMBG_AVAILABLE:
+            # প্রথমে এআই দিয়ে ব্যাকগ্রাউন্ড রিমুভ করার চেষ্টা করা হবে
+            transparent_img = remove(img_pil, session=ai_session, alpha_matting=True, alpha_matting_foreground_threshold=240, alpha_matting_background_threshold=10)
+        else:
+            raise Exception("Rembg not available")
+    except Exception:
+        # এআই ফেল করলে কালার ফিল্টার কাজ করবে
+        img_cv = cv2.cvtColor(np.array(img_pil.convert("RGB")), cv2.COLOR_RGB2BGR)
+        h_img, w_img = img_cv.shape[:2]
+        corners = [img_cv[5, 5], img_cv[5, w_img-5], img_cv[h_img-5, 5], img_cv[h_img-5, w_img-5]]
+        avg_bg_color = np.mean(corners, axis=0)
+        diff = np.sum(np.abs(img_cv - avg_bg_color), axis=2)
+        mask = np.where(diff < 25, 0, 255).astype(np.uint8) # কাপড়ের রঙ যেন না কাটে সেজন্য টলারেন্স কমানো হয়েছে
+        transparent_img = Image.fromarray(cv2.cvtColor(img_cv, cv2.COLOR_BGR2RGBA))
+        transparent_img.putalpha(Image.fromarray(mask))
+
+    bg_rgb = tuple(int(bg_hex[i:i+2], 16) for i in (0, 2, 4))
+    
+    if custom_bg_img is not None:
+        bg_final = custom_bg_img.resize(img_pil.size, Image.Resampling.LANCZOS).convert("RGBA")
+        bg_final.paste(transparent_img, (0, 0), transparent_img)
+        return bg_final.convert("RGB")
+    else:
+        bg = Image.new("RGBA", img_pil.size, bg_rgb + (255,))
+        bg.paste(transparent_img, (0, 0), transparent_img)
+        return bg.convert("RGB")
+
 # ================= MODULE 1 =================
 if st.session_state.active_module == "1":
-    st.markdown("### 🪄 1. ছবির ব্যাকগ্রাউন্ড পরিবর্তন (Studio Smart BG)")
+    st.markdown("### 🪄 1. ছবির ব্যাকগ্রাউন্ড পরিবর্তন (Studio Smart AI)")
     if base_image:
         bg_selection = st.selectbox(
             "ব্যাকগ্রাউন্ড স্টাইল সিলেক্ট করুন:", 
@@ -194,49 +232,18 @@ if st.session_state.active_module == "1":
             custom_bg_file = st.file_uploader("আপনার কাঙ্খিত ব্যাকগ্রাউন্ড সিনারিটি আপলোড করুন:", type=["jpg", "jpeg", "png"], key="m1_bg")
         
         if st.button("ব্যাকগ্রাউন্ড পরিবর্তন করুন", type="primary", use_container_width=True):
-            with st.spinner("সম্পূর্ণ বডি অক্ষত রেখে ব্যাকগ্রাউন্ড পরিবর্তন করা হচ্ছে..."):
-                img_cv = cv2.cvtColor(np.array(base_image.convert("RGB")), cv2.COLOR_RGB2BGR)
-                
-                # ছবির চার কোণ থেকে ব্যাকগ্রাউন্ডের রঙ স্যাম্পল নিয়ে রিমুভ করার স্মার্ট টেকনিক (বডি কাটবে না)
-                h_img, w_img = img_cv.shape[:2]
-                corners = [img_cv[10, 10], img_cv[10, w_img-10], img_cv[h_img-10, 10], img_cv[h_img-10, w_img-10]]
-                avg_bg_color = np.mean(corners, axis=0)
-                
-                # কালার টলারেন্স দিয়ে ব্যাকগ্রাউন্ড আলাদা করা
-                diff = np.sum(np.abs(img_cv - avg_bg_color), axis=2)
-                mask = np.where(diff < 45, 0, 255).astype(np.uint8)
-                
-                # নয়েজ কমানোর জন্য মরফোলজিক্যাল অপারেশন
-                kernel = np.ones((3,3), np.uint8)
-                mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel)
-                mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)
-                
-                # নতুন ব্যাকগ্রাউন্ড তৈরি
+            with st.spinner("নিখুঁতভাবে ব্যাকগ্রাউন্ড পরিবর্তন করা হচ্ছে..."):
                 if bg_selection == "আকাশী (Sky Blue)": hex_val = "87CEEB"
                 elif bg_selection == "পাসপোর্ট নীল (Studio Blue)": hex_val = "0033aa"
                 elif bg_selection == "অফিসিয়াল সাদা (Pure White)": hex_val = "ffffff"
                 elif bg_selection == "সলিড কালার (Color Picker)": hex_val = custom_color.lstrip('#')
                 else: hex_val = "ffffff"
                 
-                bg_rgb = tuple(int(hex_val[i:i+2], 16) for i in (0, 2, 4))
-                bg_img = np.full_like(img_cv, bg_rgb[::-1], dtype=np.uint8)
+                custom_img = Image.open(custom_bg_file) if custom_bg_file else None
+                out = process_background_change(base_image, hex_val, custom_img)
                 
-                # মাস্ক দিয়ে ফোরগ্রাউন্ড ও ব্যাকগ্রাউন্ড ব্লেন্ড করা
-                mask_3ch = cv2.cvtColor(mask, cv2.COLOR_GRAY2BGR) / 255.0
-                foreground = img_cv.astype(float) * mask_3ch
-                background = bg_img.astype(float) * (1 - mask_3ch)
-                out_np = np.clip(foreground + background, 0, 255).astype(np.uint8)
-                
-                out = Image.fromarray(cv2.cvtColor(out_np, cv2.COLOR_BGR2RGB))
-                
-                if bg_selection == "🏞️ গ্যালারি থেকে নিজস্ব কাস্টম ছবি/সিনারি" and custom_bg_file is not None:
-                    bg_custom = Image.open(custom_bg_file).resize(base_image.size, Image.Resampling.LANCZOS).convert("RGB")
-                    alpha_mask = Image.fromarray(mask).convert("L")
-                    bg_custom.paste(base_image.convert("RGB"), (0, 0), alpha_mask)
-                    out = bg_custom
-
             with col_v2:
-                st.image(out, caption="Output (Full Body Protected)", use_container_width=True)
+                st.image(out, caption="Output (Clean & Fixed)", use_container_width=True)
                 buf = io.BytesIO()
                 out.save(buf, format="JPEG", quality=100, subsampling=0)
                 st.download_button("📥 ডাউনলোড করুন", data=buf.getvalue(), file_name="new_bg.jpg", mime="image/jpeg", use_container_width=True)
@@ -263,24 +270,8 @@ elif st.session_state.active_module == "3":
         bg_color_pick = st.color_picker("ব্যাকগ্রাউন্ড কালার বেছে নিন:", "#87CEEB")
         if st.button(apply_txt, type="primary", use_container_width=True):
             with st.spinner("Applying Color..."):
-                img_cv = cv2.cvtColor(np.array(base_image.convert("RGB")), cv2.COLOR_RGB2BGR)
-                h_img, w_img = img_cv.shape[:2]
-                corners = [img_cv[10, 10], img_cv[10, w_img-10], img_cv[h_img-10, 10], img_cv[h_img-10, w_img-10]]
-                avg_bg_color = np.mean(corners, axis=0)
-                
-                diff = np.sum(np.abs(img_cv - avg_bg_color), axis=2)
-                mask = np.where(diff < 45, 0, 255).astype(np.uint8)
-                
                 hex_val = bg_color_pick.lstrip('#')
-                bg_rgb = tuple(int(hex_val[i:i+2], 16) for i in (0, 2, 4))
-                bg_img = np.full_like(img_cv, bg_rgb[::-1], dtype=np.uint8)
-                
-                mask_3ch = cv2.cvtColor(mask, cv2.COLOR_GRAY2BGR) / 255.0
-                foreground = img_cv.astype(float) * mask_3ch
-                background = bg_img.astype(float) * (1 - mask_3ch)
-                out_np = np.clip(foreground + background, 0, 255).astype(np.uint8)
-                
-                out = Image.fromarray(cv2.cvtColor(out_np, cv2.COLOR_BGR2RGB))
+                out = process_background_change(base_image, hex_val)
                 with col_v2:
                     st.image(out, caption="Colored BG Output", use_container_width=True)
                     buf = io.BytesIO(); out.save(buf, format="JPEG", quality=100, subsampling=0)
