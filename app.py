@@ -6,13 +6,6 @@ import streamlit as st
 from pypdf import PdfReader
 from datetime import date
 
-# নিরাপদভাবে rembg ইম্পোর্ট করার চেষ্টা (ক্র্যাশ এড়াতে)
-try:
-    from rembg import remove
-    REMBG_AVAILABLE = True
-except Exception:
-    REMBG_AVAILABLE = False
-
 # পেজের লেআউট সেটআপ
 st.set_page_config(page_title="হাসানুর কম্পিউটার স্টুডিও / Hasanur Computer Studio", layout="wide")
 
@@ -129,7 +122,7 @@ st.sidebar.header(t['menu_header'])
 
 menu_dict = {
     1: ("✨ ইমেজ ব্রাইটনেস ও কালার এডিটর", "ছবির আলো, ব্রাইটনেস ও কন্ট্রাস্ট ঠিক করার টুল।"),
-    2: ("🪄 ছবির ব্যাকগ্রাউন্ড রিমুভ ও পরিবর্তন", "এআই দিয়ে ব্যাকগ্রাউন্ড মুছে কাস্টম ব্যাকগ্রাউন্ড কালার বা ছবি দিন।"),
+    2: ("🖼️ ছবির কালার ব্যাকগ্রাউন্ড বা ফ্রেম বদল", "ছবির চারপাশে সুন্দর ফ্রেম বা কালার ব্যাকগ্রাউন্ড দিন।"),
     3: ("🆔 আইডি কার্ড ক্রপ ও সোজা করার টুল", "আইডি কার্ড ক্রপ ও নির্দিষ্ট কোণে ঘোরানো।"),
     4: ("🛂 পাসপোর্ট সাইজ ছবি শিট তৈরি (৪ কপি)", "এক ক্লিকে ৪ কপি পাসপোর্ট ছবি শিট তৈরি।"),
     5: ("🎂 বয়স ক্যালকুলেটর (Age Calculator)", "নির্ভুল বয়স ও দিন-মাস হিসাব।"),
@@ -140,9 +133,8 @@ menu_dict = {
     10: ("📏 ছবির সাইজ পরিবর্তন ও রিসাইজার", "পিক্সেল অনুযায়ী ছবির সাইজ ছোট-বড় করা।"),
     11: ("⬛ সাদাকালো (Black & White) কনভার্টার", "কালার ছবিকে সাদাকালো করা।"),
     12: ("🔄 ছবি ঘোরানো (Rotate & Flip)", "ছবি বিভিন্ন এঙ্গেলে ঘোরানো।"),
-    13: ("🖼️ ছবি বর্ডার ও ফ্রেম যুক্ত করা", "ছবির চারপাশে সুন্দর বর্ডার ও ফ্রেম দেওয়া।"),
-    14: ("💧 ওয়াটারমার্ক যুক্ত করার টুল", "ছবিতে নিজের নাম বা লোগো ওয়াটারমার্ক দেওয়া।"),
-    15: ("📄 পিডিএফ টেক্সট এক্সট্র্যাক্ট টুল", "পিডিএফ ফাইল থেকে টেক্সট আলাদা করা।")
+    13: ("💧 ওয়াটারমার্ক যুক্ত করার টুল", "ছবিতে নিজের নাম বা লোগো ওয়াটারমার্ক দেওয়া।"),
+    14: ("📄 পিডিএফ টেক্সট এক্সট্র্যাক্ট টুল", "পিডিএফ ফাইল থেকে টেক্সট আলাদা করা।")
 }
 
 for num, (item_name, desc) in menu_dict.items():
@@ -153,7 +145,7 @@ for num, (item_name, desc) in menu_dict.items():
 app_mode = st.session_state.app_mode
 
 # =====================================================================
-# ফিচারসমূহ হ্যান্ডলিং
+# ফিচারসমূহ হ্যান্ডলিং (ক্র্যাশ মুক্ত)
 # =====================================================================
 
 if app_mode == 1:
@@ -173,60 +165,25 @@ if app_mode == 1:
         st.info("👋 অনুগ্রহ করে উপরে একটি ছবি আপলোড করুন।")
 
 elif app_mode == 2:
-    st.header("🪄 ছবির ব্যাকগ্রাউন্ড রিমুভ ও কাস্টম ব্যাকগ্রাউন্ড পরিবর্তন")
+    st.header("🖼️ ছবির কালার ব্যাকগ্রাউন্ড বা ফ্রেম বদল")
     if global_file is not None:
-        if not REMBG_AVAILABLE:
-            st.error("⚠️ `rembg` প্যাকেজটি ইনস্টল করা নেই অথবা সার্ভারে লোড হয়নি। অনুগ্রহ করে requirements.txt ফাইলে rembg ও onnxruntime যুক্ত করুন।")
-        else:
-            input_image = Image.open(global_file).convert("RGB")
-            st.image(input_image, caption="Original Image", width=300)
+        img = Image.open(global_file).convert("RGB")
+        st.image(img, caption="Original Image", width=300)
+        border_size = st.slider("Border / Background Padding Size", 0, 100, 20)
+        color_choice = st.color_picker("Pick Background/Border Color", "#0B50FA")
+        
+        if st.button("Apply Background / Border"):
+            # Hex to RGB
+            h = color_choice.lstrip('#')
+            rgb_col = tuple(int(h[i:i+2], 16) for i in (0, 2, 4))
+            new_img = ImageOps.expand(img, border=border_size, fill=rgb_col)
+            st.image(new_img, use_container_width=True, caption="Processed Image")
             
-            bg_choice = st.selectbox("ব্যাকগ্রাউন্ড অপশন নির্বাচন করুন / Choose Background Type:", ["Solid Color (রঙিন)", "Custom Image (কম্পিউটার থেকে ছবি দিন)"])
-            
-            if bg_choice == "Solid Color (রঙিন)":
-                bg_color_hex = st.color_picker("ব্যাকগ্রাউন্ডের রঙ বেছে নিন:", "#FFFFFF")
-                # HEX থেকে RGB কনভার্ট
-                hex_str = bg_color_hex.lstrip('#')
-                bg_rgb = tuple(int(hex_str[i:i+2], 16) for i in (0, 2, 4))
-                custom_bg_img = None
-            else:
-                custom_bg_file = st.file_uploader("ব্যাকগ্রাউন্ডের জন্য কাস্টম ছবি আপলোড করুন", type=["jpg", "jpeg", "png"], key="custom_bg_uploader")
-                if custom_bg_file is not None:
-                    custom_bg_img = Image.open(custom_bg_file).convert("RGB")
-                else:
-                    custom_bg_img = None
-
-            if st.button("ব্যাকগ্রাউন্ড পরিবর্তন করুন (Process Image)"):
-                with st.spinner("ব্যাকগ্রাউন্ড রিমুভ করা হচ্ছে... দয়া করে অপেক্ষা করুন..."):
-                    try:
-                        # ব্যাকগ্রাউন্ড রিমুভ (transparent png)
-                        output_img = remove(input_image)
-                        
-                        # ব্যাকগ্রাউন্ড কম্পোজিশন
-                        final_w, final_h = input_image.size
-                        if bg_choice == "Solid Color (রঙিন)":
-                            bg_canvas = Image.new("RGBA", (final_w, final_h), bg_rgb + (255,))
-                            bg_canvas.paste(output_img, (0, 0), output_img)
-                            final_result = bg_canvas.convert("RGB")
-                        else:
-                            if custom_bg_img is not None:
-                                bg_resized = custom_bg_img.resize((final_w, final_h))
-                                bg_canvas = bg_resized.convert("RGBA")
-                                bg_canvas.paste(output_img, (0, 0), output_img)
-                                final_result = bg_canvas.convert("RGB")
-                            else:
-                                final_result = output_img.convert("RGB")
-                        
-                        st.success("সফলভাবে ব্যাকগ্রাউন্ড পরিবর্তন করা হয়েছে!")
-                        st.image(final_result, caption="Modified Image with New Background", use_container_width=True)
-                        
-                        buf = io.BytesIO()
-                        final_result.save(buf, format="JPEG", quality=95)
-                        st.download_button("Download Processed Image", buf.getvalue(), "bg_removed.jpg", "image/jpeg", key="dl_bg")
-                    except Exception as e:
-                        st.error(f"প্রক্রিয়াকরণে ত্রুটি ঘটেছে: {e}")
+            buf = io.BytesIO()
+            new_img.save(buf, format="JPEG", quality=95)
+            st.download_button("Download Processed Image", buf.getvalue(), "custom_bg.jpg", "image/jpeg", key="dl_bg")
     else:
-        st.warning("দয়া করে উপরে একটি ছবি আপলোড করুন।")
+        st.warning("দয়া করে ছবি আপলোড করুন।")
 
 elif app_mode == 3:
     st.header("🆔 আইডি কার্ড ক্রপ ও রোটেশন টুল")
@@ -362,18 +319,6 @@ elif app_mode == 12:
         st.warning("দয়া করে ছবি আপলোড করুন।")
 
 elif app_mode == 13:
-    st.header("🖼️ বর্ডার ও ফ্রেম যুক্ত করুন")
-    if global_file is not None:
-        img = Image.open(global_file)
-        bordered = ImageOps.expand(img, border=20, fill='black')
-        st.image(bordered, use_container_width=True)
-        buf = io.BytesIO()
-        bordered.save(buf, format="JPEG", quality=95)
-        st.download_button("Download", buf.getvalue(), "border.jpg", "image/jpeg", key="dl_13")
-    else:
-        st.warning("দয়া করে ছবি আপলোড করুন।")
-
-elif app_mode == 14:
     st.header("💧 ওয়াটারমার্ক টুল")
     if global_file is not None:
         st.image(Image.open(global_file), use_container_width=True)
@@ -381,7 +326,7 @@ elif app_mode == 14:
     else:
         st.warning("দয়া করে ছবি আপলোড করুন।")
 
-elif app_mode == 15:
+elif app_mode == 14:
     st.header("📄 পিডিএফ টেক্সট এক্সট্র্যাক্ট")
     if global_file is not None:
         try:
@@ -394,7 +339,7 @@ elif app_mode == 15:
         st.warning("দয়া করে একটি পিডিএফ ফাইল আপলোড করুন।")
 
 # =========================================================================
-# ক্যাটাগরি ও সমস্ত সার্ভিস লিংক ডিরেক্টরি (আপনার স্ক্রিনশটের মতো সাজানো)
+# ক্যাটাগরি ও সমস্ত সার্ভিস লিংক ডিরেক্টরি
 # =========================================================================
 st.markdown("---")
 st.header("🌐 " + ("Complete Government & Online Service Directory" if is_eng else "সকল ক্যাটাগরি ভিত্তিক সরকারি ও অনলাইন সার্ভিস ডিরেক্টরি"))
