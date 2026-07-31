@@ -6,6 +6,15 @@ import io
 import random
 from pypdf import PdfReader, PdfWriter
 
+# এআই ব্যাকগ্রাউন্ড রিমুভাল (rembg) সেটআপ
+try:
+    from rembg import remove, new_session
+    REMBG_AVAILABLE = True
+    # isnet-general-use মডেলটি হিজাব, চুল এবং কাপড়ের প্রান্ত নিখুঁতভাবে ডিটেক্ট করতে ফটো রুমের মতো কাজ করে
+    ai_session = new_session("isnet-general-use")
+except Exception:
+    REMBG_AVAILABLE = False
+
 # পেজ কনফিগারেশন
 st.set_page_config(page_title="হাসানুর কম্পিউটার স্টুডিও", layout="wide", page_icon="📸")
 
@@ -131,7 +140,7 @@ if lang_mode == "🇧🇩 বাংলা UI":
     apply_txt = "Apply (পরিবর্তন সেভ করুন)"
     
     b1, b2, b3, b4, b5, b6, b7, b8, b9, b10, b11 = (
-        "1. 🪄 স্টুডিও ছবি ফিক্সার ও লাইটিং", "2. 🪄 ছবি উন্নত করুন", "3. 🎨 কালার ও ব্রাইটনেস কন্ট্রোল", "4. ✂️ ফটো ক্রপ",
+        "1. 🪄 স্মার্ট এআই ব্যাকগ্রাউন্ড রিমুভার", "2. 🪄 ছবি উন্নত করুন", "3. 🎨 কালার ও ব্রাইটনেস কন্ট্রোল", "4. ✂️ ফটো ক্রপ",
         "5. 🧽 অবজেক্ট রিমুভ", "6. 📐 বাঁকা আইডি কার্ড সোজা", "7. 📜 প্রতাপ ফটো ও প্রত্যয়ন", "8. 📝 সিভি/বায়োডাটা মেকার",
         "9. 🔗 পিডিএফ টুলস", "10. 🌐 অনলাইন সেবা ও লিঙ্ক", "📄 11. এ ফোর ডকুমেন্ট রিসাইজার"
     )
@@ -145,7 +154,7 @@ else:
     apply_txt = "Apply Changes"
     
     b1, b2, b3, b4, b5, b6, b7, b8, b9, b10, b11 = (
-        "1. 🪄 Studio Photo Fixer", "2. 🪄 Photo Enhancer", "3. 🎨 Color & Brightness", "4. ✂️ Crop Tool",
+        "1. 🪄 Smart AI BG Remover", "2. 🪄 Photo Enhancer", "3. 🎨 Color & Brightness", "4. ✂️ Crop Tool",
         "5. 🧽 Object Remover", "6. 📐 ID Card Fixer", "7. 📜 Forms & TC", "8. 📝 CV Maker",
         "9. 🔗 PDF Tools", "10. 🌐 Online Directory", "📄 11. A4 Document Resizer"
     )
@@ -180,22 +189,50 @@ if uploaded_file is not None:
 
 # ================= MODULE 1 =================
 if st.session_state.active_module == "1":
-    st.markdown("### 🪄 1. স্টুডিও ছবি ফিক্সার ও লাইটিং (Studio Photo Adjuster)")
+    st.markdown("### 🪄 1. স্মার্ট এআই ব্যাকগ্রাউন্ড রিমুভার (AI Studio Background Remover)")
     if base_image:
-        st.info("💡 এই টুলটি আপনার ছবির আসল কোয়ালিটি ও কাপড়ের রঙ শতভাগ ঠিক রেখে ব্রাইটনেস এবং শার্পনেস নিখুঁতভাবে বাড়িয়ে দেবে।")
-        b_val = st.slider("উজ্জ্বলতা (Brightness):", 0.5, 2.0, 1.1, 0.1)
-        c_val = st.slider("কনট্রাস্ট (Contrast):", 0.5, 2.0, 1.2, 0.1)
-        s_val = st.slider("শার্পনেস (Sharpness):", 1.0, 3.0, 1.5, 0.1)
+        st.info("✨ এটি ফটো রুমের মতো এআই প্রযুক্তি ব্যবহার করে এক ক্লিকে চুল, হিজাব এবং বডি একদম নিখুঁতভাবে আলাদা করে ফেলবে।")
         
-        if st.button("ছবি প্রসেস করুন", type="primary", use_container_width=True):
-            out = ImageEnhance.Brightness(base_image).enhance(b_val)
-            out = ImageEnhance.Contrast(out).enhance(c_val)
-            out = ImageEnhance.Sharpness(out).enhance(s_val)
+        bg_style = st.selectbox("ব্যাকগ্রাউন্ড কালার বা স্টাইল সিলেক্ট করুন:", ["স্টুডিও নীল (Studio Blue)", "আকাশী (Sky Blue)", "অফিসিয়াল সাদা (Pure White)", "কাস্টম কালার (Custom Color)"])
+        custom_hex = st.color_picker("পছন্দের কালার বেছে নিন:", "#0033aa")
+        
+        if st.button("এআই ব্যাকগ্রাউন্ড রিমুভ ও চেঞ্জ করুন", type="primary", use_container_width=True):
+            with st.spinner("এআই দিয়ে অত্যন্ত নিখুঁতভাবে ব্যাকগ্রাউন্ড রিমুভ করা হচ্ছে..."):
+                try:
+                    if REMBG_AVAILABLE:
+                        # alpha_matting দিয়ে প্রান্তগুলো একদম মসৃণ ও নিখুঁত করা হয়েছে
+                        output_image = remove(
+                            base_image, 
+                            session=ai_session, 
+                            alpha_matting=True, 
+                            alpha_matting_foreground_threshold=240, 
+                            alpha_matting_background_threshold=10
+                        )
+                    else:
+                        st.error("সতর্কতা: আপনার সিস্টেমে 'rembg' লাইব্রেরি ইনস্টল করা নেই। দয়া করে টার্মিনালে `pip install rembg` লিখে ইনস্টল করে নিন।")
+                        output_image = base_image
+                except Exception as e:
+                    st.error(f"এআই প্রসেসিং ত্রুটি: {e}")
+                    output_image = base_image
+
+                # ব্যাকগ্রাউন্ড রঙ সেট করা
+                if bg_style == "স্টুডিও নীল (Studio Blue)": bg_rgb = (0, 51, 170)
+                elif bg_style == "আকাশী (Sky Blue)": bg_rgb = (135, 206, 235)
+                elif bg_style == "অফিসিয়াল সাদা (Pure White)": bg_rgb = (255, 255, 255)
+                else:
+                    c_clean = custom_hex.lstrip('#')
+                    bg_rgb = tuple(int(c_clean[i:i+2], 16) for i in (0, 2, 4))
+                
+                # নতুন ব্যাকগ্রাউন্ডের ওপর বডি পেস্ট করা
+                final_bg = Image.new("RGBA", output_image.size, bg_rgb + (255,))
+                final_bg.paste(output_image, (0, 0), output_image)
+                out = final_bg.convert("RGB")
+                
             with col_v2:
-                st.image(out, caption="Processed Studio Photo (100% Safe)", use_container_width=True)
+                st.image(out, caption="Smart AI Clean Output", use_container_width=True)
                 buf = io.BytesIO()
                 out.save(buf, format="JPEG", quality=100, subsampling=0)
-                st.download_button("📥 ডাউনলোড করুন", data=buf.getvalue(), file_name="fixed_photo.jpg", mime="image/jpeg", use_container_width=True)
+                st.download_button("📥 এআই এইচডি ছবি ডাউনলোড করুন", data=buf.getvalue(), file_name="ai_bg_removed.jpg", mime="image/jpeg", use_container_width=True)
 
 # ================= MODULE 2 =================
 elif st.session_state.active_module == "2":
@@ -403,9 +440,11 @@ else:
                 processed_img = ImageEnhance.Brightness(processed_img).enhance(brightness_val)
                 processed_img = ImageEnhance.Contrast(processed_img).enhance(contrast_val)
                 
-                if "Black & White" in doc_filter:
+                if "Black & White", doc_filter: # handled clean
+                    pass
+                if "Black & White Scan" in doc_filter:
                     processed_img = processed_img.convert("L")
-                elif "Magic" in doc_filter:
+                elif "Magic Enhancer" in doc_filter:
                     processed_img = processed_img.filter(ImageFilter.SHARPEN)
                 
                 with col_v2:
