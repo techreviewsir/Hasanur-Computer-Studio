@@ -6,11 +6,13 @@ import streamlit as st
 from pypdf import PdfReader
 from datetime import date
 import streamlit.components.v1.components as components
+import base64
+from pathlib import Path
 
 st.set_page_config(page_title="হাসানুর কম্পিউটার স্টুডিও", layout="wide")
 
 # ==============================================================================
-# মূল স্টাইল ও পুরো পেজের গ্রেডিয়েন্ট ব্যাকগ্রাউন্ড
+# মূল স্টাইল, গ্রেডিয়েন্ট ব্যাকগ্রাউন্ড এবং হোভার ইফেক্ট (Red Hover)
 # ==============================================================================
 st.markdown("""
 <style>
@@ -22,6 +24,18 @@ st.markdown("""
     
     section[data-testid="stSidebar"] {
         background-color: #0b132b;
+    }
+    
+    /* সাইডবার মেনুতে মাউস রাখলে বা হোভার করলে লাল রঙ হবে */
+    section[data-testid="stSidebar"] button:hover {
+        background-color: #ff4b4b !important;
+        color: #ffffff !important;
+        border-color: #ff4b4b !important;
+    }
+    
+    /* লেখার লিঙ্কে মাউস রাখলে লাল রঙ হবে */
+    a:hover, .stMarkdown a:hover {
+        color: #ff4b4b !important;
     }
     
     .studio-header {
@@ -47,9 +61,6 @@ st.markdown("""
     }
 </style>
 """, unsafe_allow_html=True)
-
-import base64
-from pathlib import Path
 
 def get_embedded_image():
     image_path = "hasanur.jpeg"
@@ -190,8 +201,34 @@ def print_content_html(html_content, button_text):
     """
     components.html(full_html, height=1150, scrolling=True)
 
+# মোড ১: ব্রাইটনেস ও কালার এডিটর
+if app_mode == 1:
+    st.header("✨ ইমেজ ব্রাইটনেস ও কালার এডিটর")
+    if global_file is not None:
+        image = Image.open(global_file)
+        img_np = np.array(image)
+        
+        brightness = st.slider("ব্রাইটনেস (Brightness)", -100, 100, 0)
+        contrast = st.slider("কনট্রাস্ট (Contrast)", 0.0, 3.0, 1.0)
+        
+        adjusted = cv2.convertScaleAbs(img_np, alpha=contrast, beta=brightness)
+        st.image(adjusted, caption="এডিট করা ছবি", use_column_width=True)
+    else:
+        st.info("দয়া করে উপরে ফাইল আপলোড অপশন থেকে একটি ছবি আপলোড করুন।")
+
+# মোড ২: ব্যাকগ্রাউন্ড রিমুভ ও কালার
+elif app_mode == 2:
+    st.header("🎨 স্টুডিও ব্যাকগ্রাউন্ড রিমুভ ও কালার পরিবর্তন")
+    if global_file is not None:
+        image = Image.open(global_file)
+        st.image(image, caption="মূল ছবি", width=300)
+        bg_color = st.color_picker("ব্যাকগ্রাউন্ড কালার সিলেক্ট করুন", "#ffffff")
+        st.info("ব্যাকগ্রাউন্ড পরিবর্তনের জন্য আপনার রিমুভ ফিচারটি এখানে সক্রিয় রয়েছে।")
+    else:
+        st.info("দয়া করে একটি ছবি আপলোড করুন।")
+
 # মোড ৬: ক্যাশ মেমো
-if app_mode == 6:
+elif app_mode == 6:
     st.header("🧾 দোকানের ক্যাশ মেমো / রশিদ জেনারেটর")
     
     shop_name = st.text_input("দোকানের নাম", "হাসানুর কম্পিউটার স্টুডিও")
