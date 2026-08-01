@@ -20,17 +20,14 @@ st.set_page_config(page_title="হাসানুর কম্পিউটার
 # ==============================================================================
 st.markdown("""
 <style>
-    /* Streamlit এর মেইন অ্যাপ ব্যাকগ্রাউন্ড এবং সাইডবার কালার পরিবর্তন */
     .stApp {
         background: linear-gradient(135deg, #071952, #0b2f64, #1b032d, #381123);
         background-attachment: fixed;
         color: #ffffff;
     }
-    
     section[data-testid="stSidebar"] {
         background-color: #0b132b;
     }
-    
     .studio-header {
         background: linear-gradient(135deg, #0B50FA, #ff4b4b);
         padding: 25px 20px;
@@ -100,7 +97,6 @@ for num, (item_name, desc) in menu_dict.items():
 
 app_mode = st.session_state.app_mode
 
-# নিখুঁত A4 সাইজ এবং মার্জিনসহ প্রিন্ট ফাংশন
 def print_content_html(html_content, button_text):
     full_html = f"""
     <!DOCTYPE html>
@@ -132,59 +128,33 @@ def print_content_html(html_content, button_text):
                 border: 2px solid #0B50FA;
             }}
             @media print {{
-                body {{
-                    background: none;
-                    padding: 0;
-                }}
-                .no-print {{
-                    display: none !important;
-                }}
+                body {{ background: none; padding: 0; }}
+                .no-print {{ display: none !important; }}
                 .a4-page {{
-                    box-shadow: none;
-                    margin: 0;
-                    width: 210mm;
-                    height: 297mm;
-                    padding: 12mm 15mm;
-                    page-break-after: avoid;
-                    page-break-inside: avoid;
-                    border: 2px solid #0B50FA !important;
-                    -webkit-print-color-adjust: exact;
+                    box-shadow: none; margin: 0; width: 210mm; height: 297mm;
+                    padding: 12mm 15mm; page-break-after: avoid; page-break-inside: avoid;
+                    border: 2px solid #0B50FA !important; -webkit-print-color-adjust: exact;
                 }}
-                @page {{
-                    size: A4;
-                    margin: 0;
-                }}
+                @page {{ size: A4; margin: 0; }}
             }}
             .print-btn {{
-                background-color: #0B50FA;
-                color: white;
-                padding: 12px 30px;
-                border: none;
-                border-radius: 8px;
-                cursor: pointer;
-                font-size: 16px;
-                font-weight: bold;
-                margin-bottom: 20px;
-                box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+                background-color: #0B50FA; color: white; padding: 12px 30px;
+                border: none; border-radius: 8px; cursor: pointer; font-size: 16px;
+                font-weight: bold; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.2);
             }}
-            .print-btn:hover {{
-                background-color: #083cb3;
-            }}
+            .print-btn:hover {{ background-color: #083cb3; }}
         </style>
     </head>
     <body>
         <button class="print-btn no-print" onclick="window.print()">🖨️ {button_text}</button>
-        <div class="a4-page">
-            {html_content}
-        </div>
+        <div class="a4-page">{html_content}</div>
     </body>
     </html>
     """
     components.html(full_html, height=1150, scrolling=True)
 
-
 # ==============================================================================
-# মোড ২: ব্যাকগ্রাউন্ড রিমুভ ও কালার/ছবি পরিবর্তন (সংশোধিত ও পূর্ণাঙ্গ)
+# মোড ২: ব্যাকগ্রাউন্ড রিমুভ ও কালার/ছবি পরিবর্তন
 # ==============================================================================
 if app_mode == 2:
     st.header("🎨 স্টুডিও ব্যাকগ্রাউন্ড রিমুভ ও কালার/ছবি পরিবর্তন")
@@ -208,37 +178,52 @@ if app_mode == 2:
                     img_np = np.array(image)
                     h, w = img_np.shape[:2]
                     
-                    mask = np.zeros(img_np.shape[:2], np.uint8)
-                    bgdModel = np.zeros((1, 65), np.float64)
-                    fgdModel = np.zeros((1, 65), np.float64)
-                    
-                    rect = (int(w * 0.1), int(h * 0.05), int(w * 0.8), int(h * 0.9))
-                    # সঠিক OpenCV এট্রিবিউট ব্যবহার করা হয়েছে যাতে কোনো এরর না আসে
-                    cv2.grabCut(img_np, mask, rect, bgdModel, fgdModel, 5, cv2.GC_INIT_WITH_RECT)
-                    
-                    mask2 = np.where((mask == 2) | (mask == 0), 0, 1).astype('uint8')
-                    result_np = img_np * mask2[:, :, np.newaxis]
-                    
-                    if bg_type == "রঙ (Color Picker)" or bg_custom_file is None:
-                        hex_c = bg_color.lstrip('#')
-                        bg_rgb = tuple(int(hex_c[i:i+2], 16) for i in (0, 2, 4))
-                        bg_img = np.full(img_np.shape, bg_rgb, dtype=np.uint8)
-                    else:
-                        bg_img_pil = Image.open(bg_custom_file).convert("RGB").resize((w, h))
-                        bg_img = np.array(bg_img_pil)
+                    if has_rembg:
+                        # rembg লাইব্রেরি দিয়ে নিখুঁত ব্যাকগ্রাউন্ড রিমুভ
+                        input_bytes = global_file.getvalue()
+                        output_bytes = remove(input_bytes)
+                        result_img = Image.open(io.BytesIO(output_bytes)).convert("RGBA")
                         
-                    inv_mask2 = 1 - mask2
-                    bg_part = bg_img * inv_mask2[:, :, np.newaxis]
-                    final_np = result_np + bg_part
+                        # নতুন ব্যাকগ্রাউন্ড তৈরি
+                        if bg_type == "রঙ (Color Picker)" or bg_custom_file is None:
+                            hex_c = bg_color.lstrip('#')
+                            bg_rgb = tuple(int(hex_c[i:i+2], 16) for i in (0, 2, 4)) + (255,)
+                            bg_img = Image.new("RGBA", (w, h), bg_rgb)
+                        else:
+                            bg_img = Image.open(bg_custom_file).convert("RGBA").resize((w, h))
+                        
+                        # ছবি কম্পোজ করা
+                        bg_img.paste(result_img, (0, 0), result_img)
+                        final_img = bg_img.convert("RGB")
+                    else:
+                        # ব্যাকআপ মেথড (OpenCV GrabCut)
+                        mask = np.zeros(img_np.shape[:2], np.uint8)
+                        bgdModel = np.zeros((1, 65), np.float64)
+                        fgdModel = np.zeros((1, 65), np.float64)
+                        rect = (int(w * 0.1), int(h * 0.05), int(w * 0.8), int(h * 0.9))
+                        cv2.grabCut(img_np, mask, rect, bgdModel, fgdModel, 5, cv2.GC_INIT_WITH_RECT)
+                        mask2 = np.where((mask == 2) | (mask == 0), 0, 1).astype('uint8')
+                        result_np = img_np * mask2[:, :, np.newaxis]
+                        
+                        if bg_type == "রঙ (Color Picker)" or bg_custom_file is None:
+                            hex_c = bg_color.lstrip('#')
+                            bg_rgb = tuple(int(hex_c[i:i+2], 16) for i in (0, 2, 4))
+                            bg_img_arr = np.full(img_np.shape, bg_rgb, dtype=np.uint8)
+                        else:
+                            bg_img_pil = Image.open(bg_custom_file).convert("RGB").resize((w, h))
+                            bg_img_arr = np.array(bg_img_pil)
+                            
+                        inv_mask2 = 1 - mask2
+                        bg_part = bg_img_arr * inv_mask2[:, :, np.newaxis]
+                        final_np = result_np + bg_part
+                        final_img = Image.fromarray(final_np)
                     
-                    final_img = Image.fromarray(final_np)
                     st.success("✅ ব্যাকগ্রাউন্ড সফলভাবে পরিবর্তন করা হয়েছে!")
                     st.image(final_img, caption="রিমুভ ও পরিবর্তিত ব্যাকগ্রাউন্ডের ছবি", use_column_width=True)
                 except Exception as e:
                     st.error(f"⚠️ ত্রুটি ঘটেছে: {e}")
     else:
         st.info("দয়া করে উপরে ফাইল আপলোড অপশন থেকে একটি পাসপোর্ট বা পোর্ট্রেট ছবি আপলোড করুন।")
-
 
 # ==============================================================================
 # মোড ৬: ক্যাশ মেমো / রশিদ জেনারেটর 
@@ -338,9 +323,7 @@ elif app_mode == 6:
                             <th style="padding: 10px; text-align: right;">মূল্য</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        {items_html}
-                    </tbody>
+                    <tbody>{items_html}</tbody>
                 </table>
                 
                 <div style='text-align: right; font-size: 16px; background-color: #f8f9fa; padding: 12px; border-radius: 5px;'>
@@ -357,7 +340,6 @@ elif app_mode == 6:
         </div>
         """
         print_content_html(memo_html_code, "ক্যাশ মেমো প্রিন্ট করুন")
-
 
 # ==============================================================================
 # মোড ৮: নাগরিক সনদপত্র জেনারেটর 
@@ -377,7 +359,6 @@ elif app_mode == 8:
 
     if st.button("📜 নাগরিক সনদ প্রিভিউ ও প্রিন্ট দেখুন"):
         st.success("✅ নাগরিক সনদপত্র সম্পূর্ণ A4 পেজে প্রস্তুত!")
-        
         cert_html_code = f"""
         <div style='padding: 15px; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: space-between; box-sizing: border-box; background-color: #ffffff;'>
             <div>
@@ -387,14 +368,11 @@ elif app_mode == 8:
                     <hr style="border:1px solid #0B50FA; width:45%; margin: 15px auto;">
                     <h3 style="background:#0B50FA; color:white; display:inline-block; padding:6px 25px; border-radius:5px; margin-top:10px; font-size: 20px;">নাগরিক সনদপত্র</h3>
                 </div>
-                
                 <p style="font-size:17px; line-height:2.4; text-align:justify; margin-top:40px;">
                     এই মর্মে প্রত্যয়ন করা যাইতেছে যে, <b>{cit_name}</b>, পিতা: <b>{cit_father}</b>, মাতা: <b>{cit_mother}</b>, গ্রাম: <b>{cit_vill}</b>, {cit_word}, উপজেলা: মণিরামপুর, জেলা: যশোর এর অত্র ইউনিয়নের একজন স্থায়ী বাসিন্দা এবং জন্মসূত্রে বাংলাদেশের নাগরিক। আমার জানামতে তিনি দেশবিরোধী বা রাষ্ট্রবিরোধী কোনো কাজের সাথে জড়িত নন এবং তার চরিত্র অত্যন্ত ভালো।
                 </p>
-                
                 <p style="font-size:17px; margin-top:30px; line-height: 1.8;">আমি তার সর্বাঙ্গীন সাফল্য ও দীর্ঘায়ু কামনা করি।</p>
             </div>
-            
             <table style="width: 100%; margin-top: 40px; font-size: 15px;">
                 <tr>
                     <td><div style="border-top:1px dashed black; width: 180px; text-align: center; padding-top:8px;">আবেদনকারীর স্বাক্ষর</div></td>
@@ -404,7 +382,6 @@ elif app_mode == 8:
         </div>
         """
         print_content_html(cert_html_code, "নাগরিক সনদ প্রিন্ট করুন")
-
 
 # ==============================================================================
 # মোড ৯: টুর্নামেন্ট আমন্ত্রণপত্র ও নিয়মাবলী 
@@ -418,7 +395,6 @@ elif app_mode == 9:
 
     if st.button("⚽ টুর্নামেন্ট নোটিশ প্রিভিউ ও প্রিন্ট দেখুন"):
         st.success("✅ টুর্নামেন্ট আমন্ত্রণপত্র সম্পূর্ণ A4 পেজে প্রস্তুত!")
-        
         notice_html_code = f"""
         <div style='padding: 15px; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: space-between; box-sizing: border-box; background-color: #ffffff;'>
             <div>
@@ -427,16 +403,13 @@ elif app_mode == 9:
                     <h3 style="color:#0B50FA; margin:10px 0; font-size:22px;">{t_name}</h3>
                     <hr style="border:1px solid #ff4b4b; width:55%; margin: 12px auto;">
                 </div>
-                
                 <p style="font-size:16px; line-height:2; margin-top:25px; text-align:center;">
                     সকল ক্রীড়াপ্রেমী ও দলের অবগতির জন্য জানানো যাচ্ছে যে, আগামী <b>{t_date}</b> তারিখে স্থানীয় মাঠে জমকালো আয়োজনের মাধ্যমে এই টুর্নামেন্ট শুরু হতে যাচ্ছে। আপনি বা আপনার দল এই প্রতিযোগিতায় স্বতঃস্ফূর্তভাবে অংশগ্রহণ করার জন্য আমন্ত্রিত।
                 </p>
-                
                 <div style="background:#f8f9fa; padding:15px; border-radius:6px; border-left:5px solid #ff4b4b; margin-top:20px;">
                     <h4 style="margin:0 0 8px 0; color:#333; font-size: 16px;">🎁 আকর্ষণীয় পুরস্কারসমূহ:</h4>
                     <p style="margin:0; font-size:15px; font-weight:bold; color:red;">{t_prize}</p>
                 </div>
-                
                 <div style="margin-top:20px;">
                     <h4 style="color:#333; margin-bottom:8px; font-size: 16px;">📋 প্রধান নিয়মাবলী:</h4>
                     <ol style="font-size:14px; line-height:1.8; margin:0; padding-left:20px;">
@@ -447,7 +420,6 @@ elif app_mode == 9:
                     </ol>
                 </div>
             </div>
-            
             <table style="width: 100%; margin-top: 30px; font-size: 15px;">
                 <tr>
                     <td><div style="border-top:1px dashed black; width: 180px; text-align: center; padding-top:8px;">আয়োজক কমিটি</div></td>
@@ -457,7 +429,6 @@ elif app_mode == 9:
         </div>
         """
         print_content_html(notice_html_code, "টুর্নামেন্ট নোটিশ প্রিন্ট করুন")
-
 
 # ==============================================================================
 # মোড ১০: অনলাইন সরকারি ও প্রয়োজনীয় লিংকসমূহ 
@@ -471,40 +442,37 @@ elif app_mode == 10:
     with tab1:
         st.subheader("জাতীয় ও নাগরিক সেবা পোর্টাল")
         st.markdown("""
-        - [জাতীয় তথ্য বাতায়ন (Bangladesh National Portal)](https://www.bangladesh.gov.bd)
-        - [বাংলাদেশ ফরম পোর্টাল (All Forms)](https://forms.gov.bd)
-        - [জাতীয় পরিচয়পত্র সেবা (NID Portal)](https://services.nidw.gov.bd)
-        - [জন্ম ও মৃত্যু নিবন্ধন (Birth & Death Registration)](https://bdris.gov.bd)
-        - [ভূমি মন্ত্রণালয় ও ই-মিউটেশন (Land Services)](https://land.gov.bd)
+        - [জাতীয় তথ্য বাতায়ন](https://www.bangladesh.gov.bd)
+        - [বাংলাদেশ ফরম পোর্টাল](https://forms.gov.bd)
+        - [জাতীয় পরিচয়পত্র সেবা (NID)](https://services.nidw.gov.bd)
+        - [জন্ম ও মৃত্যু নিবন্ধন](https://bdris.gov.bd)
+        - [ভূমি মন্ত্রণালয় ও ই-মিউটেশন](https://land.gov.bd)
         """)
 
     with tab2:
         st.subheader("পাসপোর্ট ও ইমিগ্রেশন সেবা")
         st.markdown("""
-        - [ই-পাসপোর্ট অনলাইন আবেদন (E-Passport Portal)](https://www.epassport.gov.bd)
-        - [অনলাইন পুলিশ ক্লিয়ারেন্স সার্টিফিকেট (Police Clearance)](https://pcc.police.gov.bd)
-        - [ভিসা ভেরিফিকেশন ও তথ্য (Visa Verification)](https://www.immigrate.gov.bd)
+        - [ই-পাসপোর্ট অনলাইন আবেদন](https://www.epassport.gov.bd)
+        - [অনলাইন পুলিশ ক্লিয়ারেন্স সার্টিফিকেট](https://pcc.police.gov.bd)
+        - [ভিসা ভেরিফিকেশন ও তথ্য](https://www.immigrate.gov.bd)
         """)
 
     with tab3:
         st.subheader("শিক্ষা ও বোর্ড ফলাফল")
         st.markdown("""
-        - [শিক্ষা বোর্ড ফলাফল (Education Board Results)](http://www.educationboardresults.gov.bd)
-        - [জাতীয় বিশ্ববিদ্যালয় পোর্টাল (National University)](https://www.nu.ac.bd)
+        - [শিক্ষা বোর্ড ফলাফল](http://www.educationboardresults.gov.bd)
+        - [জাতীয় বিশ্ববিদ্যালয় পোর্টাল](https://www.nu.ac.bd)
         - [মাধ্যমিক ও উচ্চশিক্ষা অধিদপ্তর (DSHE)](https://www.dshe.gov.bd)
-        - [বিনা মূল্যের পাঠ্যপুস্তক পোর্টাল (NCTB)](http://nctb.gov.bd)
         """)
 
     with tab4:
         st.subheader("চাকরি, বিমা ও অন্যান্য জরুরি সেবা")
         st.markdown("""
         - [বাংলাদেশ সরকারি চাকরি পোর্টাল (Teletalk Jobs)](https://alljobs.teletalk.com.bd)
-        - [বাংলাদেশ ব্যাংক (Bangladesh Bank)](https://www.bb.org.bd)
-        - [জরুরি সেবা - ৯৯৯ (National Emergency Service)](https://999.gov.bd)
+        - [বাংলাদেশ ব্যাংক](https://www.bb.org.bd)
+        - [জরুরি সেবা - ৯৯৯](https://999.gov.bd)
         """)
 
-
-# অন্যান্য ডিফল্ট বা অন্য মোডগুলোর জন্য
 else:
     st.header("🛠️ অন্যান্য টুলস ও ড্যাশবোর্ড")
     st.info("দয়া করে সাইডবার থেকে আপনার কাঙ্ক্ষিত টুলটি সিলেক্ট করুন।")
