@@ -49,14 +49,34 @@ st.markdown("""
         line-height: 1.5;
         color: white;
     }
+    .header-profile-img {
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
+        overflow: hidden;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border: 2px solid rgba(255, 255, 255, 0.8);
+        box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        margin-bottom: 10px;
+    }
+    .header-profile-img img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
 </style>
 """, unsafe_allow_html=True)
 
-# হেডার সেকশন
+# হেডার সেকশন (প্রিন্টার আইকনের জায়গায় Hasanur.jpeg ছবি বৃত্তাকার রূপ দেওয়া হয়েছে)
 st.markdown("""
 <div class="studio-header">
-    <div style="background: rgba(255,255,255,0.15); padding: 18px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.3);">
-        <h1 style="margin: 0 0 6px 0;">🖨️ হাসানুর কম্পিউটার স্টুডিও</h1>
+    <div style="background: rgba(255,255,255,0.15); padding: 18px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.3); text-align: center;">
+        <div class="header-profile-img">
+            <img src="Hasanur.jpeg" alt="Hasanur">
+        </div>
+        <h1 style="margin: 0 0 6px 0;">হাসানুর কম্পিউটার স্টুডিও</h1>
         <p style="margin: 3px 0;"><b>ঠিকানা:</b> দিঘীরপাড়, মনিরামপুর, যশোর</p>
         <p style="margin: 3px 0;"><b>মোবাইল:</b> ০১৭৪৩-৬১৪৩৫৯</p>
         <hr style="border: 0.5px solid rgba(255,255,255,0.3); width: 80%; margin: 10px auto;">
@@ -179,12 +199,10 @@ if app_mode == 2:
                     h, w = img_np.shape[:2]
                     
                     if has_rembg:
-                        # rembg লাইব্রেরি দিয়ে নিখুঁত ব্যাকগ্রাউন্ড রিমুভ
                         input_bytes = global_file.getvalue()
                         output_bytes = remove(input_bytes)
                         result_img = Image.open(io.BytesIO(output_bytes)).convert("RGBA")
                         
-                        # নতুন ব্যাকগ্রাউন্ড তৈরি
                         if bg_type == "রঙ (Color Picker)" or bg_custom_file is None:
                             hex_c = bg_color.lstrip('#')
                             bg_rgb = tuple(int(hex_c[i:i+2], 16) for i in (0, 2, 4)) + (255,)
@@ -192,11 +210,9 @@ if app_mode == 2:
                         else:
                             bg_img = Image.open(bg_custom_file).convert("RGBA").resize((w, h))
                         
-                        # ছবি কম্পোজ করা
                         bg_img.paste(result_img, (0, 0), result_img)
                         final_img = bg_img.convert("RGB")
                     else:
-                        # ব্যাকআপ মেথড (OpenCV GrabCut)
                         mask = np.zeros(img_np.shape[:2], np.uint8)
                         bgdModel = np.zeros((1, 65), np.float64)
                         fgdModel = np.zeros((1, 65), np.float64)
