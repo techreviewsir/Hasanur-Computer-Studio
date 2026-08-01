@@ -67,7 +67,6 @@ st.markdown(f"""
         box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         font-size: 11px;
     }}
-    /* লম্বালম্বি ও আকর্ষণীয় স্টুডিও হেডার কার্ড */
     .studio-header {{
         background: {header_gradient};
         padding: 30px 20px;
@@ -121,7 +120,6 @@ st.markdown(f"""
         padding-bottom: 4px;
     }}
     
-    /* স্ক্রিনের পেপার স্টাইল */
     .a4-paper-box {{
         background: #ffffff;
         width: 100%;
@@ -135,9 +133,6 @@ st.markdown(f"""
         border-radius: 6px;
     }}
 
-    /* ========================================================== */
-    /* প্রিন্টিং অপ্টিমাইজেশন: প্রিন্ট করার সময় শুধু A4 পেপার প্রিন্ট হবে */
-    /* ========================================================== */
     @media print {{
         body {{
             background: white !important;
@@ -175,7 +170,6 @@ t = {
     "portal_header": "📋 অন্যান্য গুরুত্বপূর্ণ অনলাইন লিংক ও পোর্টাল" if not is_eng else "📋 All Important Online Links",
 }
 
-# লম্বালম্বি সুবিন্যস্ত হেডার লেআউট
 st.markdown(f"""
 <div class="studio-header">
     <h1>{t['title']}</h1>
@@ -186,17 +180,12 @@ st.markdown(f"""
 </div>
 """, unsafe_allow_html=True)
 
-# মেইন ফাইল আপলোডার
-st.markdown(f"### {t['upload_header']}")
 global_file = st.file_uploader(t['upload_label'], type=["jpg", "jpeg", "png", "pdf"])
 st.markdown("---")
 
 if 'app_mode' not in st.session_state:
     st.session_state.app_mode = 1
 
-# ==============================================================================
-# ১ থেকে ১৪ ফটো এডিটিং ও ইউটিলিটি ফিচার মেনু (সাইডবার)
-# ==============================================================================
 st.sidebar.markdown(f"<div class='sidebar-section-title'>{t['tools_header']}</div>", unsafe_allow_html=True)
 
 menu_dict = {
@@ -221,19 +210,13 @@ for num, (item_name, desc) in menu_dict.items():
         st.session_state.app_mode = num
     st.sidebar.markdown(f"<p style='font-size:10px; color:gray; margin-top:-2px; margin-bottom:5px;'>ℹ️ {desc}</p>", unsafe_allow_html=True)
 
-
-# ==============================================================================
-# সরকারি ও বেসরকারি চাকরির পোর্টাল ক্যাটাগরি
-# ==============================================================================
 st.sidebar.markdown(f"<div class='sidebar-section-title'>{t['job_header']}</div>", unsafe_allow_html=True)
-
 st.sidebar.markdown("""
 <div class="link-box">
     <b>🏛️ সরকারি চাকরির পোর্টাল ও সার্কুলার:</b><br>
     • সরকারি জবস পোর্টাল (Teletalk): <a href="https://alljobs.teletalk.com.bd/" target="_blank">All Jobs BD</a><br>
     • বাংলাদেশ জাতীয় তথ্য বাতায়ন: <a href="https://bangladesh.gov.bd/" target="_blank">National Portal</a>
 </div>
-
 <div class="link-box">
     <b>🏢 বেসরকারি ও করপোরেট জবস পোর্টাল:</b><br>
     • বিডি জবস পোর্টাল: <a href="https://www.bdjobs.com/" target="_blank">Bdjobs.com</a><br>
@@ -241,47 +224,33 @@ st.sidebar.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-
-# ==============================================================================
-# ক্লাস ৫ থেকে সর্বোচ্চ ক্লাস পর্যন্ত মার্কশিট ও রেজাল্ট পোর্টাল
-# ==============================================================================
 st.sidebar.markdown(f"<div class='sidebar-section-title'>{t['result_header']}</div>", unsafe_allow_html=True)
-
 st.sidebar.markdown("""
 <div class="link-box">
     <b>🎓 পিএসসি, জেএসসি, এসএসসি ও এইচএসসি (মার্কশিট সহ):</b><br>
     • অফিশিয়াল রেজাল্ট পোর্টাল: <a href="http://www.educationboardresults.gov.bd/" target="_blank">Web Link</a><br>
     • শিক্ষা বোর্ড মার্কশিট কর্নার: <a href="https://eboardresults.com/" target="_blank">E-Board Marksheet</a>
 </div>
-
 <div class="link-box">
     <b>🏫 প্রাথমিক শিক্ষা সমাপনী (PEC / Class 5):</b><br>
     • প্রাথমিক শিক্ষা অধিদপ্তর: <a href="http://www.dpe.gov.bd/" target="_blank">DPE Portal</a>
 </div>
-
 <div class="link-box">
     <b>🏛️ জাতীয় বিশ্ববিদ্যালয় (অনার্স, মাস্টার্স, ডিগ্রি):</b><br>
     • এনইউ রেজাল্ট পোর্টাল: <a href="http://results.nu.ac.bd/" target="_blank">NU Results</a> | 
     স্টুডেন্ট পোর্টাল: <a href="http://www.nu.ac.bd/" target="_blank">NU Portal</a>
 </div>
-
 <div class="link-box">
     <b>📚 উন্মুক্ত বিশ্ববিদ্যালয় (SSC, HSC, BA, BSS):</b><br>
     • বাউবি এক্সাম রেজাল্ট: <a href="https://www.bou.ac.bd/" target="_blank">BOU Portal</a>
 </div>
-
 <div class="link-box">
     <b>🎓 পাবলিক ও অন্যান্য উচ্চশিক্ষা:</b><br>
     • ইউজিসি (UGC) পোর্টাল: <a href="https://www.ugc.gov.bd/" target="_blank">UGC Link</a>
 </div>
 """, unsafe_allow_html=True)
 
-
-# ==============================================================================
-# অন্যান্য গুরুত্বপূর্ণ অনলাইন লিংক ও পোর্টাল
-# ==============================================================================
 st.sidebar.markdown(f"<div class='sidebar-section-title'>{t['portal_header']}</div>", unsafe_allow_html=True)
-
 st.sidebar.markdown("""
 <div class="link-box">
     <b>📇 নাগরিক ও পরিচয়পত্র সেবা:</b><br>
@@ -290,13 +259,11 @@ st.sidebar.markdown("""
     • পাসপোর্ট: <a href="https://www.epassport.gov.bd/" target="_blank">Link</a> | 
     পুলিশ ও নাগরিক: <a href="https://pcc.police.gov.bd/" target="_blank">Link</a>
 </div>
-
 <div class="link-box">
     <b>🏥 স্বাস্থ্য, টিকিট ও অন্যান্য সেবা:</b><br>
     • টিকা (Surokkha): <a href="https://surokkha.gov.bd/" target="_blank">Link</a> | 
     রেলওয়ে টিকিট: <a href="https://eticket.railway.gov.bd/" target="_blank">Link</a>
 </div>
-
 <div class="link-box">
     <b>⚡ ইউটিলিটি, প্রবাস ও অন্যান্য:</b><br>
     • বিদ্যুৎ (BPDB): <a href="https://www.bpdb.gov.bd/" target="_blank">Link</a> | 
@@ -309,10 +276,6 @@ st.sidebar.markdown("""
 st.sidebar.markdown("---")
 st.sidebar.markdown("ℹ️ **Hasanur Computer Studio** | 📞 01743-614359")
 
-
-# ==============================================================================
-# মূল ফিচার হ্যান্ডলিং (App Mode Logic)
-# ==============================================================================
 app_mode = st.session_state.app_mode
 
 if app_mode == 1:
@@ -408,31 +371,127 @@ elif app_mode == 5:
         st.success(f"🎉 বয়স: **{years} বছর, {months} মাস, এবং {days} দিন**")
 
 elif app_mode == 6:
-    st.header("🧾 দোকানের ক্যাশ মেমো / রশিদ জেনারেটর")
-    c_name = st.text_input("Customer Name", "Md. Rahim")
-    c_phone = st.text_input("Phone Number", "01700000000")
-    col1, col2 = st.columns(2)
-    with col1:
-        item1 = st.text_input("Item 1 Name", "Lamination & Print")
-        price1 = st.number_input("Price 1 (TK)", 0, 10000, 150)
-    with col2:
-        item2 = st.text_input("Item 2 Name", "Online Form Fillup")
-        price2 = st.number_input("Price 2 (TK)", 0, 10000, 200)
-    total = price1 + price2
-    if st.button("Generate Memo"):
-        st.markdown(f"""
-        <div style="background:white; padding:20px; border:2px solid #0B50FA; border-radius:10px; color:black;">
-            <h3 style="text-align:center; color:#0B50FA; margin:0;">Hasanur Computer Studio</h3>
-            <p style="text-align:center; font-size:12px;">Dighirpar, Monirampur, Jashore</p>
-            <hr>
-            <p><b>Customer:</b> {c_name} | <b>Mobile:</b> {c_phone}</p>
-            <p><b>Date:</b> {date.today().strftime('%d-%m-%Y')}</p>
-            <p>1. {item1} - <b>{price1} TK</b></p>
-            <p>2. {item2} - <b>{price2} TK</b></p>
-            <hr>
-            <h4>Total Payable: <span style="color:red;">{total} TK</span></h4>
+    st.header("🧾 দোকানের ক্যাশ মেমো / রশিদ জেনারেটর (Items, Serial & Warranty)")
+    st.info("💡 টিপস: দোকানের নাম, ঠিকানা, ক্রেতার তথ্য এবং প্রয়োজনীয় আইটেম (+ বাটন দিয়ে) যোগ করুন। প্রতিটি পণ্যের সিরিয়াল নম্বর (S/N) এবং ওয়ারেন্টির তথ্য দিন।")
+
+    # দোকানদারের তথ্য
+    st.markdown("### 🏪 দোকানের তথ্য (Shop Info)")
+    shop_name = st.text_input("দোকানের নাম (Shop Name)", "হাসানুর কম্পিউটার স্টুডিও")
+    shop_address = st.text_input("দোকানের ঠিকানা ও ফোন (Address & Phone)", "দিঘীরপাড়, মনিরামপুর, যশোর | মোবাইল: ০১৭৪৩-৬১৪৩৫৯")
+
+    st.markdown("---")
+    st.markdown("### 🛒 ক্রেতা ও পণ্যের তালিকা (Customer & Items with Serial & Warranty)")
+    c_name = st.text_input("গ্রাহকের নাম (Customer Name)", "মোঃ রহিম")
+    c_phone = st.text_input("মোবাইল নম্বর (Phone Number)", "01700000000")
+
+    # সেশন স্টেটে আইটেমগুলোর ডিফল্ট মান (নাম, সিরিয়াল নাম্বার, দাম, ওয়ারেন্টি আছে কিনা, ওয়ারেন্টির মেয়াদ)
+    if 'memo_items' not in st.session_state:
+        st.session_state.memo_items = [
+            {'name': 'ল্যামিনেশন ও প্রিন্ট', 'serial': 'N/A', 'price': 150, 'has_warranty': 'না', 'warranty_period': '-'},
+            {'name': 'এইচপি প্রিন্টার', 'serial': 'HP-SN987654', 'price': 8500, 'has_warranty': 'হ্যাঁ', 'warranty_period': '১ বছর'}
+        ]
+
+    col_btn1, col_btn2 = st.columns(2)
+    with col_btn1:
+        if st.button("➕ নতুন আইটেম যোগ করুন (Add Item)"):
+            st.session_state.memo_items.append({'name': '', 'serial': '', 'price': 0, 'has_warranty': 'না', 'warranty_period': '-'})
+    with col_btn2:
+        if len(st.session_state.memo_items) > 1 and st.button("➖ শেষের আইটেমটি বাদ দিন"):
+            st.session_state.memo_items.pop()
+
+    updated_items = []
+    total_amount = 0
+
+    # প্রতিটি আইটেমের জন্য ফিল্ড তৈরি (নাম, সিরিয়াল, দাম, ওয়ারেন্টি চেকবাক্স এবং মেয়াদ)
+    for i, item in enumerate(st.session_state.memo_items):
+        st.markdown(f"**আইটেম #{i+1}**")
+        c1, c2, c3, c4, c5 = st.columns([3, 2, 2, 2, 2])
+        with c1:
+            item_name = st.text_input(f"পণ্যের নাম", item['name'], key=f"item_name_{i}")
+        with c2:
+            item_serial = st.text_input(f"সিরিয়াল নম্বর (S/N)", item.get('serial', ''), key=f"item_serial_{i}")
+        with c3:
+            item_price = st.number_input(f"মূল্য (TK)", 0, 1000000, int(item['price']), key=f"item_price_{i}")
+        with c4:
+            default_w_idx = 0 if item['has_warranty'] == 'হ্যাঁ' else 1
+            has_war = st.selectbox(f"ওয়ারেন্টি?", ["হ্যাঁ", "না"], index=default_w_idx, key=f"has_war_{i}")
+        with c5:
+            default_period = item['warranty_period'] if item['warranty_period'] else "১ বছর"
+            war_period = st.text_input(f"ওয়ারেন্টি মেয়াদ", default_period, key=f"war_period_{i}")
+        
+        updated_items.append({
+            'name': item_name, 
+            'serial': item_serial if item_serial else "N/A",
+            'price': item_price, 
+            'has_warranty': has_war, 
+            'warranty_period': war_period if has_war == "হ্যাঁ" else "প্রযোজ্য নয়"
+        })
+        total_amount += item_price
+        st.markdown("---")
+
+    if st.button("🖨️ ক্যাশ মেমো জেনারেট করুন (A4 Print Ready)"):
+        items_html = ""
+        for idx, itm in enumerate(updated_items):
+            items_html += f"""
+            <tr>
+                <td style="padding: 8px; border-bottom: 1px solid #ddd; text-align: center;">{idx + 1}</td>
+                <td style="padding: 8px; border-bottom: 1px solid #ddd;">{itm['name']}</td>
+                <td style="padding: 8px; border-bottom: 1px solid #ddd; text-align: center; font-family: monospace; font-weight: bold;">{itm['serial']}</td>
+                <td style="padding: 8px; border-bottom: 1px solid #ddd; text-align: center;">{itm['has_warranty']} ({itm['warranty_period']})</td>
+                <td style="padding: 8px; border-bottom: 1px solid #ddd; text-align: right;">{itm['price']} TK</td>
+            </tr>
+            """
+
+        memo_html = f"""
+        <div class="a4-paper-box" style="border: 3px solid #0B50FA;">
+            <div style="text-align:center;">
+                <h2 style="color:#0B50FA; margin:0; font-size:28px;">{shop_name}</h2>
+                <p style="font-size:14px; margin:5px 0; color:#333;">{shop_address}</p>
+                <hr style="border: 1px solid #0B50FA; width:70%; margin:15px auto;">
+                <h3 style="background:#0B50FA; color:white; display:inline-block; padding:4px 20px; border-radius:4px; margin:5px 0;">ক্যাশ মেমো / রসিদ</h3>
+            </div>
+            
+            <div style="margin-top:20px; display:flex; justify-content:space-between; font-size:14px; background:#f8f9fa; padding:10px; border-radius:5px;">
+                <div>
+                    <p style="margin:2px 0;"><b>গ্রাহকের নাম:</b> {c_name}</p>
+                    <p style="margin:2px 0;"><b>মোবাইল নম্বর:</b> {c_phone}</p>
+                </div>
+                <div style="text-align:right;">
+                    <p style="margin:2px 0;"><b>তারিখ:</b> {date.today().strftime('%d-%m-%Y')}</p>
+                </div>
+            </div>
+
+            <table style="width:100%; border-collapse: collapse; margin-top:20px; font-size:14px;">
+                <thead>
+                    <tr style="background:#0B50FA; color:white;">
+                        <th style="padding: 10px; text-align: center; width: 8%;">ক্রমিক</th>
+                        <th style="padding: 10px; text-align: left; width: 32%;">পণ্যের বিবরণ / সেবার নাম</th>
+                        <th style="padding: 10px; text-align: center; width: 20%;">সিরিয়াল নম্বর (S/N)</th>
+                        <th style="padding: 10px; text-align: center; width: 22%;">ওয়ারেন্টি স্ট্যাটাস ও মেয়াদ</th>
+                        <th style="padding: 10px; text-align: right; width: 18%;">মূল্য</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {items_html}
+                </tbody>
+            </table>
+
+            <div style="margin-top: 20px; text-align: right; font-size: 16px; background:#f1f3f5; padding: 10px; border-radius: 5px;">
+                <b>সর্বমোট প্রদেয় টাকা (Total): <span style="color:red; font-size:18px;">{total_amount} TK</span></b>
+            </div>
+
+            <div style="margin-top: 100px; display: flex; justify-content: space-between; font-size: 14px;">
+                <div>
+                    <p style="border-top: 1px dashed black; padding-top: 5px; display: inline-block;">গ্রাহকের স্বাক্ষর</p>
+                </div>
+                <div style="text-align: right;">
+                    <p style="border-top: 1px solid black; padding-top: 5px; display: inline-block; font-weight: bold;">বিক্রেতার স্বাক্ষর / সিল</p>
+                </div>
+            </div>
         </div>
-        """, unsafe_allow_html=True)
+        """
+        st.markdown(memo_html, unsafe_allow_html=True)
+        st.success("✅ সিরিয়াল নম্বর ও ওয়ারেন্টিসহ ক্যাশ মেমো সফলভাবে জেনারেট হয়েছে! প্রিন্ট করতে Ctrl + P চাপুন।")
 
 elif app_mode == 7:
     st.header("🛡️ ডিজিটাল ওয়ারেন্টি কার্ড জেনারেটর")
@@ -443,8 +502,6 @@ elif app_mode == 7:
 
 elif app_mode == 8:
     st.header("📜 নাগরিক সনদপত্র জেনারেটর (A4 Print Ready)")
-    st.info("💡 টিপস: সরাসরি প্রিন্ট করতে ব্রাউজারের প্রিন্ট অপশন ব্যবহার করুন (Ctrl + P)। প্রিন্টার পেপার সাইজ স্বয়ংক্রিয়ভাবে A4 এ সেট করা আছে।")
-    
     col1, col2 = st.columns(2)
     with col1:
         cit_name = st.text_input("আবেদনকারীর নাম (Applicant Name)", "মোঃ রফিকুল ইসলাম")
@@ -491,8 +548,6 @@ elif app_mode == 8:
 
 elif app_mode == 9:
     st.header("⚽ টুর্নামেন্ট আমন্ত্রণপত্র ও নিয়মাবলী জেনারেটর (A4 Print Ready)")
-    st.info("💡 টিপস: সরাসরি প্রিন্ট করতে ব্রাউজারের প্রিন্ট অপশন ব্যবহার করুন (Ctrl + P)। পেপার সাইজ স্বয়ংক্রিয়ভাবে A4 প্রিন্ট ফরম্যাটে সেট করা থাকবে।")
-    
     col1, col2 = st.columns(2)
     with col1:
         t_name = st.text_input("টুর্নামেন্টের নাম (Tournament Name)", "দিঘীরপাড় প্রিমিয়ার লিগ (ক্রিকেট/ফুটবল)")
