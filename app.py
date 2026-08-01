@@ -252,16 +252,24 @@ if app_mode == 1:
     else:
         st.info("দয়া করে উপরে ফাইল আপলোড অপশন থেকে একটি ছবি আপলোড করুন।")
 
-# মোড ২: ব্যাকগ্রাউন্ড রিমুভ ও কালার পরিবর্তন
+# মোড ২: ব্যাকগ্রাউন্ড রিমুভ ও কালার/ছবি পরিবর্তন
 elif app_mode == 2:
-    st.header("🎨 স্টুডিও ব্যাকগ্রাউন্ড রিমুভ ও কালার পরিবর্তন")
+    st.header("🎨 স্টুডিও ব্যাকগ্রাউন্ড রিমুভ ও কালার/ছবি পরিবর্তন")
     if global_file is not None:
         image = Image.open(global_file).convert("RGB")
         st.image(image, caption="মূল আপলোড করা ছবি", width=300)
         
-        bg_color = st.color_picker("নতুন ব্যাকগ্রাউন্ড কালার সিলেক্ট করুন", "#ffffff")
+        bg_type = st.radio("ব্যাকগ্রাউন্ড পরিবর্তনের মাধ্যম বেছে নিন:", ["রঙ (Color Picker)", "কম্পিউটার থেকে ছবি আপলোড (Custom Image)"])
         
-        if st.button("🚀 ব্যাকগ্রাউন্ড রিমুভ ও নতুন কালার সেট করুন"):
+        bg_color = "#ffffff"
+        bg_custom_file = None
+        
+        if bg_type == "রঙ (Color Picker)":
+            bg_color = st.color_picker("নতুন ব্যাকগ্রাউন্ড কালার সিলেক্ট করুন", "#ffffff")
+        else:
+            bg_custom_file = st.file_uploader("ব্যাকগ্রাউন্ডের জন্য একটি ছবি আপলোড করুন", type=["jpg", "jpeg", "png"], key="bg_img_upload")
+        
+        if st.button("🚀 ব্যাকগ্রাউন্ড রিমুভ ও নতুন ব্যাকগ্রাউন্ড সেট করুন"):
             with st.spinner("প্রসেসিং হচ্ছে, দয়া করে অপেক্ষা করুন..."):
                 try:
                     img_np = np.array(image)
@@ -272,15 +280,19 @@ elif app_mode == 2:
                     fgdModel = np.zeros((1, 65), np.float64)
                     
                     rect = (int(w * 0.1), int(h * 0.05), int(w * 0.8), int(h * 0.9))
-                    cv2.grabCut(img_np, mask, rect, bgdModel, fgdModel, 5, cv2.INIT_WITH_RECT)
+                    cv2.grabCut(img_np, mask, rect, bgdModel, fgdModel, 5, cv2.GC_INIT_WITH_RECT)
                     
                     mask2 = np.where((mask == 2) | (mask == 0), 0, 1).astype('uint8')
                     result_np = img_np * mask2[:, :, np.newaxis]
                     
-                    hex_c = bg_color.lstrip('#')
-                    bg_rgb = tuple(int(hex_c[i:i+2], 16) for i in (0, 2, 4))
-                    
-                    bg_img = np.full(img_np.shape, bg_rgb, dtype=np.uint8)
+                    if bg_type == "রঙ (Color Picker)" or bg_custom_file is None:
+                        hex_c = bg_color.lstrip('#')
+                        bg_rgb = tuple(int(hex_c[i:i+2], 16) for i in (0, 2, 4))
+                        bg_img = np.full(img_np.shape, bg_rgb, dtype=np.uint8)
+                    else:
+                        bg_img_pil = Image.open(bg_custom_file).convert("RGB").resize((w, h))
+                        bg_img = np.array(bg_img_pil)
+                        
                     inv_mask2 = 1 - mask2
                     bg_part = bg_img * inv_mask2[:, :, np.newaxis]
                     final_np = result_np + bg_part
