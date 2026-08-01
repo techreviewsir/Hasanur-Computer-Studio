@@ -185,111 +185,119 @@ def print_content_html(html_content, button_text):
     components.html(full_html, height=1150, scrolling=True)
 
 # ==============================================================================
-# মোড ২: ব্যাকগ্রাউন্ড রিমুভ, কালার/ছবি পরিবর্তন ও লাইভ অ্যাডজাস্টমেন্ট টুল
+# মোড ২: ব্যাকগ্রাউন্ড রিমুভ, কালার পরিবর্তন ও লাইভ অ্যাডজাস্টমেন্ট টুল
 # ==============================================================================
 if app_mode == 2:
     st.header("🎨 স্টুডিও ব্যাকগ্রাউন্ড রিমুভ, কালার ও অ্যাডজাস্টমেন্ট টুল")
     if global_file is not None:
         image = Image.open(global_file).convert("RGB")
         
-        bg_type = st.radio("ব্যাকগ্রাউন্ড পরিবর্তনের মাধ্যম বেছে নিন:", ["রঙ (Color Picker)", "কম্পিউটার থেকে ছবি আপলোড (Custom Image)"])
+        col_orig, col_proc = st.columns(2)
         
-        bg_color = "#ffffff"
-        bg_custom_file = None
+        with col_orig:
+            st.image(image, caption="মূল আপলোড করা ছবি (অক্ষুন্ন)", use_column_width=True)
+            st.info("💡 মূল ছবি পরিবর্তন করা হবে না। প্রসেস করা ছবিটি ডানে লাইভ দেখা যাবে।")
         
-        if bg_type == "রঙ (Color Picker)":
-            bg_color = st.color_picker("নতুন ব্যাকগ্রাউন্ড কালার সিলেক্ট করুন", "#ffffff")
-        else:
-            bg_custom_file = st.file_uploader("ব্যাকগ্রাউন্ডের জন্য একটি ছবি আপলোড করুন", type=["jpg", "jpeg", "png"], key="bg_img_upload")
+        with col_proc:
+            # ছবির ঠিক নিচে ব্যাকগ্রাউন্ড পরিবর্তন ও কালার সিলেকশনের অপশনসমূহ
+            st.markdown("### 🛠️ ব্যাকগ্রাউন্ড সেটিংস")
+            bg_type = st.radio("ব্যাকগ্রাউন্ড পরিবর্তনের মাধ্যম বেছে নিন:", ["রঙ (Color Picker)", "কম্পিউটার থেকে ছবি আপলোড (Custom Image)"], key="bg_type_radio")
+            
+            bg_color = "#ffffff"
+            bg_custom_file = None
+            
+            if bg_type == "রঙ (Color Picker)":
+                bg_color = st.color_picker("নতুন ব্যাকগ্রাউন্ড কালার সিলেক্ট করুন", "#ffffff", key="bg_color_picker")
+            else:
+                bg_custom_file = st.file_uploader("ব্যাকগ্রাউন্ডের জন্য একটি ছবি আপলোড করুন", type=["jpg", "jpeg", "png"], key="bg_img_upload")
 
-        if st.button("🚀 ব্যাকগ্রাউন্ড রিমুভ ও প্রসেস করুন"):
-            with st.spinner("প্রসেসিং হচ্ছে, দয়া করে অপেক্ষা করুন..."):
-                try:
-                    img_np = np.array(image)
-                    h, w = img_np.shape[:2]
-                    
-                    if has_rembg:
-                        input_bytes = global_file.getvalue()
-                        output_bytes = remove(input_bytes)
-                        result_img = Image.open(io.BytesIO(output_bytes)).convert("RGBA")
+            if st.button("🚀 ব্যাকগ্রাউন্ড রিমুভ ও প্রসেস করুন"):
+                with st.spinner("প্রসেসিং হচ্ছে, দয়া করে অপেক্ষা করুন..."):
+                    try:
+                        img_np = np.array(image)
+                        h, w = img_np.shape[:2]
                         
-                        if bg_type == "রঙ (Color Picker)" or bg_custom_file is None:
-                            hex_c = bg_color.lstrip('#')
-                            bg_rgb = tuple(int(hex_c[i:i+2], 16) for i in (0, 2, 4)) + (255,)
-                            bg_img = Image.new("RGBA", (w, h), bg_rgb)
-                        else:
-                            bg_img = Image.open(bg_custom_file).convert("RGBA").resize((w, h))
-                        
-                        bg_img.paste(result_img, (0, 0), result_img)
-                        base_processed = bg_img.convert("RGB")
-                    else:
-                        mask = np.zeros(img_np.shape[:2], np.uint8)
-                        bgdModel = np.zeros((1, 65), np.float64)
-                        fgdModel = np.zeros((1, 65), np.float64)
-                        rect = (int(w * 0.1), int(h * 0.05), int(w * 0.8), int(h * 0.9))
-                        cv2.grabCut(img_np, mask, rect, bgdModel, fgdModel, 5, cv2.GC_INIT_WITH_RECT)
-                        mask2 = np.where((mask == 2) | (mask == 0), 0, 1).astype('uint8')
-                        result_np = img_np * mask2[:, :, np.newaxis]
-                        
-                        if bg_type == "রঙ (Color Picker)" or bg_custom_file is None:
-                            hex_c = bg_color.lstrip('#')
-                            bg_rgb = tuple(int(hex_c[i:i+2], 16) for i in (0, 2, 4))
-                            bg_img_arr = np.full(img_np.shape, bg_rgb, dtype=np.uint8)
-                        else:
-                            bg_img_pil = Image.open(bg_custom_file).convert("RGB").resize((w, h))
-                            bg_img_arr = np.array(bg_img_pil)
+                        if has_rembg:
+                            input_bytes = global_file.getvalue()
+                            output_bytes = remove(input_bytes)
+                            result_img = Image.open(io.BytesIO(output_bytes)).convert("RGBA")
                             
-                        inv_mask2 = 1 - mask2
-                        bg_part = bg_img_arr * inv_mask2[:, :, np.newaxis]
-                        final_np = result_np + bg_part
-                        base_processed = Image.fromarray(final_np)
-                    
-                    st.session_state['base_processed_img'] = base_processed
-                    st.success("✅ ব্যাকগ্রাউন্ড সফলভাবে পরিবর্তন করা হয়েছে!")
-                except Exception as e:
-                    st.error(f"⚠️ ত্রুটি ঘটেছে: {e}")
+                            if bg_type == "রঙ (Color Picker)" or bg_custom_file is None:
+                                hex_c = bg_color.lstrip('#')
+                                bg_rgb = tuple(int(hex_c[i:i+2], 16) for i in (0, 2, 4)) + (255,)
+                                bg_img = Image.new("RGBA", (w, h), bg_rgb)
+                            else:
+                                bg_img = Image.open(bg_custom_file).convert("RGBA").resize((w, h))
+                            
+                            bg_img.paste(result_img, (0, 0), result_img)
+                            base_processed = bg_img.convert("RGB")
+                        else:
+                            mask = np.zeros(img_np.shape[:2], np.uint8)
+                            bgdModel = np.zeros((1, 65), np.float64)
+                            fgdModel = np.zeros((1, 65), np.float64)
+                            rect = (int(w * 0.1), int(h * 0.05), int(w * 0.8), int(h * 0.9))
+                            cv2.grabCut(img_np, mask, rect, bgdModel, fgdModel, 5, cv2.GC_INIT_WITH_RECT)
+                            mask2 = np.where((mask == 2) | (mask == 0), 0, 1).astype('uint8')
+                            result_np = img_np * mask2[:, :, np.newaxis]
+                            
+                            if bg_type == "রঙ (Color Picker)" or bg_custom_file is None:
+                                hex_c = bg_color.lstrip('#')
+                                bg_rgb = tuple(int(hex_c[i:i+2], 16) for i in (0, 2, 4))
+                                bg_img_arr = np.full(img_np.shape, bg_rgb, dtype=np.uint8)
+                            else:
+                                bg_img_pil = Image.open(bg_custom_file).convert("RGB").resize((w, h))
+                                bg_img_arr = np.array(bg_img_pil)
+                                
+                            inv_mask2 = 1 - mask2
+                            bg_part = bg_img_arr * inv_mask2[:, :, np.newaxis]
+                            final_np = result_np + bg_part
+                            base_processed = Image.fromarray(final_np)
+                        
+                        st.session_state['base_processed_img'] = base_processed
+                        st.success("✅ ব্যাকগ্রাউন্ড সফলভাবে পরিবর্তন করা হয়েছে!")
+                    except Exception as e:
+                        st.error(f"⚠️ ত্রুটি ঘটেছে: {e}")
 
-        # যদি ব্যাকগ্রাউন্ড রিমুভ ও প্রসেস করা হয়ে থাকে, তবে লাইভ কন্ট্রোল ও ছবি প্রদর্শন হবে
-        if 'base_processed_img' in st.session_state:
-            st.markdown("---")
-            st.markdown("### 🎛️ লাইভ ব্রাইটনেস, কনট্রাস্ট ও সিলেক্টিভ কালার অ্যাডজাস্টমেন্ট")
-            
-            c_adj1, c_adj2, c_adj3, c_adj4 = st.columns(4)
-            with c_adj1:
-                brightness_val = st.slider("ব্রাইটনেস (Brightness)", 0.2, 3.0, 1.0, 0.1)
-            with c_adj2:
-                contrast_val = st.slider("কনট্রাস্ট (Contrast)", 0.2, 3.0, 1.0, 0.1)
-            with c_adj3:
-                selected_color_mode = st.selectbox("সিলেক্টিভ কালার টোন", ["সব স্বাভাবিক (Normal)", "লালচে টোন (Redish)", "নীলাভ টোন (Bluish)", "সবুজাভ টোন (Greenish)"])
-            with c_adj4:
-                color_intensity = st.slider("টোন মাত্রা (Intensity)", -50, 50, 0, 5)
+            # যদি ব্যাকগ্রাউন্ড রিমুভ ও প্রসেস করা হয়ে থাকে, তবে লাইভ কন্ট্রোল ও ছবি প্রদর্শন হবে
+            if 'base_processed_img' in st.session_state:
+                st.markdown("---")
+                st.markdown("### 🎛️ লাইভ ব্রাইটনেস, কনট্রাস্ট ও কালার অ্যাডজাস্টমেন্ট")
+                
+                brightness_val = st.slider("ব্রাইটনেস (Brightness)", 0.2, 3.0, 1.0, 0.1, key="live_bright")
+                contrast_val = st.slider("কনট্রাস্ট (Contrast)", 0.2, 3.0, 1.0, 0.1, key="live_contrast")
+                selected_color_mode = st.selectbox("সিলেক্টিভ কালার টোন", ["সব স্বাভাবিক (Normal)", "লালচে টোন (Redish)", "নীলাভ টোন (Bluish)", "সবুজাভ টোন (Greenish)"], key="live_color_mode")
+                color_intensity = st.slider("টোন মাত্রা (Intensity)", -50, 50, 0, 5, key="live_intensity")
 
-            # লাইভ ইফেক্ট অ্যাপ্লাই করা
-            current_img = st.session_state['base_processed_img'].copy()
-            
-            enhancer_b = ImageEnhance.Brightness(current_img)
-            current_img = enhancer_b.enhance(brightness_val)
-            enhancer_c = ImageEnhance.Contrast(current_img)
-            current_img = enhancer_c.enhance(contrast_val)
-            
-            arr = np.array(current_img)
-            if selected_color_mode == "লালচে টোন (Redish)":
-                arr[:, :, 0] = np.clip(arr[:, :, 0].astype(int) + color_intensity, 0, 255)
-            elif selected_color_mode == "নীলাভ টোন (Bluish)":
-                arr[:, :, 2] = np.clip(arr[:, :, 2].astype(int) + color_intensity, 0, 255)
-            elif selected_color_mode == "সবুজাভ টোন (Greenish)":
-                arr[:, :, 1] = np.clip(arr[:, :, 1].astype(int) + color_intensity, 0, 255)
-            current_img = Image.fromarray(arr)
+                # লাইভ ইফেক্ট অ্যাপ্লাই করা
+                current_img = st.session_state['base_processed_img'].copy()
+                
+                enhancer_b = ImageEnhance.Brightness(current_img)
+                current_img = enhancer_b.enhance(brightness_val)
+                enhancer_c = ImageEnhance.Contrast(current_img)
+                current_img = enhancer_c.enhance(contrast_val)
+                
+                arr = np.array(current_img)
+                if selected_color_mode == "লালচে টোন (Redish)":
+                    arr[:, :, 0] = np.clip(arr[:, :, 0].astype(int) + color_intensity, 0, 255)
+                elif selected_color_mode == "নীলাভ টোন (Bluish)":
+                    arr[:, :, 2] = np.clip(arr[:, :, 2].astype(int) + color_intensity, 0, 255)
+                elif selected_color_mode == "সবুজাভ টোন (Greenish)":
+                    arr[:, :, 1] = np.clip(arr[:, :, 1].astype(int) + color_intensity, 0, 255)
+                current_img = Image.fromarray(arr)
 
-            col_orig, col_proc = st.columns(2)
-            with col_orig:
-                st.image(image, caption="মূল আপলোড করা ছবি (অক্ষুন্ন)", use_column_width=True)
-            with col_proc:
                 st.image(current_img, caption="প্রসেস করা ও লাইভ অ্যাডজাস্টকৃত ছবি", use_column_width=True)
-        else:
-            col_orig, _ = st.columns(2)
-            with col_orig:
-                st.image(image, caption="মূল আপলোড করা ছবি", use_column_width=True)
+                
+                # প্রসেস করা ছবি ডাউনলোডের অপশন
+                buffered = io.BytesIO()
+                current_img.save(buffered, format="JPEG")
+                img_bytes = buffered.getvalue()
+                
+                st.download_button(
+                    label="📥 প্রসেস করা ছবি ডাউনলোড করুন",
+                    data=img_bytes,
+                    file_name="processed_studio_image.jpg",
+                    mime="image/jpeg"
+                )
     else:
         st.info("দয়া করে উপরে ফাইল আপলোড অপশন থেকে একটি পাসপোর্ট বা পোর্ট্রেট ছবি আপলোড করুন।")
 
