@@ -5,75 +5,32 @@ from PIL import Image
 import streamlit as st
 from pypdf import PdfReader
 from datetime import date
-import streamlit.components.v1.components as components
-import base64
-from pathlib import Path
+import streamlit.components.v1 as components
+
+try:
+    from rembg import remove
+    has_rembg = True
+except ImportError:
+    has_rembg = False
 
 st.set_page_config(page_title="হাসানুর কম্পিউটার স্টুডিও", layout="wide")
 
 # ==============================================================================
-# মূল স্টাইল, গ্রেডিয়েন্ট ব্যাকগ্রাউন্ড, সাইডবার মেনু হোয়াইট ব্যাকগ্রাউন্ড ও ব্ল্যাক টেক্সট
+# মূল স্টাইল ও পুরো পেজের গ্রেডিয়েন্ট ব্যাকগ্রাউন্ড
 # ==============================================================================
 st.markdown("""
 <style>
-    /* ডার্ক মোড চিরতরে বন্ধ করার জন্য গ্লোবাল লাইট থিম স্টাইল */
+    /* Streamlit এর মেইন অ্যাপ ব্যাকগ্রাউন্ড এবং সাইডবার কালার পরিবর্তন */
     .stApp {
-        background: linear-gradient(135deg, #071952, #0b2f64, #1b032d, #381123) !important;
-        background-attachment: fixed !important;
-        color: #ffffff !important;
+        background: linear-gradient(135deg, #071952, #0b2f64, #1b032d, #381123);
+        background-attachment: fixed;
+        color: #ffffff;
     }
     
-    /* সাইডবার ব্যাকগ্রাউন্ড */
     section[data-testid="stSidebar"] {
-        background-color: #0b132b !important;
+        background-color: #0b132b;
     }
     
-    /* সাইডবারের মেনু বাটন এবং তার ভেতরের সব লেখার রঙ কালো ও ব্যাকগ্রাউন্ড সাদা করা */
-    section[data-testid="stSidebar"] button,
-    section[data-testid="stSidebar"] button p,
-    section[data-testid="stSidebar"] button span,
-    section[data-testid="stSidebar"] div[data-testid="stBaseButton-secondary"] {
-        background-color: #ffffff !important;
-        color: #000000 !important;
-        border: 1px solid #cccccc !important;
-        font-weight: 700 !important;
-        border-radius: 6px !important;
-        text-align: left !important;
-    }
-    
-    /* বাটনে মাউস নিলে লাল ব্যাকগ্রাউন্ড ও সাদা লেখা হবে */
-    section[data-testid="stSidebar"] button:hover,
-    section[data-testid="stSidebar"] button:hover p,
-    section[data-testid="stSidebar"] button:hover span {
-        background-color: #ff4b4b !important;
-        color: #ffffff !important;
-        border-color: #ff4b4b !important;
-    }
-    
-    /* সাইডবারের অন্যান্য সাধারণ শিরোনাম সাদা রাখা */
-    section[data-testid="stSidebar"] .stMarkdown, 
-    section[data-testid="stSidebar"] label, 
-    section[data-testid="stSidebar"] h1, 
-    section[data-testid="stSidebar"] h2, 
-    section[data-testid="stSidebar"] h3 {
-        color: #ffffff !important;
-    }
-    
-    /* লেখার লিঙ্কে মাউস রাখলে লাল রঙ */
-    a:hover, .stMarkdown a:hover {
-        color: #ff4b4b !important;
-    }
-    
-    /* অ্যাপের ভেতরের সমস্ত সাধারণ লেখা এবং লেবেল সাদা রঙ নিশ্চিত করা */
-    h1, h2, h3, h4, h5, h6, p, span, label, div, .stMarkdown, .stText {
-        color: #ffffff !important;
-    }
-    
-    /* টেক্সট ইনপুট ও সিলেক্ট বক্সের ভেতরে লেখার রঙ স্পষ্ট রাখা */
-    input, textarea, select {
-        color: #000000 !important;
-    }
-
     .studio-header {
         background: linear-gradient(135deg, #0B50FA, #ff4b4b);
         padding: 25px 20px;
@@ -87,35 +44,22 @@ st.markdown("""
         font-size: 26px;
         margin-bottom: 8px;
         font-weight: bold;
-        color: white !important;
+        color: white;
     }
     .studio-header p {
         font-size: 14px;
         margin: 4px 0;
         line-height: 1.5;
-        color: white !important;
+        color: white;
     }
 </style>
 """, unsafe_allow_html=True)
 
-def get_embedded_image():
-    image_path = "hasanur.jpeg"
-    if Path(image_path).exists():
-        with open(image_path, "rb") as img_file:
-            encoded = base64.b64encode(img_file.read()).decode()
-            return f'<img src="data:image/jpeg;base64,{encoded}" style="width: 105px; height: 105px; border-radius: 50%; object-fit: contain; background-color: #ffffff; border: 3px solid white; box-shadow: 0 4px 10px rgba(0,0,0,0.3); vertical-align: middle; margin-right: 15px;">'
-    return '👤'
-
-img_tag = get_embedded_image()
-
 # হেডার সেকশন
-st.markdown(f"""
+st.markdown("""
 <div class="studio-header">
     <div style="background: rgba(255,255,255,0.15); padding: 18px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.3);">
-        <div style="display: flex; align-items: center; justify-content: center; flex-wrap: wrap; margin-bottom: 8px;">
-            {img_tag}
-            <h1 style="margin: 0; display: inline-block;">হাসানুর কম্পিউটার স্টুডিও</h1>
-        </div>
+        <h1 style="margin: 0 0 6px 0;">🖨️ হাসানুর কম্পিউটার স্টুডিও</h1>
         <p style="margin: 3px 0;"><b>ঠিকানা:</b> দিঘীরপাড়, মনিরামপুর, যশোর</p>
         <p style="margin: 3px 0;"><b>মোবাইল:</b> ০১৭৪৩-৬১৪৩৫৯</p>
         <hr style="border: 0.5px solid rgba(255,255,255,0.3); width: 80%; margin: 10px auto;">
@@ -156,6 +100,7 @@ for num, (item_name, desc) in menu_dict.items():
 
 app_mode = st.session_state.app_mode
 
+# নিখুঁত A4 সাইজ এবং মার্জিনসহ প্রিন্ট ফাংশন
 def print_content_html(html_content, button_text):
     full_html = f"""
     <!DOCTYPE html>
@@ -237,23 +182,11 @@ def print_content_html(html_content, button_text):
     """
     components.html(full_html, height=1150, scrolling=True)
 
-# মোড ১: ব্রাইটনেস ও কালার এডিটর
-if app_mode == 1:
-    st.header("✨ ইমেজ ব্রাইটনেস ও কালার এডিটর")
-    if global_file is not None:
-        image = Image.open(global_file)
-        img_np = np.array(image)
-        
-        brightness = st.slider("ব্রাইটনেস (Brightness)", -100, 100, 0)
-        contrast = st.slider("কনট্রাস্ট (Contrast)", 0.0, 3.0, 1.0)
-        
-        adjusted = cv2.convertScaleAbs(img_np, alpha=contrast, beta=brightness)
-        st.image(adjusted, caption="এডিট করা ছবি", use_column_width=True)
-    else:
-        st.info("দয়া করে উপরে ফাইল আপলোড অপশন থেকে একটি ছবি আপলোড করুন।")
 
-# মোড ২: ব্যাকগ্রাউন্ড রিমুভ ও কালার/ছবি পরিবর্তন
-elif app_mode == 2:
+# ==============================================================================
+# মোড ২: ব্যাকগ্রাউন্ড রিমুভ ও কালার/ছবি পরিবর্তন (সংশোধিত ও পূর্ণাঙ্গ)
+# ==============================================================================
+if app_mode == 2:
     st.header("🎨 স্টুডিও ব্যাকগ্রাউন্ড রিমুভ ও কালার/ছবি পরিবর্তন")
     if global_file is not None:
         image = Image.open(global_file).convert("RGB")
@@ -280,6 +213,7 @@ elif app_mode == 2:
                     fgdModel = np.zeros((1, 65), np.float64)
                     
                     rect = (int(w * 0.1), int(h * 0.05), int(w * 0.8), int(h * 0.9))
+                    # সঠিক OpenCV এট্রিবিউট ব্যবহার করা হয়েছে যাতে কোনো এরর না আসে
                     cv2.grabCut(img_np, mask, rect, bgdModel, fgdModel, 5, cv2.GC_INIT_WITH_RECT)
                     
                     mask2 = np.where((mask == 2) | (mask == 0), 0, 1).astype('uint8')
@@ -305,37 +239,10 @@ elif app_mode == 2:
     else:
         st.info("দয়া করে উপরে ফাইল আপলোড অপশন থেকে একটি পাসপোর্ট বা পোর্ট্রেট ছবি আপলোড করুন।")
 
-# মোড ৩: আইডি কার্ড ক্রপ
-elif app_mode == 3:
-    st.header("🆔 আইডি কার্ড ক্রপ ও সোজা করার টুল")
-    if global_file is not None:
-        image = Image.open(global_file)
-        st.image(image, caption="মূল আইডি কার্ড", use_column_width=True)
-        st.info("আইডি কার্ড প্রসেসিং এবং ক্রপ করার অপশন এখানে কাজ করবে।")
-    else:
-        st.info("দয়া করে একটি আইডি কার্ডের ছবি আপলোড করুন।")
 
-# মোড ৪: পাসপোর্ট সাইজ ছবি শিট (৪ কপি)
-elif app_mode == 4:
-    st.header("🛂 পাসপোর্ট সাইজ ছবি শিট তৈরি (৪ কপি)")
-    if global_file is not None:
-        image = Image.open(global_file)
-        st.image(image, width=150, caption="আপনার ছবি")
-        if st.button("৪ কপি ছবি শিট তৈরি করুন"):
-            st.success("৪ কপি ছবির প্রিন্ট প্রিভিউ প্রস্তুত।")
-    else:
-        st.info("দয়া করে একটি পাসপোর্ট ছবি আপলোড করুন।")
-
-# মোড ৫: বয়স ক্যালকুলেটর
-elif app_mode == 5:
-    st.header("🎂 বয়স ক্যালকুলেটর (Age Calculator)")
-    b_date = st.date_input("জন্মতারিখ সিলেক্ট করুন", date(2000, 1, 1))
-    t_date_val = st.date_input("কাঙ্ক্ষিত তারিখ", date.today())
-    if st.button("বয়স হিসাব করুন"):
-        age_years = t_date_val.year - b_date.year - ((t_date_val.month, t_date_val.day) < (b_date.month, b_date.day))
-        st.success(f"বয়স: প্রায় {age_years} বছর পূর্ণ হয়েছে।")
-
-# মোড ৬: ক্যাশ মেমো
+# ==============================================================================
+# মোড ৬: ক্যাশ মেমো / রশিদ জেনারেটর 
+# ==============================================================================
 elif app_mode == 6:
     st.header("🧾 দোকানের ক্যাশ মেমো / রশিদ জেনারেটর")
     
@@ -451,15 +358,10 @@ elif app_mode == 6:
         """
         print_content_html(memo_html_code, "ক্যাশ মেমো প্রিন্ট করুন")
 
-# মোড ৭: ওয়ারেন্টি কার্ড
-elif app_mode == 7:
-    st.header("🛡️ ডিজিটাল ওয়ারেন্টি কার্ড জেনারেটর")
-    w_item = st.text_input("পণ্যের নাম", "স্মার্ট এলইডি টিভি")
-    w_code = st.text_input("ওয়ারেন্টি কোড / সিরিয়াল", "SN-987654")
-    if st.button("ওয়ারেন্টি কার্ড তৈরি করুন"):
-        st.success("ওয়ারেন্টি কার্ড প্রস্তুত করা হয়েছে।")
 
-# মোড ৮: নাগরিক সনদপত্র
+# ==============================================================================
+# মোড ৮: নাগরিক সনদপত্র জেনারেটর 
+# ==============================================================================
 elif app_mode == 8:
     st.header("📜 নাগরিক সনদপত্র জেনারেটর")
     
@@ -503,7 +405,10 @@ elif app_mode == 8:
         """
         print_content_html(cert_html_code, "নাগরিক সনদ প্রিন্ট করুন")
 
-# মোড ৯: টুর্নামেন্ট
+
+# ==============================================================================
+# মোড ৯: টুর্নামেন্ট আমন্ত্রণপত্র ও নিয়মাবলী 
+# ==============================================================================
 elif app_mode == 9:
     st.header("⚽ টুর্নামেন্ট আমন্ত্রণপত্র ও নিয়মাবলী জেনারেটর")
     
@@ -553,7 +458,10 @@ elif app_mode == 9:
         """
         print_content_html(notice_html_code, "টুর্নামেন্ট নোটিশ প্রিন্ট করুন")
 
-# মোড ১০: অনলাইন লিংক
+
+# ==============================================================================
+# মোড ১০: অনলাইন সরকারি ও প্রয়োজনীয় লিংকসমূহ 
+# ==============================================================================
 elif app_mode == 10:
     st.header("🔗 অনলাইন সরকারি ও প্রয়োজনীয় লিংকসমূহ")
     st.write("আপনার সাজানো ক্যাটাগরি অনুযায়ী গুরুত্বপূর্ণ সরকারি ও অনলাইন সেবার পোর্টালগুলো নিচে দেওয়া হলো:")
@@ -595,54 +503,8 @@ elif app_mode == 10:
         - [জরুরি সেবা - ৯৯৯ (National Emergency Service)](https://999.gov.bd)
         """)
 
-# মোড ১১: ছবির সাইজ পরিবর্তন
-elif app_mode == 11:
-    st.header("📏 ছবির সাইজ পরিবর্তন ও রিসাইজার")
-    if global_file is not None:
-        image = Image.open(global_file)
-        st.image(image, width=200)
-        width_val = st.number_input("নতুন প্রস্থ (Width)", 100, 3000, 800)
-        height_val = st.number_input("নতুন উচ্চতা (Height)", 100, 3000, 600)
-        if st.button("রিসাইজ করুন"):
-            resized_img = image.resize((width_val, height_val))
-            st.image(resized_img, caption="রিসাইজ করা ছবি")
 
-# মোড ১২: সাদাকালো কনভার্টার
-elif app_mode == 12:
-    st.header("⬛ সাদাকালো (Black & White) কনভার্টার")
-    if global_file is not None:
-        image = Image.open(global_file).convert("L")
-        st.image(image, caption="সাদাকালো ছবি", use_column_width=True)
-    else:
-        st.info("দয়া করে একটি ছবি আপলোড করুন।")
-
-# মোড ১৩: ছবি ঘোরানো
-elif app_mode == 13:
-    st.header("🔄 ছবি ঘোরানো (Rotate & Flip)")
-    if global_file is not None:
-        image = Image.open(global_file)
-        angle = st.selectbox("ঘোরানোর কোণ", [90, 180, 270])
-        if st.button("ঘোরান"):
-            rotated = image.rotate(angle, expand=True)
-            st.image(rotated, caption=f"{angle}° ঘোরানো ছবি")
-
-# মোড ১৪: ওয়াটারমার্ক
-elif app_mode == 14:
-    st.header("💧 ওয়াটারমার্ক যুক্ত করার টুল")
-    watermark_text = st.text_input("ওয়াটারমার্কের টেক্সট", "হাসানুর কম্পিউটার স্টুডিও")
-    if global_file is not None:
-        image = Image.open(global_file)
-        st.image(image, caption="মূল ছবি")
-        st.info("ওয়াটারমার্ক যুক্ত করার অপশন প্রস্তুত।")
-
-# মোড ১৫: পিডিএফ টেক্সট এক্সট্র্যাক্ট
-elif app_mode == 15:
-    st.header("📄 পিডিএফ টেক্সট এক্সট্র্যাক্ট টুল")
-    if global_file is not None and global_file.name.endswith('.pdf'):
-        reader = PdfReader(global_file)
-        text = ""
-        for page in reader.pages:
-            text += page.extract_text()
-        st.text_area("পিডিএফ থেকে প্রাপ্ত টেক্সট", text, height=300)
-    else:
-        st.info("দয়া করে উপরে ফাইল আপলোড অপশন থেকে একটি পিডিএফ ফাইল আপলোড করুন।")
+# অন্যান্য ডিফল্ট বা অন্য মোডগুলোর জন্য
+else:
+    st.header("🛠️ অন্যান্য টুলস ও ড্যাশবোর্ড")
+    st.info("দয়া করে সাইডবার থেকে আপনার কাঙ্ক্ষিত টুলটি সিলেক্ট করুন।")
