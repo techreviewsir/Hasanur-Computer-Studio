@@ -61,7 +61,7 @@ global_file = st.file_uploader("ছবি বা পিডিএফ ফাইল
 st.markdown("---")
 
 if 'app_mode' not in st.session_state:
-    st.session_state.app_mode = 8
+    st.session_state.app_mode = 6
 
 st.sidebar.header("⚙️ টুলস ও মেনুবার")
 
@@ -105,7 +105,7 @@ def print_content_html(html_content, button_text):
                 flex-direction: column;
                 align-items: center;
             }}
-            /* নিখুঁত A4 পেপার সাইজ (210mm x 297mm) */
+            /* নিখুঁত A4 পেপার সাইজ (210mm x 297mm) এবং চারিধারে বর্ডার ও মার্জিন */
             .a4-page {{
                 background: white;
                 width: 210mm;
@@ -118,6 +118,7 @@ def print_content_html(html_content, button_text):
                 flex-direction: column;
                 justify-content: space-between;
                 position: relative;
+                border: 2px solid #0B50FA;
             }}
             @media print {{
                 body {{
@@ -135,6 +136,8 @@ def print_content_html(html_content, button_text):
                     padding: 12mm 15mm;
                     page-break-after: avoid;
                     page-break-inside: avoid;
+                    border: 2px solid #0B50FA !important;
+                    -webkit-print-color-adjust: exact;
                 }}
                 @page {{
                     size: A4;
@@ -144,7 +147,7 @@ def print_content_html(html_content, button_text):
             .print-btn {{
                 background-color: #0B50FA;
                 color: white;
-                padding: 12px 30px;
+                padding: 12mm 30px;
                 border: none;
                 border-radius: 8px;
                 cursor: pointer;
@@ -194,10 +197,11 @@ if app_mode == 6:
 
     updated_items = []
     total_amount = 0
+    indices_to_delete = []
 
     for i, item in enumerate(st.session_state.memo_items):
         st.markdown(f"**আইটেম #{i+1}**")
-        c1, c2, c3, c4, c5 = st.columns([3, 2, 2, 2, 2])
+        c1, c2, c3, c4, c5, c6 = st.columns([2.5, 2, 1.5, 1.5, 1.5, 1])
         with c1:
             it_name = st.text_input("পণ্যের নাম", item['name'], key=f"item_name_{i}")
         with c2:
@@ -208,10 +212,20 @@ if app_mode == 6:
             has_war = st.selectbox("ওয়ারেন্টি?", ["হ্যাঁ", "না"], index=0 if item['has_warranty']=='হ্যাঁ' else 1, key=f"has_war_{i}")
         with c5:
             war_per = st.text_input("মেয়াদ", item['warranty_period'], key=f"war_per_{i}")
+        with c6:
+            st.markdown("<div style='margin-top: 28px;'></div>", unsafe_allow_html=True)
+            if st.button("❌ বাদ", key=f"del_item_{i}"):
+                indices_to_delete.append(i)
         
         updated_items.append({'name': it_name, 'serial': it_serial or "N/A", 'price': it_price, 'has_warranty': has_war, 'warranty_period': war_per})
         total_amount += it_price
         st.markdown("---")
+
+    # নির্দিষ্ট আইটেম বাদ দেওয়ার লজিক
+    if indices_to_delete:
+        for idx in sorted(indices_to_delete, reverse=True):
+            del st.session_state.memo_items[idx]
+        st.rerun()
 
     if st.button("🖨️ ক্যাশ মেমো ফাইনাল প্রিভিউ ও প্রিন্ট দেখুন"):
         st.success("✅ ক্যাশ মেমো সম্পূর্ণ A4 পেজে প্রস্তুত!")
@@ -229,7 +243,7 @@ if app_mode == 6:
             """
 
         memo_html_code = f"""
-        <div style='border: 2px solid #0B50FA; padding: 25px; border-radius: 8px; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: space-between; box-sizing: border-box;'>
+        <div style='padding: 10px; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: space-between; box-sizing: border-box;'>
             <div>
                 <h2 style='text-align: center; color: #0B50FA; margin: 0; font-size: 26px;'>{shop_name}</h2>
                 <p style='text-align: center; font-size: 14px; color: #333; margin: 6px 0;'>{shop_address}</p>
@@ -298,7 +312,7 @@ elif app_mode == 8:
         st.success("✅ নাগরিক সনদপত্র সম্পূর্ণ A4 পেজে প্রস্তুত!")
         
         cert_html_code = f"""
-        <div style='border: 6px double #0B50FA; padding: 35px; border-radius: 12px; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: space-between; box-sizing: border-box; background-color: #ffffff;'>
+        <div style='padding: 15px; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: space-between; box-sizing: border-box; background-color: #ffffff;'>
             <div>
                 <div style="text-align:center;">
                     <h2 style="color:#0B50FA; margin:0; font-size: 28px; font-weight: bold;">{cit_union} কার্যালয়</h2>
@@ -339,7 +353,7 @@ elif app_mode == 9:
         st.success("✅ টুর্নামেন্ট আমন্ত্রণপত্র সম্পূর্ণ A4 পেজে প্রস্তুত!")
         
         notice_html_code = f"""
-        <div style='border: 4px solid #ff4b4b; padding: 30px; border-radius: 10px; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: space-between; box-sizing: border-box; background-color: #ffffff;'>
+        <div style='padding: 15px; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: space-between; box-sizing: border-box; background-color: #ffffff;'>
             <div>
                 <div style="text-align:center;">
                     <h2 style="color:#ff4b4b; margin:0; font-size: 24px;">🏆 টুর্নামেন্ট আমন্ত্রণপত্র ও নোটিশ 🏆</h2>
