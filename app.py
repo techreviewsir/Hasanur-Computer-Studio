@@ -5,6 +5,7 @@ from PIL import Image
 import streamlit as st
 from pypdf import PdfReader
 from datetime import date
+import streamlit.components.v1 as components  # নতুন যুক্ত করা হয়েছে প্রিন্টের জন্য
 
 try:
     from rembg import remove
@@ -15,7 +16,7 @@ except ImportError:
 st.set_page_config(page_title="হাসানুর কম্পিউটার স্টুডিও", layout="wide")
 
 # ==============================================================================
-# মূল স্টাইল এবং প্রিন্ট কনফিগারেশন (প্রিন্ট করার সময় শুধু মেমো বা সনদ প্রিন্ট হবে)
+# মূল স্টাইল এবং প্রিন্ট কনফিগারেশন
 # ==============================================================================
 st.markdown("""
 <style>
@@ -40,9 +41,10 @@ st.markdown("""
         line-height: 1.5;
         color: white;
     }
+    /* প্রিন্ট করার সময় যেসব জিনিস হাইড থাকবে */
     @media print {
         body { background: white !important; color: black !important; }
-        [data-testid="stSidebar"], .studio-header, .stButton, header, footer, .no-print { display: none !important; }
+        [data-testid="stSidebar"], .studio-header, .stButton, header, footer, iframe { display: none !important; }
     }
 </style>
 """, unsafe_allow_html=True)
@@ -91,8 +93,28 @@ for num, (item_name, desc) in menu_dict.items():
 
 app_mode = st.session_state.app_mode
 
+# প্রিন্ট বাটনের জন্য HTML/JS ফাংশন
+def print_button_html(button_text):
+    return f"""
+    <button onclick="window.parent.print()" style="
+        background-color: #0B50FA; 
+        color: white; 
+        padding: 12px 20px; 
+        border: none; 
+        border-radius: 8px; 
+        cursor: pointer; 
+        font-size: 16px;
+        font-weight: bold;
+        width: 100%;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        margin-top: 10px;
+    ">
+        🖨️ {button_text}
+    </button>
+    """
+
 # ==============================================================================
-# মোড ৬: ক্যাশ মেমো / রশিদ জেনারেটর (+ প্রিন্ট অপশন)
+# মোড ৬: ক্যাশ মেমো / রশিদ জেনারেটর 
 # ==============================================================================
 if app_mode == 6:
     st.header("🧾 দোকানের ক্যাশ মেমো / রশিদ জেনারেটর")
@@ -136,9 +158,8 @@ if app_mode == 6:
         st.markdown("---")
 
     if st.button("🖨️ ক্যাশ মেমো ফাইনাল প্রিভিউ দেখুন"):
-        st.success("✅ ক্যাশ মেমো সফলভাবে প্রস্তুত করা হয়েছে! নিচে প্রিন্ট বাটন পেয়ে যাবেন।")
+        st.success("✅ ক্যাশ মেমো সফলভাবে প্রস্তুত করা হয়েছে! নিচে নীল রঙের প্রিন্ট বাটনে ক্লিক করুন।")
         
-        # ক্যাশ মেমোর মূল পেপার ডিজাইন
         with st.container():
             st.markdown("<div style='border: 3px solid #0B50FA; padding: 30px; border-radius: 8px; background-color: #ffffff; color: #000000;'>", unsafe_allow_html=True)
             
@@ -184,18 +205,12 @@ if app_mode == 6:
             
             st.markdown("</div>", unsafe_allow_html=True)
 
-        # সরাসরি প্রিন্ট করার বাটন
-        st.markdown("<br>", unsafe_allow_html=True)
-        if st.button("🖨️ এখন ক্যাশ মেমো প্রিন্ট করুন (Print Memo)"):
-            st.markdown("""
-                <script>
-                    window.print();
-                </script>
-            """, unsafe_allow_html=True)
+        # কাজ করার মতো আসল HTML প্রিন্ট বাটন
+        components.html(print_button_html("এখন ক্যাশ মেমো প্রিন্ট করুন"), height=70)
 
 
 # ==============================================================================
-# মোড ৮: নাগরিক সনদপত্র জেনারেটর (+ প্রিন্ট অপশন)
+# মোড ৮: নাগরিক সনদপত্র জেনারেটর 
 # ==============================================================================
 elif app_mode == 8:
     st.header("📜 নাগরিক সনদপত্র জেনারেটর")
@@ -211,7 +226,7 @@ elif app_mode == 8:
         cit_union = st.text_input("ইউনিয়ন / পৌরসভা", "মণিরামপুর সদর ইউনিয়ন")
 
     if st.button("📜 নাগরিক সনদ প্রিভিউ ও প্রিন্ট দেখুন"):
-        st.success("✅ নাগরিক সনদপত্র তৈরি হয়েছে!")
+        st.success("✅ নাগরিক সনদপত্র তৈরি হয়েছে! নিচে নীল রঙের প্রিন্ট বাটনে ক্লিক করুন।")
         
         with st.container():
             st.markdown("""
@@ -234,17 +249,12 @@ elif app_mode == 8:
             </div>
             """, unsafe_allow_html=True)
             
-        st.markdown("<br>", unsafe_allow_html=True)
-        if st.button("🖨️ এখন নাগরিক সনদ প্রিন্ট করুন (Print Certificate)"):
-            st.markdown("""
-                <script>
-                    window.print();
-                </script>
-            """, unsafe_allow_html=True)
+        # কাজ করার মতো আসল HTML প্রিন্ট বাটন
+        components.html(print_button_html("এখন নাগরিক সনদ প্রিন্ট করুন"), height=70)
 
 
 # ==============================================================================
-# মোড ৯: টুর্নামেন্ট আমন্ত্রণপত্র ও নিয়মাবলী (+ প্রিন্ট অপশন)
+# মোড ৯: টুর্নামেন্ট আমন্ত্রণপত্র ও নিয়মাবলী 
 # ==============================================================================
 elif app_mode == 9:
     st.header("⚽ টুর্নামেন্ট আমন্ত্রণপত্র ও নিয়মাবলী জেনারেটর")
@@ -254,7 +264,7 @@ elif app_mode == 9:
     t_prize = st.text_input("পুরস্কারের বিবরণ", "চ্যাম্পিয়ন: ১০,০০০ টাকা + ট্রফি | রানার্সআপ: ৫,০০০ টাকা + ট্রফি")
 
     if st.button("⚽ টুর্নামেন্ট নোটিশ প্রিভিউ ও প্রিন্ট দেখুন"):
-        st.success("✅ টুর্নামেন্ট আমন্ত্রণপত্র প্রস্তুত!")
+        st.success("✅ টুর্নামেন্ট আমন্ত্রণপত্র প্রস্তুত! নিচে নীল রঙের প্রিন্ট বাটনে ক্লিক করুন।")
         
         with st.container():
             st.markdown("""
@@ -287,13 +297,8 @@ elif app_mode == 9:
             </div>
             """, unsafe_allow_html=True)
 
-        st.markdown("<br>", unsafe_allow_html=True)
-        if st.button("🖨️ এখন টুর্নামেন্ট নোটিশ প্রিন্ট করুন (Print Notice)"):
-            st.markdown("""
-                <script>
-                    window.print();
-                </script>
-            """, unsafe_allow_html=True)
+        # কাজ করার মতো আসল HTML প্রিন্ট বাটন
+        components.html(print_button_html("এখন টুর্নামেন্ট নোটিশ প্রিন্ট করুন"), height=70)
 
 # অন্যান্য ডিফল্ট মোড
 else:
