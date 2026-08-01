@@ -12,32 +12,52 @@ from pathlib import Path
 st.set_page_config(page_title="হাসানুর কম্পিউটার স্টুডিও", layout="wide")
 
 # ==============================================================================
-# মূল স্টাইল, গ্রেডিয়েন্ট ব্যাকগ্রাউন্ড এবং হোভার ইফেক্ট (Red Hover)
+# মূল স্টাইল, গ্রেডিয়েন্ট ব্যাকগ্রাউন্ড, হোভার ইফেক্ট (Red Hover) এবং চিরতরে ডার্ক মোড বন্ধ
 # ==============================================================================
 st.markdown("""
 <style>
+    /* ডার্ক মোড চিরতরে বন্ধ করার জন্য গ্লোবাল লাইট থিম স্টাইল */
     .stApp {
-        background: linear-gradient(135deg, #071952, #0b2f64, #1b032d, #381123);
-        background-attachment: fixed;
-        color: #ffffff;
+        background: linear-gradient(135deg, #071952, #0b2f64, #1b032d, #381123) !important;
+        background-attachment: fixed !important;
+        color: #ffffff !important;
     }
     
+    /* সাইডবার ব্যাকগ্রাউন্ড এবং টেক্সট */
     section[data-testid="stSidebar"] {
-        background-color: #0b132b;
+        background-color: #0b132b !important;
+        color: #ffffff !important;
     }
     
-    /* সাইডবার মেনুতে মাউস রাখলে বা হোভার করলে লাল রঙ হবে */
+    section[data-testid="stSidebar"] .stMarkdown, 
+    section[data-testid="stSidebar"] span, 
+    section[data-testid="stSidebar"] label, 
+    section[data-testid="stSidebar"] div {
+        color: #ffffff !important;
+    }
+    
+    /* সাইডবার মেনু বাটনে মাউস রাখলে লাল রঙ */
     section[data-testid="stSidebar"] button:hover {
         background-color: #ff4b4b !important;
         color: #ffffff !important;
         border-color: #ff4b4b !important;
     }
     
-    /* লেখার লিঙ্কে মাউস রাখলে লাল রঙ হবে */
+    /* লেখার লিঙ্কে মাউস রাখলে লাল রঙ */
     a:hover, .stMarkdown a:hover {
         color: #ff4b4b !important;
     }
     
+    /* অ্যাপের ভেতরের সমস্ত সাধারণ লেখা এবং লেবেল সাদা রঙ নিশ্চিত করা */
+    h1, h2, h3, h4, h5, h6, p, span, label, div, .stMarkdown, .stText {
+        color: #ffffff !important;
+    }
+    
+    /* টেক্সট ইনপুট ও সিলেক্ট বক্সের ভেতরে লেখার রঙ কালো বা স্পষ্ট রাখা */
+    input, textarea, select {
+        color: #000000 !important;
+    }
+
     .studio-header {
         background: linear-gradient(135deg, #0B50FA, #ff4b4b);
         padding: 25px 20px;
@@ -51,13 +71,13 @@ st.markdown("""
         font-size: 26px;
         margin-bottom: 8px;
         font-weight: bold;
-        color: white;
+        color: white !important;
     }
     .studio-header p {
         font-size: 14px;
         margin: 4px 0;
         line-height: 1.5;
-        color: white;
+        color: white !important;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -216,16 +236,34 @@ if app_mode == 1:
     else:
         st.info("দয়া করে উপরে ফাইল আপলোড অপশন থেকে একটি ছবি আপলোড করুন।")
 
-# মোড ২: ব্যাকগ্রাউন্ড রিমুভ ও কালার
+# মোড ২: ব্যাকগ্রাউন্ড রিমুভ ও কালার পরিবর্তন
 elif app_mode == 2:
     st.header("🎨 স্টুডিও ব্যাকগ্রাউন্ড রিমুভ ও কালার পরিবর্তন")
     if global_file is not None:
         image = Image.open(global_file)
-        st.image(image, caption="মূল ছবি", width=300)
-        bg_color = st.color_picker("ব্যাকগ্রাউন্ড কালার সিলেক্ট করুন", "#ffffff")
-        st.info("ব্যাকগ্রাউন্ড পরিবর্তনের জন্য আপনার রিমুভ ফিচারটি এখানে সক্রিয় রয়েছে।")
+        st.image(image, caption="মূল আপলোড করা ছবি", width=300)
+        
+        bg_color = st.color_picker("নতুন ব্যাকগ্রাউন্ড কালার সিলেক্ট করুন", "#ffffff")
+        
+        if st.button("🚀 ব্যাকগ্রাউন্ড রিমুভ ও নতুন কালার সেট করুন"):
+            with st.spinner("প্রসেসিং হচ্ছে, দয়া করে অপেক্ষা করুন..."):
+                try:
+                    from rembg import remove
+                    img_bytes = global_file.getvalue()
+                    output_bytes = remove(img_bytes)
+                    result_image = Image.open(io.BytesIO(output_bytes)).convert("RGBA")
+                    
+                    # নতুন ব্যাকগ্রাউন্ড তৈরি
+                    bg = Image.new("RGBA", result_image.size, bg_color)
+                    bg.paste(result_image, (0, 0), result_image)
+                    final_img = bg.convert("RGB")
+                    
+                    st.success("✅ ব্যাকগ্রাউন্ড সফলভাবে পরিবর্তন করা হয়েছে!")
+                    st.image(final_img, caption="রিমুভ ও পরিবর্তিত ব্যাকগ্রাউন্ডের ছবি", use_column_width=True)
+                except Exception as e:
+                    st.error(f"⚠️ ত্রুটি ঘটেছে: {e} (নিশ্চিত করুন আপনার এনভায়রনমেন্টে rembg ইন্সটল করা আছে)")
     else:
-        st.info("দয়া করে একটি ছবি আপলোড করুন।")
+        st.info("দয়া করে উপরে ফাইল আপলোড অপশন থেকে একটি পাসপোর্ট বা পোর্ট্রেট ছবি আপলোড করুন।")
 
 # মোড ৬: ক্যাশ মেমো
 elif app_mode == 6:
