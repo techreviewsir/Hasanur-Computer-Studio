@@ -12,7 +12,7 @@ from pathlib import Path
 st.set_page_config(page_title="হাসানুর কম্পিউটার স্টুডিও", layout="wide")
 
 # ==============================================================================
-# মূল স্টাইল, গ্রেডিয়েন্ট ব্যাকগ্রাউন্ড, হোভার ইফেক্ট (Red Hover) এবং চিরতরে ডার্ক মোড বন্ধ
+# মূল স্টাইল, গ্রেডিয়েন্ট ব্যাকগ্রাউন্ড, সাইডবার মেনু হোয়াইট ব্যাকগ্রাউন্ড ও ব্ল্যাক টেক্সট
 # ==============================================================================
 st.markdown("""
 <style>
@@ -23,24 +23,36 @@ st.markdown("""
         color: #ffffff !important;
     }
     
-    /* সাইডবার ব্যাকগ্রাউন্ড এবং টেক্সট */
+    /* সাইডবার ব্যাকগ্রাউন্ড */
     section[data-testid="stSidebar"] {
         background-color: #0b132b !important;
-        color: #ffffff !important;
     }
     
-    section[data-testid="stSidebar"] .stMarkdown, 
-    section[data-testid="stSidebar"] span, 
-    section[data-testid="stSidebar"] label, 
-    section[data-testid="stSidebar"] div {
-        color: #ffffff !important;
+    /* সাইডবারের মেনু বাটনগুলো: ব্যাকগ্রাউন্ড সাদা এবং লেখার রঙ কালো */
+    section[data-testid="stSidebar"] button {
+        background-color: #ffffff !important;
+        color: #000000 !important;
+        border: 1px solid #cccccc !important;
+        font-weight: 600 !important;
+        border-radius: 6px !important;
+        text-align: left !important;
     }
     
-    /* সাইডবার মেনু বাটনে মাউস রাখলে লাল রঙ */
+    /* সাইডবার মেনু বাটনে মাউস রাখলে লাল ব্যাকগ্রাউন্ড ও সাদা লেখা */
     section[data-testid="stSidebar"] button:hover {
         background-color: #ff4b4b !important;
         color: #ffffff !important;
         border-color: #ff4b4b !important;
+    }
+    
+    /* সাইডবারের অন্য সাধারণ লেখা ও শিরোনাম সাদা রাখা */
+    section[data-testid="stSidebar"] .stMarkdown, 
+    section[data-testid="stSidebar"] span, 
+    section[data-testid="stSidebar"] label, 
+    section[data-testid="stSidebar"] h1, 
+    section[data-testid="stSidebar"] h2, 
+    section[data-testid="stSidebar"] h3 {
+        color: #ffffff !important;
     }
     
     /* লেখার লিঙ্কে মাউস রাখলে লাল রঙ */
@@ -53,7 +65,7 @@ st.markdown("""
         color: #ffffff !important;
     }
     
-    /* টেক্সট ইনপুট ও সিলেক্ট বক্সের ভেতরে লেখার রঙ কালো বা স্পষ্ট রাখা */
+    /* টেক্সট ইনপুট ও সিলেক্ট বক্সের ভেতরে লেখার রঙ স্পষ্ট রাখা */
     input, textarea, select {
         color: #000000 !important;
     }
@@ -240,7 +252,7 @@ if app_mode == 1:
 elif app_mode == 2:
     st.header("🎨 স্টুডিও ব্যাকগ্রাউন্ড রিমুভ ও কালার পরিবর্তন")
     if global_file is not None:
-        image = Image.open(global_file)
+        image = Image.open(global_file).convert("RGB")
         st.image(image, caption="মূল আপলোড করা ছবি", width=300)
         
         bg_color = st.color_picker("নতুন ব্যাকগ্রাউন্ড কালার সিলেক্ট করুন", "#ffffff")
@@ -248,20 +260,34 @@ elif app_mode == 2:
         if st.button("🚀 ব্যাকগ্রাউন্ড রিমুভ ও নতুন কালার সেট করুন"):
             with st.spinner("প্রসেসিং হচ্ছে, দয়া করে অপেক্ষা করুন..."):
                 try:
-                    from rembg import remove
-                    img_bytes = global_file.getvalue()
-                    output_bytes = remove(img_bytes)
-                    result_image = Image.open(io.BytesIO(output_bytes)).convert("RGBA")
+                    img_np = np.array(image)
+                    h, w = img_np.shape[:2]
                     
-                    # নতুন ব্যাকগ্রাউন্ড তৈরি
-                    bg = Image.new("RGBA", result_image.size, bg_color)
-                    bg.paste(result_image, (0, 0), result_image)
-                    final_img = bg.convert("RGB")
+                    # শরীরের অংশ অক্ষত রেখে নিখুঁত GrabCut ও মাস্ক প্রসেসিং
+                    mask = np.zeros(img_np.shape[:2], np.uint8)
+                    bgdModel = np.zeros((1, 65), np.float64)
+                    fgdModel = np.zeros((1, 65), np.float64)
                     
+                    rect = (int(w * 0.1), int(h * 0.05), int(w * 0.8), int(h * 0.9))
+                    cv2.grabCut(img_np, mask, rect, bgdModel, fgdModel, 5, cv2.INIT_WITH_RECT)
+                    
+                    mask2 = np.where((mask == 2) | (mask == 0), 0, 1).astype('uint8')
+                    result_np = img_np * mask2[:, :, np.newaxis]
+                    
+                    # ব্যাকগ্রাউন্ড কালার রূপান্তর
+                    hex_c = bg_color.lstrip('#')
+                    bg_rgb = tuple(int(hex_c[i:i+2], 16) for i in (0, 2, 4))
+                    
+                    bg_img = np.full(img_np.shape, bg_rgb, dtype=np.uint8)
+                    inv_mask2 = 1 - mask2
+                    bg_part = bg_img * inv_mask2[:, :, np.newaxis]
+                    final_np = result_np + bg_part
+                    
+                    final_img = Image.fromarray(final_np)
                     st.success("✅ ব্যাকগ্রাউন্ড সফলভাবে পরিবর্তন করা হয়েছে!")
                     st.image(final_img, caption="রিমুভ ও পরিবর্তিত ব্যাকগ্রাউন্ডের ছবি", use_column_width=True)
                 except Exception as e:
-                    st.error(f"⚠️ ত্রুটি ঘটেছে: {e} (নিশ্চিত করুন আপনার এনভায়রনমেন্টে rembg ইন্সটল করা আছে)")
+                    st.error(f"⚠️ ত্রুটি ঘটেছে: {e}")
     else:
         st.info("দয়া করে উপরে ফাইল আপলোড অপশন থেকে একটি পাসপোর্ট বা পোর্ট্রেট ছবি আপলোড করুন।")
 
