@@ -15,7 +15,7 @@ except ImportError:
 st.set_page_config(page_title="হাসানুর কম্পিউটার স্টুডিও", layout="wide")
 
 # ==============================================================================
-# মূল স্টাইল (প্রিন্ট এবং হেডার ডিজাইন)
+# মূল স্টাইল এবং প্রিন্ট কনফিগারেশন (প্রিন্ট করার সময় শুধু মেমো বা সনদ প্রিন্ট হবে)
 # ==============================================================================
 st.markdown("""
 <style>
@@ -42,7 +42,7 @@ st.markdown("""
     }
     @media print {
         body { background: white !important; color: black !important; }
-        [data-testid="stSidebar"], .studio-header, .stButton, header, footer { display: none !important; }
+        [data-testid="stSidebar"], .studio-header, .stButton, header, footer, .no-print { display: none !important; }
     }
 </style>
 """, unsafe_allow_html=True)
@@ -92,7 +92,7 @@ for num, (item_name, desc) in menu_dict.items():
 app_mode = st.session_state.app_mode
 
 # ==============================================================================
-# মোড ৬: ক্যাশ মেমো / রশিদ জেনারেটর (নেটটিভ স্ট্রিমলিট ডিজাইন - কোনো কোড শো করবে না)
+# মোড ৬: ক্যাশ মেমো / রশিদ জেনারেটর (+ প্রিন্ট অপশন)
 # ==============================================================================
 if app_mode == 6:
     st.header("🧾 দোকানের ক্যাশ মেমো / রশিদ জেনারেটর")
@@ -136,19 +136,17 @@ if app_mode == 6:
         st.markdown("---")
 
     if st.button("🖨️ ক্যাশ মেমো ফাইনাল প্রিভিউ দেখুন"):
-        st.success("✅ ক্যাশ মেমো সফলভাবে প্রস্তুত করা হয়েছে!")
+        st.success("✅ ক্যাশ মেমো সফলভাবে প্রস্তুত করা হয়েছে! নিচে প্রিন্ট বাটন পেয়ে যাবেন।")
         
-        # ক্যাশ মেমোর মূল পেপার ডিজাইন (স্ট্রিমলিট কন্টেইনার দিয়ে তৈরি)
+        # ক্যাশ মেমোর মূল পেপার ডিজাইন
         with st.container():
             st.markdown("<div style='border: 3px solid #0B50FA; padding: 30px; border-radius: 8px; background-color: #ffffff; color: #000000;'>", unsafe_allow_html=True)
             
-            # দোকানের তথ্য
             st.markdown(f"<h2 style='text-align: center; color: #0B50FA; margin-bottom: 0;'>{shop_name}</h2>", unsafe_allow_html=True)
             st.markdown(f"<p style='text-align: center; font-size: 13px; color: #333;'>{shop_address}</p>", unsafe_allow_html=True)
             st.markdown("<hr style='border: 1px solid #0B50FA;'>", unsafe_allow_html=True)
             st.markdown("<h3 style='text-align: center; background-color: #0B50FA; color: white; padding: 6px; border-radius: 4px;'>ক্যাশ মেমো / রসিদ</h3>", unsafe_allow_html=True)
             
-            # গ্রাহক ও তারিখের তথ্য
             col_info1, col_info2 = st.columns(2)
             with col_info1:
                 st.markdown(f"**গ্রাহকের নাম:** {c_name}")
@@ -158,7 +156,6 @@ if app_mode == 6:
             
             st.markdown("---")
             
-            # টেবিল হেডার
             t_col1, t_col2, t_col3, t_col4, t_col5 = st.columns([1, 3, 2, 2, 2])
             t_col1.markdown("**ক্রমিক**")
             t_col2.markdown("**পণ্যের বিবরণ**")
@@ -167,7 +164,6 @@ if app_mode == 6:
             t_col5.markdown("**মূল্য (TK)**")
             st.markdown("<hr style='margin: 5px 0;'>", unsafe_allow_html=True)
             
-            # টেবিল রো
             for idx, itm in enumerate(updated_items):
                 r_col1, r_col2, r_col3, r_col4, r_col5 = st.columns([1, 3, 2, 2, 2])
                 r_col1.write(str(idx + 1))
@@ -177,11 +173,8 @@ if app_mode == 6:
                 r_col5.write(f"{itm['price']} TK")
             
             st.markdown("<hr style='margin: 10px 0;'>", unsafe_allow_html=True)
-            
-            # মোট টাকা
             st.markdown(f"<div style='text-align: right; font-size: 16px; background-color: #f1f3f5; padding: 10px; border-radius: 5px;'><b>সর্বমোট প্রদেয় টাকা (Total): <span style='color: red; font-size: 18px;'>{total_amount} TK</span></b></div>", unsafe_allow_html=True)
             
-            # স্বাক্ষর অংশ
             st.markdown("<br><br>", unsafe_allow_html=True)
             s_col1, s_col2 = st.columns(2)
             with s_col1:
@@ -191,17 +184,118 @@ if app_mode == 6:
             
             st.markdown("</div>", unsafe_allow_html=True)
 
-elif app_mode == 1:
-    st.header("✨ ইমেজ ব্রাইটনেস ও কালার এডিটর")
-    if global_file is not None:
-        st.image(Image.open(global_file), use_container_width=True)
-    else:
-        st.info("দয়া করে ছবি আপলোড করুন।")
+        # সরাসরি প্রিন্ট করার বাটন
+        st.markdown("<br>", unsafe_allow_html=True)
+        if st.button("🖨️ এখন ক্যাশ মেমো প্রিন্ট করুন (Print Memo)"):
+            st.markdown("""
+                <script>
+                    window.print();
+                </script>
+            """, unsafe_allow_html=True)
 
+
+# ==============================================================================
+# মোড ৮: নাগরিক সনদপত্র জেনারেটর (+ প্রিন্ট অপশন)
+# ==============================================================================
 elif app_mode == 8:
     st.header("📜 নাগরিক সনদপত্র জেনারেটর")
-    st.info("নাগরিক সনদপত্র মোড সক্রিয় আছে।")
+    
+    col_u1, col_u2 = st.columns(2)
+    with col_u1:
+        cit_name = st.text_input("আবেদনকারীর নাম", "মোঃ রফিকুল ইসলাম")
+        cit_father = st.text_input("পিতার নাম", "মোঃ আব্দুল জব্বার")
+        cit_mother = st.text_input("মাতার নাম", "মাজেদা বেগম")
+    with col_u2:
+        cit_vill = st.text_input("গ্রাম / পাড়া", "দিঘীরপাড়")
+        cit_word = st.text_input("ওয়ার্ড নম্বর", "ওয়ার্ড নং - ০৪")
+        cit_union = st.text_input("ইউনিয়ন / পৌরসভা", "মণিরামপুর সদর ইউনিয়ন")
 
+    if st.button("📜 নাগরিক সনদ প্রিভিউ ও প্রিন্ট দেখুন"):
+        st.success("✅ নাগরিক সনদপত্র তৈরি হয়েছে!")
+        
+        with st.container():
+            st.markdown("""
+            <div style='border: 6px double #0B50FA; padding: 40px; border-radius: 10px; background-color: #ffffff; color: #000000;'>
+                <div style="text-align:center;">
+                    <h2 style="color:#0B50FA; margin:0;">ইউনিয়ন পরিষদ কার্যালয়</h2>
+                    <p style="font-size:13px; margin:2px 0; color:#333;">দিঘীরপাড়, মনিরামপুর, যশোর।</p>
+                    <hr style="border:1px solid #0B50FA; width:50%;">
+                    <h3 style="background:#0B50FA; color:white; display:inline-block; padding:5px 25px; border-radius:4px; margin-top:5px;">নাগরিক সনদপত্র</h3>
+                </div>
+                <p style="font-size:15px; line-height:2.0; text-align:justify; margin-top:30px;">
+                    এই মর্মে প্রত্যয়ন করা যাইতেছে যে, <b>""" + cit_name + """</b>, পিতা: <b>""" + cit_father + """</b>, মাতা: <b>""" + cit_mother + """</b>, গ্রাম: <b>""" + cit_vill + """</b>, """ + cit_word + """, উপজেলা: মণিরামপুর, জেলা: যশোর এর অত্র ইউনিয়নের একজন স্থায়ী বাসিন্দা এবং জন্মসূত্রে বাংলাদেশের নাগরিক। আমার জানামতে তিনি দেশবিরোধী বা রাষ্ট্রবিরোধী কোনো কাজের সাথে জড়িত নন এবং তার চরিত্র অত্যন্ত ভালো।
+                </p>
+                <p style="font-size:14px; margin-top:20px;">আমি তার সর্বাঙ্গীন সাফল্য ও দীর্ঘায়ু কামনা করি।</p>
+                
+                <div style="margin-top:120px; display:flex; justify-content:space-between; font-size:14px;">
+                    <div><p style="border-top:1px dashed black; padding-top:6px; display:inline-block; width:160px; text-align:center;">আবেদনকারীর স্বাক্ষর</p></div>
+                    <div style="text-align:right;"><p style="border-top:1px solid black; padding-top:6px; display:inline-block; width:160px; text-align:center; font-weight:bold;">চেয়ারম্যান</p></div>
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+            
+        st.markdown("<br>", unsafe_allow_html=True)
+        if st.button("🖨️ এখন নাগরিক সনদ প্রিন্ট করুন (Print Certificate)"):
+            st.markdown("""
+                <script>
+                    window.print();
+                </script>
+            """, unsafe_allow_html=True)
+
+
+# ==============================================================================
+# মোড ৯: টুর্নামেন্ট আমন্ত্রণপত্র ও নিয়মাবলী (+ প্রিন্ট অপশন)
+# ==============================================================================
+elif app_mode == 9:
+    st.header("⚽ টুর্নামেন্ট আমন্ত্রণপত্র ও নিয়মাবলী জেনারেটর")
+    
+    t_name = st.text_input("টুর্নামেন্টের নাম", "দিঘীরপাড় প্রিমিয়ার লিগ ক্রিকেট টুর্নামেন্ট - ২০২৬")
+    t_date = st.text_input("শুরুর তারিখ ও সময়", "১৫ ই ফেব্রুয়ারি, ২০২৬ খ্রিঃ, সকাল ১০:০০ টা")
+    t_prize = st.text_input("পুরস্কারের বিবরণ", "চ্যাম্পিয়ন: ১০,০০০ টাকা + ট্রফি | রানার্সআপ: ৫,০০০ টাকা + ট্রফি")
+
+    if st.button("⚽ টুর্নামেন্ট নোটিশ প্রিভিউ ও প্রিন্ট দেখুন"):
+        st.success("✅ টুর্নামেন্ট আমন্ত্রণপত্র প্রস্তুত!")
+        
+        with st.container():
+            st.markdown("""
+            <div style='border: 4px solid #ff4b4b; padding: 35px; border-radius: 8px; background-color: #ffffff; color: #000000;'>
+                <div style="text-align:center;">
+                    <h2 style="color:#ff4b4b; margin:0;">🏆 টুর্নামেন্ট আমন্ত্রণপত্র ও নোটিশ 🏆</h2>
+                    <h3 style="color:#0B50FA; margin:8px 0; font-size:22px;">""" + t_name + """</h3>
+                    <hr style="border:1px solid #ff4b4b; width:60%;">
+                </div>
+                <p style="font-size:15px; line-height:1.8; margin-top:20px; text-align:center;">
+                    সকল ক্রীড়াপ্রেমী ও দলের অবগতির জন্য জানানো যাচ্ছে যে, আগামী <b>""" + t_date + """</b> তারিখে স্থানীয় মাঠে জমকালো আয়োজনের মাধ্যমে এই টুর্নামেন্ট শুরু হতে যাচ্ছে। আপনি বা আপনার দল এই প্রতিযোগিতায় স্বতঃস্ফূর্তভাবে অংশগ্রহণ করার জন্য আমন্ত্রিত।
+                </p>
+                <div style="background:#f8f9fa; padding:15px; border-radius:6px; border-left:4px solid #ff4b4b; margin-top:20px;">
+                    <h4 style="margin:0 0 5px 0; color:#333;">🎁 আকর্ষণীয় পুরস্কারসমূহ:</h4>
+                    <p style="margin:0; font-size:14px; font-weight:bold; color:red;">""" + t_prize + """</p>
+                </div>
+                <div style="margin-top:25px;">
+                    <h4 style="color:#333; margin-bottom:5px;">📋 প্রধান নিয়মাবলী:</h4>
+                    <ol style="font-size:13px; line-height:1.6; margin:0; padding-left:20px;">
+                        <li>ম্যাচ শুরুর নির্ধারিত সময়ের ১৫ মিনিট পূর্বে মাঠে উপস্থিত থাকতে হবে।</li>
+                        <li>আম্পায়ারের সিদ্ধান্তই চূড়ান্ত সিদ্ধান্ত বলে গণ্য হবে।</li>
+                        <li>খেলার মাঠে শৃঙ্খলা বজায় রাখা বাধ্যতামূলক। বিশৃঙ্খলা সৃষ্টিকারী দলকে বহিষ্কার করা হবে।</li>
+                        <li>এন্ট্রি ফি জমা দিয়ে নির্দিষ্ট সময়ের মধ্যে টিম রেজিস্ট্রেশন সম্পন্ন করতে হবে।</li>
+                    </ol>
+                </div>
+                <div style="margin-top:100px; display:flex; justify-content:space-between; font-size:14px;">
+                    <div><p style="border-top:1px dashed black; padding-top:6px; display:inline-block; width:160px; text-align:center;">আয়োজক কমিটি</p></div>
+                    <div style="text-align:right;"><p style="border-top:1px solid black; padding-top:6px; display:inline-block; width:160px; text-align:center; font-weight:bold;">প্রধান সমন্বয়ক</p></div>
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+
+        st.markdown("<br>", unsafe_allow_html=True)
+        if st.button("🖨️ এখন টুর্নামেন্ট নোটিশ প্রিন্ট করুন (Print Notice)"):
+            st.markdown("""
+                <script>
+                    window.print();
+                </script>
+            """, unsafe_allow_html=True)
+
+# অন্যান্য ডিফল্ট মোড
 else:
-    st.header("🛠️ টুলস সেকশন")
-    st.info("দয়া করে সাইডবার থেকে প্রয়োজনীয় অপশন নির্বাচন করুন।")
+    st.header("🛠️ অন্যান্য টুলস ও ড্যাশবোর্ড")
+    st.info("দয়া করে সাইডবার থেকে ক্যাশ মেমো (৬), নাগরিক সনদ (৮) অথবা টুর্নামেন্ট নোটিশ (৯) সিলেক্ট করুন।")
