@@ -107,6 +107,47 @@ st.markdown(f"""
         border-bottom: 2px solid {accent_color};
         padding-bottom: 4px;
     }}
+    
+    /* স্ক্রিনের পেপার স্টাইল */
+    .a4-paper-box {{
+        background: #ffffff;
+        width: 100%;
+        max-width: 750px;
+        min-height: 1060px;
+        margin: 20px auto;
+        padding: 50px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        color: #000000;
+        box-sizing: border-box;
+        border-radius: 6px;
+    }}
+
+    /* ========================================================== */
+    /* প্রিন্টিং অপ্টিমাইজেশন: প্রিন্ট করার সময় শুধু A4 পেপার প্রিন্ট হবে */
+    /* ========================================================== */
+    @media print {{
+        body {{
+            background: white !important;
+            color: black !important;
+        }}
+        /* সাইডবার, হেডার এবং ফালতু বাটনগুলো প্রিন্ট থেকে লুকিয়ে রাখা হবে */
+        [data-testid="stSidebar"], .studio-header, .stButton, header, footer {{
+            display: none !important;
+        }}
+        /* শুধুমাত্র A4 পেপার বক্সটি প্রিন্ট পেজে দেখাবে এবং মার্জিন ঠিক রাখবে */
+        .a4-paper-box {{
+            box-shadow: none !important;
+            margin: 0 !important;
+            padding: 20px !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            border: none !important;
+        }}
+        @page {{
+            size: A4;
+            margin: 10mm;
+        }}
+    }}
 </style>
 """, unsafe_allow_html=True)
 
@@ -151,8 +192,8 @@ menu_dict = {
     5: ("🎂 বয়স ক্যালকুলেটর (Age Calculator)", "নির্ভুল বয়স ও দিন-মাস হিসাব।"),
     6: ("🧾 দোকানের ক্যাশ মেমো / রশিদ জেনারেটর", "গ্রাহকের বিক্রয় রশিদ ও ক্যাশ মেমো তৈরি।"),
     7: ("🛡️ ডিজিটাল ওয়ারেন্টি কার্ড জেনারেটর", "পণ্যের ডিজিটাল ওয়ারেন্টি কার্ড তৈরি।"),
-    8: ("📜 নাগরিক সনদ (Citizenship) জেনারেটর", "ইউনিয়ন পরিষদের নাগরিক সনদপত্র তৈরি।"),
-    9: ("⚽ টুর্নামেন্ট আমন্ত্রণপত্র ও নিয়মাবলী", "ফুটবল বা ক্রিকেট টুর্নামেন্ট নোটিশ ও নিয়ম তৈরি।"),
+    8: ("📜 নাগরিক সনদ (Citizenship) জেনারেটর", "ইউনিয়ন পরিষদের নাগরিক সনদপত্র তৈরি (A4 Print Format)।"),
+    9: ("⚽ টুর্নামেন্ট আমন্ত্রণপত্র ও নিয়মাবলী", "ফুটবল বা ক্রিকেট টুর্নামেন্ট নোটিশ ও নিয়ম তৈরি (A4 Print Format)।"),
     10: ("📏 ছবির সাইজ পরিবর্তন ও রিসাইজার", "পিক্সেল অনুযায়ী ছবির সাইজ ছোট-বড় করা।"),
     11: ("⬛ সাদাকালো (Black & White) কনভার্টার", "কালার ছবিকে সাদাকালো করা।"),
     12: ("🔄 ছবি ঘোরানো (Rotate & Flip)", "ছবি বিভিন্ন এঙ্গেলে ঘোরানো।"),
@@ -223,7 +264,7 @@ st.sidebar.markdown("""
 
 # ==============================================================================
 # অন্যান্য গুরুত্বপূর্ণ অনলাইন লিংক ও পোর্টাল
-...
+# ==============================================================================
 st.sidebar.markdown(f"<div class='sidebar-section-title'>{t['portal_header']}</div>", unsafe_allow_html=True)
 
 st.sidebar.markdown("""
@@ -386,7 +427,9 @@ elif app_mode == 7:
         st.success("Warranty card generated successfully!")
 
 elif app_mode == 8:
-    st.header("📜 নাগরিক সনদপত্র জেনারেটর (Citizenship Certificate)")
+    st.header("📜 নাগরিক সনদপত্র জেনারেটর (A4 Print Ready)")
+    st.info("💡 টিপস: সরাসরি প্রিন্ট করতে ব্রাউজারের প্রিন্ট অপশন ব্যবহার করুন (Ctrl + P)। প্রিন্টার পেপার সাইজ স্বয়ংক্রিয়ভাবে A4 এ সেট করা আছে।")
+    
     col1, col2 = st.columns(2)
     with col1:
         cit_name = st.text_input("আবেদনকারীর নাম (Applicant Name)", "মোঃ রফিকুল ইসলাম")
@@ -399,15 +442,15 @@ elif app_mode == 8:
 
     if st.button("নাগরিক সনদ জেনারেট করুন"):
         certificate_html = f"""
-        <div style="background:#ffffff; padding:30px; border:6px double #0B50FA; border-radius:12px; color:black; font-family: Arial, sans-serif;">
+        <div class="a4-paper-box" style="border:6px double #0B50FA;">
             <div style="text-align:center;">
                 <h2 style="color:#0B50FA; margin:0;">ইউনিয়ন পরিষদ কার্যালয়</h2>
                 <p style="font-size:14px; margin:2px 0;">{cit_ward}, মনিরামপুর, যশোর।</p>
                 <hr style="border: 1px solid #0B50FA; width:60%;">
-                <h3 style="background:#0B50FA; color:white; display:inline-block; padding:5px 20px; border-radius:5px; margin:10px 0;">নাগরিক সনদপত্র</h3>
+                <h3 style="background:#0B50FA; color:white; display:inline-block; padding:5px 25px; border-radius:5px; margin:15px 0;">নাগরিক সনদপত্র</h3>
             </div>
-            <p style="text-align: right; font-size: 13px;">তারিখ: {date.today().strftime('%d-%m-%Y')}</p>
-            <p style="font-size: 15px; line-height: 1.8; text-align: justify; margin-top: 20px;">
+            <p style="text-align: right; font-size: 13px; margin-top:20px;">তারিখ: {date.today().strftime('%d-%m-%Y')}</p>
+            <p style="font-size: 15px; line-height: 1.9; text-align: justify; margin-top: 25px;">
                 এই মর্মে প্রত্যয়ন করা যাইতেছে যে, <b>{cit_name}</b>, 
                 পিতা: <b>{cit_father}</b>, 
                 মাতা: <b>{cit_mother}</b>, 
@@ -416,8 +459,9 @@ elif app_mode == 8:
                 ডাকঘর: মনিরামপুর, উপজেলা: মনিরামপুর, জেলা: যশোর। 
                 তিনি অত্র ইউনিয়নের একজন স্থায়ী বাসিন্দা এবং জন্মসূত্রে বাংলাদেশের নাগরিক। আমার জানামতে তার চরিত্র ও আচরণ সন্তোষজনক এবং তিনি রাষ্ট্রবিরোধী কোনো কাজের সাথে জড়িত নন।
             </p>
-            <p style="font-size: 15px; margin-top: 15px;">আমি তাহার সর্বাঙ্গীন মঙ্গল ও দীর্ঘায়ু কামনা করি।</p>
-            <div style="margin-top: 60px; display: flex; justify-content: space-between;">
+            <p style="font-size: 15px; margin-top: 20px;">আমি তাহার সর্বাঙ্গীন মঙ্গল ও দীর্ঘায়ু কামনা করি।</p>
+            
+            <div style="margin-top: 90px; display: flex; justify-content: space-between;">
                 <div>
                     <p style="border-top: 1px dashed black; padding-top: 5px; display: inline-block;">আবেদনকারীর স্বাক্ষর</p>
                 </div>
@@ -428,10 +472,11 @@ elif app_mode == 8:
         </div>
         """
         st.markdown(certificate_html, unsafe_allow_html=True)
-        st.success("✅ নাগরিক সনদ সফলভাবে জেনারেট করা হয়েছে!")
+        st.success("✅ A4 প্রিন্ট ফরম্যাটে নাগরিক সনদ সফলভাবে তৈরি হয়েছে!")
 
 elif app_mode == 9:
-    st.header("⚽ টুর্নামেন্ট আমন্ত্রণপত্র ও নিয়মাবলী জেনারেটর")
+    st.header("⚽ টুর্নামেন্ট আমন্ত্রণপত্র ও নিয়মাবলী জেনারেটর (A4 Print Ready)")
+    st.info("💡 টিপস: সরাসরি প্রিন্ট করতে ব্রাউজারের প্রিন্ট অপশন ব্যবহার করুন (Ctrl + P)। পেপার সাইজ স্বয়ংক্রিয়ভাবে A4 প্রিন্ট ফরম্যাটে সেট করা থাকবে।")
     
     col1, col2 = st.columns(2)
     with col1:
@@ -450,34 +495,34 @@ elif app_mode == 9:
 
     if st.button("টুর্নামেন্ট নোটিশ জেনারেট করুন"):
         notice_html = f"""
-        <div style="background:#ffffff; padding:30px; border:4px solid #ff4b4b; border-radius:12px; color:black; font-family: Arial, sans-serif;">
+        <div class="a4-paper-box" style="border:4px solid #ff4b4b;">
             <div style="text-align:center;">
                 <h2 style="color:#ff4b4b; margin:0;">🏆 টুর্নামেন্ট আমন্ত্রণপত্র ও নোটিশ 🏆</h2>
-                <h3 style="color:#0B50FA; margin:5px 0;">{t_name}</h3>
+                <h3 style="color:#0B50FA; margin:6px 0; font-size:22px;">{t_name}</h3>
                 <p style="font-size:13px; color:gray; margin:0;">আয়োজনে: {t_organizer}</p>
-                <hr style="border: 1px solid #ff4b4b; width:70%;">
+                <hr style="border: 1px solid #ff4b4b; width:70%; margin:15px auto;">
             </div>
             
-            <div style="background:#f8f9fa; padding:15px; border-radius:8px; margin:15px 0; font-size:14px;">
+            <div style="background:#f8f9fa; padding:15px; border-radius:8px; margin:15px 0; font-size:14px; border-left:5px solid #0B50FA;">
                 <p>📍 <b>খেলার স্থান:</b> {t_ground}</p>
                 <p>📅 <b>শুরুর তারিখ ও সময়:</b> {t_date}</p>
                 <p>💰 <b>এন্ট্রি ফি:</b> {t_fee} | 🏆 <b>গ্র্যান্ড পুরস্কার:</b> {t_prize}</p>
             </div>
 
-            <h4 style="color:#0B50FA; border-bottom: 2px solid #0B50FA; padding-bottom:3px;">📋 টুর্নামেন্টের বিশেষ নিয়মাবলী:</h4>
-            <div style="font-size: 14px; line-height: 1.6; white-space: pre-line; background:#fffdfd; padding:10px; border-left:4px solid #ff4b4b;">
+            <h4 style="color:#0B50FA; border-bottom: 2px solid #0B50FA; padding-bottom:4px; margin-top:20px;">📋 টুর্নামেন্টের বিশেষ নিয়মাবলী:</h4>
+            <div style="font-size: 14px; line-height: 1.7; white-space: pre-line; background:#fffdfd; padding:12px; border-left:4px solid #ff4b4b; margin-top:8px;">
                 {t_rules}
             </div>
 
-            <p style="text-align:center; font-weight:bold; margin-top:20px; color:#ff4b4b;">সকল ক্রীড়াপ্রেমী ও দলগুলোকে টুর্নামেন্টে অংশগ্রহণের জন্য আন্তরিক আমন্ত্রণ জানানো যাচ্ছে!</p>
+            <p style="text-align:center; font-weight:bold; margin-top:25px; color:#ff4b4b; font-size:15px;">সকল ক্রীড়াপ্রেমী ও দলগুলোকে টুর্নামেন্টে অংশগ্রহণের জন্য আন্তরিক আমন্ত্রণ জানানো যাচ্ছে!</p>
             
-            <div style="margin-top: 40px; text-align: right;">
+            <div style="margin-top: 70px; text-align: right;">
                 <p style="border-top: 1px solid black; padding-top: 5px; display: inline-block; font-weight: bold;">কর্তৃপক্ষ / সভাপতি<br>{t_organizer}</p>
             </div>
         </div>
         """
         st.markdown(notice_html, unsafe_allow_html=True)
-        st.success("✅ টুর্নামেন্টের নোটিশ ও আমন্ত্রণপত্র সফলভাবে তৈরি করা হয়েছে! এটি এখন প্রিন্ট বা শেয়ার করা যাবে।")
+        st.success("✅ A4 পেপার প্রিন্ট ফরম্যাটে টুর্নামেন্টের নোটিশ সফলভাবে তৈরি করা হয়েছে!")
 
 elif app_mode == 10:
     st.header("📏 ছবির সাইজ পরিবর্তন ও রিসাইজার")
