@@ -48,22 +48,20 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# আপনার প্রদত্ত ছবিটিকে সরাসরি কোডের ভেতর থেকে বেসসিকে কনভার্ট করার জন্য
 import base64
 from pathlib import Path
 
-# আপনার ছবি যদি hasanur.jpeg নামে সেভ করা থাকে তবে সেটি স্বয়ংক্রিয়ভাবে রিড করবে
 def get_embedded_image():
     image_path = "hasanur.jpeg"
     if Path(image_path).exists():
         with open(image_path, "rb") as img_file:
             encoded = base64.b64encode(img_file.read()).decode()
-            return f'<img src="data:image/jpeg;base64,{encoded}" style="width: 75px; height: 75px; border-radius: 50%; object-fit: cover; border: 3px solid white; box-shadow: 0 4px 10px rgba(0,0,0,0.3); vertical-align: middle; margin-right: 15px;">'
+            return f'<img src="data:image/jpeg;base64,{encoded}" style="width: 105px; height: 105px; border-radius: 50%; object-fit: contain; background-color: #ffffff; border: 3px solid white; box-shadow: 0 4px 10px rgba(0,0,0,0.3); vertical-align: middle; margin-right: 15px;">'
     return '👤'
 
 img_tag = get_embedded_image()
 
-# হেডার সেকশন (আপনার ছবিসহ)
+# হেডার সেকশন
 st.markdown(f"""
 <div class="studio-header">
     <div style="background: rgba(255,255,255,0.15); padding: 18px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.3);">
@@ -111,7 +109,6 @@ for num, (item_name, desc) in menu_dict.items():
 
 app_mode = st.session_state.app_mode
 
-# নিখুঁত A4 সাইজ এবং মার্জিনসহ প্রিন্ট ফাংশন
 def print_content_html(html_content, button_text):
     full_html = f"""
     <!DOCTYPE html>
@@ -193,10 +190,7 @@ def print_content_html(html_content, button_text):
     """
     components.html(full_html, height=1150, scrolling=True)
 
-
-# ==============================================================================
-# মোড ৬: ক্যাশ মেমো / রশিদ জেনারেটর 
-# ==============================================================================
+# মোড ৬: ক্যাশ মেমো
 if app_mode == 6:
     st.header("🧾 দোকানের ক্যাশ মেমো / রশিদ জেনারেটর")
     
@@ -312,10 +306,7 @@ if app_mode == 6:
         """
         print_content_html(memo_html_code, "ক্যাশ মেমো প্রিন্ট করুন")
 
-
-# ==============================================================================
-# মোড ৮: নাগরিক সনদপত্র জেনারেটর 
-# ==============================================================================
+# মোড ৮: নাগরিক সনদপত্র
 elif app_mode == 8:
     st.header("📜 নাগরিক সনদপত্র জেনারেটর")
     
@@ -359,10 +350,7 @@ elif app_mode == 8:
         """
         print_content_html(cert_html_code, "নাগরিক সনদ প্রিন্ট করুন")
 
-
-# ==============================================================================
-# মোড ৯: টুর্নামেন্ট আমন্ত্রণপত্র ও নিয়মাবলী 
-# ==============================================================================
+# মোড ৯: টুর্নামেন্ট
 elif app_mode == 9:
     st.header("⚽ টুর্নামেন্ট আমন্ত্রণপত্র ও নিয়মাবলী জেনারেটর")
     
@@ -412,10 +400,7 @@ elif app_mode == 9:
         """
         print_content_html(notice_html_code, "টুর্নামেন্ট নোটিশ প্রিন্ট করুন")
 
-
-# ==============================================================================
-# মোড ১০: অনলাইন সরকারি ও প্রয়োজনীয় লিংকসমূহ 
-# ==============================================================================
+# মোড ১০: অনলাইন লিংক
 elif app_mode == 10:
     st.header("🔗 অনলাইন সরকারি ও প্রয়োজনীয় লিংকসমূহ")
     st.write("আপনার সাজানো ক্যাটাগরি অনুযায়ী গুরুত্বপূর্ণ সরকারি ও অনলাইন সেবার পোর্টালগুলো নিচে দেওয়া হলো:")
@@ -457,8 +442,6 @@ elif app_mode == 10:
         - [জরুরি সেবা - ৯৯৯ (National Emergency Service)](https://999.gov.bd)
         """)
 
-
-# অন্যান্য ডিফল্ট বা অন্য মোডগুলোর জন্য
 else:
     st.header("🛠️ অন্যান্য টুলস ও ড্যাশবোর্ড")
     st.info("দয়া করে সাইডবার থেকে আপনার কাঙ্ক্ষিত টুলটি সিলেক্ট করুন।")
