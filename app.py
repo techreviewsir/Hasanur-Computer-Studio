@@ -5,7 +5,7 @@ from PIL import Image
 import streamlit as st
 from pypdf import PdfReader
 from datetime import date
-import streamlit.components.v1 as components  # নতুন যুক্ত করা হয়েছে প্রিন্টের জন্য
+import streamlit.components.v1 as components
 
 try:
     from rembg import remove
@@ -16,7 +16,7 @@ except ImportError:
 st.set_page_config(page_title="হাসানুর কম্পিউটার স্টুডিও", layout="wide")
 
 # ==============================================================================
-# মূল স্টাইল এবং প্রিন্ট কনফিগারেশন
+# মূল স্টাইল
 # ==============================================================================
 st.markdown("""
 <style>
@@ -40,11 +40,6 @@ st.markdown("""
         margin: 4px 0;
         line-height: 1.5;
         color: white;
-    }
-    /* প্রিন্ট করার সময় যেসব জিনিস হাইড থাকবে */
-    @media print {
-        body { background: white !important; color: black !important; }
-        [data-testid="stSidebar"], .studio-header, .stButton, header, footer, iframe { display: none !important; }
     }
 </style>
 """, unsafe_allow_html=True)
@@ -93,25 +88,58 @@ for num, (item_name, desc) in menu_dict.items():
 
 app_mode = st.session_state.app_mode
 
-# প্রিন্ট বাটনের জন্য HTML/JS ফাংশন
-def print_button_html(button_text):
-    return f"""
-    <button onclick="window.parent.print()" style="
-        background-color: #0B50FA; 
-        color: white; 
-        padding: 12px 20px; 
-        border: none; 
-        border-radius: 8px; 
-        cursor: pointer; 
-        font-size: 16px;
-        font-weight: bold;
-        width: 100%;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        margin-top: 10px;
-    ">
-        🖨️ {button_text}
-    </button>
+# নির্দিষ্ট ডিজাইন প্রিন্ট করার জন্য ডেডিকেটেড ফাংশন
+def print_content_html(html_content, button_text):
+    full_html = f"""
+    <!DOCTYPE html>
+    <html lang="bn">
+    <head>
+        <meta charset="UTF-8">
+        <style>
+            body {{
+                font-family: 'SolaimanLipi', Arial, sans-serif;
+                background: white;
+                margin: 0;
+                padding: 20px;
+                color: black;
+            }}
+            @media print {{
+                .no-print {{
+                    display: none !important;
+                }}
+                @page {{
+                    size: A4;
+                    margin: 15mm;
+                }}
+            }}
+            .print-btn {{
+                background-color: #0B50FA;
+                color: white;
+                padding: 12px 25px;
+                border: none;
+                border-radius: 8px;
+                cursor: pointer;
+                font-size: 16px;
+                font-weight: bold;
+                display: block;
+                margin: 20px auto;
+                box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            }}
+            .print-btn:hover {{
+                background-color: #083cb3;
+            }}
+        </style>
+    </head>
+    <body>
+        <div>
+            {html_content}
+        </div>
+        <button class="print-btn no-print" onclick="window.print()">🖨️ {button_text}</button>
+    </body>
+    </html>
     """
+    components.html(full_html, height=750, scrolling=True)
+
 
 # ==============================================================================
 # মোড ৬: ক্যাশ মেমো / রশিদ জেনারেটর 
@@ -157,56 +185,67 @@ if app_mode == 6:
         total_amount += it_price
         st.markdown("---")
 
-    if st.button("🖨️ ক্যাশ মেমো ফাইনাল প্রিভিউ দেখুন"):
-        st.success("✅ ক্যাশ মেমো সফলভাবে প্রস্তুত করা হয়েছে! নিচে নীল রঙের প্রিন্ট বাটনে ক্লিক করুন।")
+    if st.button("🖨️ ক্যাশ মেমো ফাইনাল প্রিভিউ ও প্রিন্ট দেখুন"):
+        st.success("✅ ক্যাশ মেমো প্রস্তুত! নিচে সরাসরি প্রিন্ট করার অপশন দেখতে পাবেন।")
         
-        with st.container():
-            st.markdown("<div style='border: 3px solid #0B50FA; padding: 30px; border-radius: 8px; background-color: #ffffff; color: #000000;'>", unsafe_allow_html=True)
-            
-            st.markdown(f"<h2 style='text-align: center; color: #0B50FA; margin-bottom: 0;'>{shop_name}</h2>", unsafe_allow_html=True)
-            st.markdown(f"<p style='text-align: center; font-size: 13px; color: #333;'>{shop_address}</p>", unsafe_allow_html=True)
-            st.markdown("<hr style='border: 1px solid #0B50FA;'>", unsafe_allow_html=True)
-            st.markdown("<h3 style='text-align: center; background-color: #0B50FA; color: white; padding: 6px; border-radius: 4px;'>ক্যাশ মেমো / রসিদ</h3>", unsafe_allow_html=True)
-            
-            col_info1, col_info2 = st.columns(2)
-            with col_info1:
-                st.markdown(f"**গ্রাহকের নাম:** {c_name}")
-                st.markdown(f"**মোবাইল নম্বর:** {c_phone}")
-            with col_info2:
-                st.markdown(f"<div style='text-align: right;'><b>তারিখ:</b> {date.today().strftime('%d-%m-%Y')}</div>", unsafe_allow_html=True)
-            
-            st.markdown("---")
-            
-            t_col1, t_col2, t_col3, t_col4, t_col5 = st.columns([1, 3, 2, 2, 2])
-            t_col1.markdown("**ক্রমিক**")
-            t_col2.markdown("**পণ্যের বিবরণ**")
-            t_col3.markdown("**সিরিয়াল নম্বর**")
-            t_col4.markdown("**ওয়ারেন্টি**")
-            t_col5.markdown("**মূল্য (TK)**")
-            st.markdown("<hr style='margin: 5px 0;'>", unsafe_allow_html=True)
-            
-            for idx, itm in enumerate(updated_items):
-                r_col1, r_col2, r_col3, r_col4, r_col5 = st.columns([1, 3, 2, 2, 2])
-                r_col1.write(str(idx + 1))
-                r_col2.write(itm['name'])
-                r_col3.write(itm['serial'])
-                r_col4.write(f"{itm['has_warranty']} ({itm['warranty_period']})")
-                r_col5.write(f"{itm['price']} TK")
-            
-            st.markdown("<hr style='margin: 10px 0;'>", unsafe_allow_html=True)
-            st.markdown(f"<div style='text-align: right; font-size: 16px; background-color: #f1f3f5; padding: 10px; border-radius: 5px;'><b>সর্বমোট প্রদেয় টাকা (Total): <span style='color: red; font-size: 18px;'>{total_amount} TK</span></b></div>", unsafe_allow_html=True)
-            
-            st.markdown("<br><br>", unsafe_allow_html=True)
-            s_col1, s_col2 = st.columns(2)
-            with s_col1:
-                st.markdown("<p style='border-top: 1px dashed black; display: inline-block; padding-top: 4px;'>গ্রাহকের স্বাক্ষর</p>", unsafe_allow_html=True)
-            with s_col2:
-                st.markdown("<div style='text-align: right;'><p style='border-top: 1px solid black; display: inline-block; padding-top: 4px; font-weight: bold;'>বিক্রেতার স্বাক্ষর / সিল</p></div>", unsafe_allow_html=True)
-            
-            st.markdown("</div>", unsafe_allow_html=True)
+        items_html = ""
+        for idx, itm in enumerate(updated_items):
+            items_html += f"""
+            <tr style="border-bottom: 1px solid #ddd;">
+                <td style="padding: 8px; text-align: center;">{idx + 1}</td>
+                <td style="padding: 8px;">{itm['name']}</td>
+                <td style="padding: 8px; text-align: center;">{itm['serial']}</td>
+                <td style="padding: 8px; text-align: center;">{itm['has_warranty']} ({itm['warranty_period']})</td>
+                <td style="padding: 8px; text-align: right;">{itm['price']} TK</td>
+            </tr>
+            """
 
-        # কাজ করার মতো আসল HTML প্রিন্ট বাটন
-        components.html(print_button_html("এখন ক্যাশ মেমো প্রিন্ট করুন"), height=70)
+        memo_html_code = f"""
+        <div style='border: 2px solid #0B50FA; padding: 25px; border-radius: 8px; background-color: #ffffff; max-width: 700px; margin: auto;'>
+            <h2 style='text-align: center; color: #0B50FA; margin: 0;'>{shop_name}</h2>
+            <p style='text-align: center; font-size: 13px; color: #333; margin: 4px 0;'>{shop_address}</p>
+            <hr style='border: 1px solid #0B50FA;'>
+            <h3 style='text-align: center; background-color: #0B50FA; color: white; padding: 6px; border-radius: 4px; margin: 15px 0;'>ক্যাশ মেমো / রসিদ</h3>
+            
+            <table style="width: 100%; margin-bottom: 15px; font-size: 14px;">
+                <tr>
+                    <td><b>গ্রাহকের নাম:</b> {c_name}</td>
+                    <td style="text-align: right;"><b>তারিখ:</b> {date.today().strftime('%d-%m-%Y')}</td>
+                </tr>
+                <tr>
+                    <td><b>মোবাইল নম্বর:</b> {c_phone}</td>
+                    <td></td>
+                </tr>
+            </table>
+            
+            <table style="width: 100%; border-collapse: collapse; font-size: 14px; margin-bottom: 20px;">
+                <thead>
+                    <tr style="background-color: #f1f3f5; border-bottom: 2px solid #0B50FA;">
+                        <th style="padding: 8px; text-align: center;">ক্রমিক</th>
+                        <th style="padding: 8px; text-align: left;">পণ্যের বিবরণ</th>
+                        <th style="padding: 8px; text-align: center;">সিরিয়াল নম্বর</th>
+                        <th style="padding: 8px; text-align: center;">ওয়ারেন্টি</th>
+                        <th style="padding: 8px; text-align: right;">মূল্য</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {items_html}
+                </tbody>
+            </table>
+            
+            <div style='text-align: right; font-size: 15px; background-color: #f8f9fa; padding: 10px; border-radius: 5px; margin-bottom: 40px;'>
+                <b>সর্বমোট প্রদেয় টাকা (Total): <span style='color: red; font-size: 17px;'>{total_amount} TK</span></b>
+            </div>
+            
+            <table style="width: 100%; margin-top: 50px; font-size: 14px;">
+                <tr>
+                    <td><div style='border-top: 1px dashed black; width: 150px; text-align: center; padding-top: 4px;'>গ্রাহকের স্বাক্ষর</div></td>
+                    <td style="text-align: right;"><div style='border-top: 1px solid black; width: 170px; text-align: center; padding-top: 4px; font-weight: bold; display: inline-block;'>বিক্রেতার স্বাক্ষর / সিল</div></td>
+                </tr>
+            </table>
+        </div>
+        """
+        print_content_html(memo_html_code, "ক্যাশ মেমো প্রিন্ট করুন")
 
 
 # ==============================================================================
@@ -226,31 +265,32 @@ elif app_mode == 8:
         cit_union = st.text_input("ইউনিয়ন / পৌরসভা", "মণিরামপুর সদর ইউনিয়ন")
 
     if st.button("📜 নাগরিক সনদ প্রিভিউ ও প্রিন্ট দেখুন"):
-        st.success("✅ নাগরিক সনদপত্র তৈরি হয়েছে! নিচে নীল রঙের প্রিন্ট বাটনে ক্লিক করুন।")
+        st.success("✅ নাগরিক সনদপত্র প্রস্তুত! নিচে সরাসরি প্রিন্ট করার অপশন দেখতে পাবেন।")
         
-        with st.container():
-            st.markdown("""
-            <div style='border: 6px double #0B50FA; padding: 40px; border-radius: 10px; background-color: #ffffff; color: #000000;'>
-                <div style="text-align:center;">
-                    <h2 style="color:#0B50FA; margin:0;">ইউনিয়ন পরিষদ কার্যালয়</h2>
-                    <p style="font-size:13px; margin:2px 0; color:#333;">দিঘীরপাড়, মনিরামপুর, যশোর।</p>
-                    <hr style="border:1px solid #0B50FA; width:50%;">
-                    <h3 style="background:#0B50FA; color:white; display:inline-block; padding:5px 25px; border-radius:4px; margin-top:5px;">নাগরিক সনদপত্র</h3>
-                </div>
-                <p style="font-size:15px; line-height:2.0; text-align:justify; margin-top:30px;">
-                    এই মর্মে প্রত্যয়ন করা যাইতেছে যে, <b>""" + cit_name + """</b>, পিতা: <b>""" + cit_father + """</b>, মাতা: <b>""" + cit_mother + """</b>, গ্রাম: <b>""" + cit_vill + """</b>, """ + cit_word + """, উপজেলা: মণিরামপুর, জেলা: যশোর এর অত্র ইউনিয়নের একজন স্থায়ী বাসিন্দা এবং জন্মসূত্রে বাংলাদেশের নাগরিক। আমার জানামতে তিনি দেশবিরোধী বা রাষ্ট্রবিরোধী কোনো কাজের সাথে জড়িত নন এবং তার চরিত্র অত্যন্ত ভালো।
-                </p>
-                <p style="font-size:14px; margin-top:20px;">আমি তার সর্বাঙ্গীন সাফল্য ও দীর্ঘায়ু কামনা করি।</p>
-                
-                <div style="margin-top:120px; display:flex; justify-content:space-between; font-size:14px;">
-                    <div><p style="border-top:1px dashed black; padding-top:6px; display:inline-block; width:160px; text-align:center;">আবেদনকারীর স্বাক্ষর</p></div>
-                    <div style="text-align:right;"><p style="border-top:1px solid black; padding-top:6px; display:inline-block; width:160px; text-align:center; font-weight:bold;">চেয়ারম্যান</p></div>
-                </div>
+        cert_html_code = f"""
+        <div style='border: 5px double #0B50FA; padding: 35px; border-radius: 10px; background-color: #ffffff; max-width: 750px; margin: auto; box-sizing: border-box;'>
+            <div style="text-align:center;">
+                <h2 style="color:#0B50FA; margin:0; font-size: 24px;">ইউনিয়ন পরিষদ কার্যালয়</h2>
+                <p style="font-size:13px; margin:4px 0; color:#333;">দিঘীরপাড়, মনিরামপুর, যশোর।</p>
+                <hr style="border:1px solid #0B50FA; width:40%; margin: 10px auto;">
+                <h3 style="background:#0B50FA; color:white; display:inline-block; padding:4px 20px; border-radius:4px; margin-top:5px; font-size: 18px;">নাগরিক সনদপত্র</h3>
             </div>
-            """, unsafe_allow_html=True)
             
-        # কাজ করার মতো আসল HTML প্রিন্ট বাটন
-        components.html(print_button_html("এখন নাগরিক সনদ প্রিন্ট করুন"), height=70)
+            <p style="font-size:15px; line-height:2.2; text-align:justify; margin-top:35px;">
+                এই মর্মে প্রত্যয়ন করা যাইতেছে যে, <b>{cit_name}</b>, পিতা: <b>{cit_father}</b>, মাতা: <b>{cit_mother}</b>, গ্রাম: <b>{cit_vill}</b>, {cit_word}, উপজেলা: মণিরামপুর, জেলা: যশোর এর অত্র ইউনিয়নের একজন স্থায়ী বাসিন্দা এবং জন্মসূত্রে বাংলাদেশের নাগরিক। আমার জানামতে তিনি দেশবিরোধী বা রাষ্ট্রবিরোধী কোনো কাজের সাথে জড়িত নন এবং তার চরিত্র অত্যন্ত ভালো।
+            </p>
+            
+            <p style="font-size:15px; margin-top:25px;">আমি তার সর্বাঙ্গীন সাফল্য ও দীর্ঘায়ু কামনা করি।</p>
+            
+            <table style="width: 100%; margin-top: 90px; font-size: 14px;">
+                <tr>
+                    <td><div style="border-top:1px dashed black; width: 160px; text-align: center; padding-top:6px;">আবেদনকারীর স্বাক্ষর</div></td>
+                    <td style="text-align: right;"><div style="border-top:1px solid black; width: 160px; text-align: center; padding-top:6px; font-weight:bold; display: inline-block;">চেয়ারম্যান</div></td>
+                </tr>
+            </table>
+        </div>
+        """
+        print_content_html(cert_html_code, "নাগরিক সনদ প্রিন্ট করুন")
 
 
 # ==============================================================================
@@ -264,41 +304,44 @@ elif app_mode == 9:
     t_prize = st.text_input("পুরস্কারের বিবরণ", "চ্যাম্পিয়ন: ১০,০০০ টাকা + ট্রফি | রানার্সআপ: ৫,০০০ টাকা + ট্রফি")
 
     if st.button("⚽ টুর্নামেন্ট নোটিশ প্রিভিউ ও প্রিন্ট দেখুন"):
-        st.success("✅ টুর্নামেন্ট আমন্ত্রণপত্র প্রস্তুত! নিচে নীল রঙের প্রিন্ট বাটনে ক্লিক করুন।")
+        st.success("✅ টুর্নামেন্ট আমন্ত্রণপত্র প্রস্তুত! নিচে সরাসরি প্রিন্ট করার অপশন দেখতে পাবেন।")
         
-        with st.container():
-            st.markdown("""
-            <div style='border: 4px solid #ff4b4b; padding: 35px; border-radius: 8px; background-color: #ffffff; color: #000000;'>
-                <div style="text-align:center;">
-                    <h2 style="color:#ff4b4b; margin:0;">🏆 টুর্নামেন্ট আমন্ত্রণপত্র ও নোটিশ 🏆</h2>
-                    <h3 style="color:#0B50FA; margin:8px 0; font-size:22px;">""" + t_name + """</h3>
-                    <hr style="border:1px solid #ff4b4b; width:60%;">
-                </div>
-                <p style="font-size:15px; line-height:1.8; margin-top:20px; text-align:center;">
-                    সকল ক্রীড়াপ্রেমী ও দলের অবগতির জন্য জানানো যাচ্ছে যে, আগামী <b>""" + t_date + """</b> তারিখে স্থানীয় মাঠে জমকালো আয়োজনের মাধ্যমে এই টুর্নামেন্ট শুরু হতে যাচ্ছে। আপনি বা আপনার দল এই প্রতিযোগিতায় স্বতঃস্ফূর্তভাবে অংশগ্রহণ করার জন্য আমন্ত্রিত।
-                </p>
-                <div style="background:#f8f9fa; padding:15px; border-radius:6px; border-left:4px solid #ff4b4b; margin-top:20px;">
-                    <h4 style="margin:0 0 5px 0; color:#333;">🎁 আকর্ষণীয় পুরস্কারসমূহ:</h4>
-                    <p style="margin:0; font-size:14px; font-weight:bold; color:red;">""" + t_prize + """</p>
-                </div>
-                <div style="margin-top:25px;">
-                    <h4 style="color:#333; margin-bottom:5px;">📋 প্রধান নিয়মাবলী:</h4>
-                    <ol style="font-size:13px; line-height:1.6; margin:0; padding-left:20px;">
-                        <li>ম্যাচ শুরুর নির্ধারিত সময়ের ১৫ মিনিট পূর্বে মাঠে উপস্থিত থাকতে হবে।</li>
-                        <li>আম্পায়ারের সিদ্ধান্তই চূড়ান্ত সিদ্ধান্ত বলে গণ্য হবে।</li>
-                        <li>খেলার মাঠে শৃঙ্খলা বজায় রাখা বাধ্যতামূলক। বিশৃঙ্খলা সৃষ্টিকারী দলকে বহিষ্কার করা হবে।</li>
-                        <li>এন্ট্রি ফি জমা দিয়ে নির্দিষ্ট সময়ের মধ্যে টিম রেজিস্ট্রেশন সম্পন্ন করতে হবে।</li>
-                    </ol>
-                </div>
-                <div style="margin-top:100px; display:flex; justify-content:space-between; font-size:14px;">
-                    <div><p style="border-top:1px dashed black; padding-top:6px; display:inline-block; width:160px; text-align:center;">আয়োজক কমিটি</p></div>
-                    <div style="text-align:right;"><p style="border-top:1px solid black; padding-top:6px; display:inline-block; width:160px; text-align:center; font-weight:bold;">প্রধান সমন্বয়ক</p></div>
-                </div>
+        notice_html_code = f"""
+        <div style='border: 4px solid #ff4b4b; padding: 30px; border-radius: 8px; background-color: #ffffff; max-width: 750px; margin: auto; box-sizing: border-box;'>
+            <div style="text-align:center;">
+                <h2 style="color:#ff4b4b; margin:0; font-size: 22px;">🏆 টুর্নামেন্ট আমন্ত্রণপত্র ও নোটিশ 🏆</h2>
+                <h3 style="color:#0B50FA; margin:8px 0; font-size:20px;">{t_name}</h3>
+                <hr style="border:1px solid #ff4b4b; width:50%; margin: 10px auto;">
             </div>
-            """, unsafe_allow_html=True)
-
-        # কাজ করার মতো আসল HTML প্রিন্ট বাটন
-        components.html(print_button_html("এখন টুর্নামেন্ট নোটিশ প্রিন্ট করুন"), height=70)
+            
+            <p style="font-size:15px; line-height:1.8; margin-top:20px; text-align:center;">
+                সকল ক্রীড়াপ্রেমী ও দলের অবগতির জন্য জানানো যাচ্ছে যে, আগামী <b>{t_date}</b> তারিখে স্থানীয় মাঠে জমকালো আয়োজনের মাধ্যমে এই টুর্নামেন্ট শুরু হতে যাচ্ছে। আপনি বা আপনার দল এই প্রতিযোগিতায় স্বতঃস্ফূর্তভাবে অংশগ্রহণ করার জন্য আমন্ত্রিত।
+            </p>
+            
+            <div style="background:#f8f9fa; padding:12px; border-radius:6px; border-left:4px solid #ff4b4b; margin-top:20px;">
+                <h4 style="margin:0 0 5px 0; color:#333; font-size: 15px;">🎁 আকর্ষণীয় পুরস্কারসমূহ:</h4>
+                <p style="margin:0; font-size:14px; font-weight:bold; color:red;">{t_prize}</p>
+            </div>
+            
+            <div style="margin-top:20px;">
+                <h4 style="color:#333; margin-bottom:5px; font-size: 15px;">📋 প্রধান নিয়মাবলী:</h4>
+                <ol style="font-size:13px; line-height:1.6; margin:0; padding-left:20px;">
+                    <li>ম্যাচ শুরুর নির্ধারিত সময়ের ১৫ মিনিট পূর্বে মাঠে উপস্থিত থাকতে হবে।</li>
+                    <li>আম্পায়ারের সিদ্ধান্তই চূড়ান্ত সিদ্ধান্ত বলে গণ্য হবে।</li>
+                    <li>খেলার মাঠে শৃঙ্খলা বজায় রাখা বাধ্যতামূলক। বিশৃঙ্খলা সৃষ্টিকারী দলকে বহিষ্কার করা হবে।</li>
+                    <li>এন্ট্রি ফি জমা দিয়ে নির্দিষ্ট সময়ের মধ্যে টিম রেজিস্ট্রেশন সম্পন্ন করতে হবে।</li>
+                </ol>
+            </div>
+            
+            <table style="width: 100%; margin-top: 70px; font-size: 14px;">
+                <tr>
+                    <td><div style="border-top:1px dashed black; width: 160px; text-align: center; padding-top:6px;">আয়োজক কমিটি</div></td>
+                    <td style="text-align: right;"><div style="border-top:1px solid black; width: 160px; text-align: center; padding-top:6px; font-weight:bold; display: inline-block;">প্রধান সমন্বয়ক</div></td>
+                </tr>
+            </table>
+        </div>
+        """
+        print_content_html(notice_html_code, "টুর্নামেন্ট নোটিশ প্রিন্ট করুন")
 
 # অন্যান্য ডিফল্ট মোড
 else:
