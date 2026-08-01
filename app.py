@@ -5,14 +5,18 @@ from PIL import Image, ImageOps, ImageDraw, ImageFont
 import streamlit as st
 from pypdf import PdfReader
 from datetime import date
-from rembg import remove
 
-# পেজের লেআউট সেটআপ
+try:
+    from rembg import remove
+    has_rembg = True
+except ImportError:
+    has_rembg = False
+
 st.set_page_config(page_title="হাসানুর কম্পিউটার স্টুডিও / Hasanur Computer Studio", layout="wide")
 
-# =====================================================================
+# ==============================================================================
 # থিম এবং ভাষা সিলেকশন (সাইডবার কন্ট্রোল)
-# =====================================================================
+# ==============================================================================
 st.sidebar.header("⚙️ সেটিংস / Settings")
 lang = st.sidebar.selectbox("ভাষা / Language", ["বাংলা (Bengali)", "English"])
 theme = st.sidebar.selectbox("থিম / Theme", ["Light Theme ☀️", "Dark Theme 🌙"])
@@ -29,6 +33,7 @@ if is_dark:
     btn_border = "#30363d"
     link_bg = "#1f242c"
     header_gradient = "linear-gradient(135deg, #1f4068, #162447)"
+    accent_color = "#ff4b4b"
 else:
     bg_main = "#ffffff"
     sidebar_bg = "#fcfcfc"
@@ -38,6 +43,7 @@ else:
     btn_border = "#e0e0e0"
     link_bg = "#f8f9fa"
     header_gradient = "linear-gradient(135deg, #0B50FA, #ff4b4b)"
+    accent_color = "#0B50FA"
 
 st.markdown(f"""
 <style>
@@ -46,17 +52,20 @@ st.markdown(f"""
         color: {text_color};
     }}
     [data-testid="stSidebar"] {{
-        min-width: 380px !important;
-        max-width: 410px !important;
+        min-width: 410px !important;
+        max-width: 440px !important;
         background-color: {sidebar_bg} !important;
+        border-right: 1px solid {btn_border};
     }}
     .link-box {{
         background-color: {link_bg};
-        padding: 15px;
+        padding: 10px;
         border-radius: 8px;
-        border-left: 5px solid #ff4b4b;
-        margin-bottom: 10px;
+        border-left: 4px solid {accent_color};
+        margin-bottom: 8px;
         color: {text_color};
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        font-size: 11px;
     }}
     .studio-header {{
         background: {header_gradient};
@@ -69,28 +78,34 @@ st.markdown(f"""
     }}
     .stButton > button {{
         width: 100% !important;
-        height: auto !important;
-        min-height: 48px !important;
-        white-space: normal !important;
-        word-wrap: break-word !important;
+        min-height: 38px !important;
         text-align: left !important;
         background-color: {btn_bg};
         color: {btn_text};
         border: 1px solid {btn_border};
         border-radius: 8px;
-        padding: 10px 12px !important;
+        padding: 6px 10px !important;
         font-weight: 600;
-        font-size: 13px;
-        margin-bottom: 5px;
+        font-size: 12px;
+        margin-bottom: 3px;
         transition: all 0.3s ease;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.02);
-        display: block !important;
     }}
     .stButton > button:hover {{
-        background: linear-gradient(135deg, #0B50FA, #ff4b4b) !important;
+        background: linear-gradient(135deg, {accent_color}, #ff4b4b) !important;
         color: white !important;
-        border-color: #0B50FA !important;
-        padding-left: 15px !important;
+        border-color: {accent_color} !important;
+        padding-left: 14px !important;
+    }}
+    .sidebar-section-title {{
+        font-size: 14px;
+        font-weight: bold;
+        color: {accent_color};
+        margin-top: 15px;
+        margin-bottom: 8px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border-bottom: 2px solid {accent_color};
+        padding-bottom: 4px;
     }}
 </style>
 """, unsafe_allow_html=True)
@@ -101,7 +116,8 @@ t = {
     "subtitle": "All-in-one Master Dashboard for Computer, Design & Online Services" if is_eng else "সকল ধরনের কম্পিউটার, ডিজাইন ও অনলাইন সার্ভিসের অল-ইন-ওয়ান মাস্টার ড্যাশবোর্ড",
     "upload_header": "📁 Master File Uploader" if is_eng else "📁 ফাইল আপলোড (Master File Uploader)",
     "upload_label": "Upload Image or PDF file" if is_eng else "ছবি বা পিডিএফ ফাইল আপলোড করুন",
-    "menu_header": "🧭 Navigation Menu & Features" if is_eng else "🧭 নেভিগেশন মেনু ও ফিচারের কাজ",
+    "tools_header": "🛠️ ডিজিটাল টুলস ও এডিটর (১-১৪)" if not is_eng else "🛠️ Digital Tools & Editors",
+    "portal_header": "📋 সকল গুরুত্বপূর্ণ অনলাইন লিংক ও পোর্টাল" if not is_eng else "📋 All Important Online Links",
 }
 
 st.markdown(f"""
@@ -112,6 +128,7 @@ st.markdown(f"""
 </div>
 """, unsafe_allow_html=True)
 
+# মেইন ফাইল আপলোডার
 st.markdown(f"### {t['upload_header']}")
 global_file = st.file_uploader(t['upload_label'], type=["jpg", "jpeg", "png", "pdf"])
 st.markdown("---")
@@ -119,17 +136,20 @@ st.markdown("---")
 if 'app_mode' not in st.session_state:
     st.session_state.app_mode = 1
 
-st.sidebar.header(t['menu_header'])
+# ==============================================================================
+# ১ থেকে ১৪ ফটো এডিটিং ও ইউটিলিটি ফিচার মেনু (সাইডবার)
+# ==============================================================================
+st.sidebar.markdown(f"<div class='sidebar-section-title'>{t['tools_header']}</div>", unsafe_allow_html=True)
 
 menu_dict = {
     1: ("✨ ইমেজ ব্রাইটনেস ও কালার এডিটর", "ছবির আলো, ব্রাইটনেস ও কন্ট্রাস্ট ঠিক করার টুল।"),
-    2: ("🎨 স্টুডিও ব্যাকগ্রাউন্ড রিমুভ ও কালার চেঞ্জার", "পাসপোর্ট ছবির ব্যাকগ্রাউন্ড নিখুঁতভাবে রিমুভ করে নতুন কালার দিন।"),
+    2: ("🎨 স্টুডিও ব্যাকগ্রাউন্ড রিমুভ ও কালার চেঞ্জার", "পাসপোর্ট ছবির ব্যাকগ্রাউন্ড নিখুঁতভাবে রিমুভ করুন।"),
     3: ("🆔 আইডি কার্ড ক্রপ ও সোজা করার টুল", "আইডি কার্ড ক্রপ ও নির্দিষ্ট কোণে ঘোরানো।"),
     4: ("🛂 পাসপোর্ট সাইজ ছবি শিট তৈরি (৪ কপি)", "এক ক্লিকে ৪ কপি পাসপোর্ট ছবি শিট তৈরি।"),
     5: ("🎂 বয়স ক্যালকুলেটর (Age Calculator)", "নির্ভুল বয়স ও দিন-মাস হিসাব।"),
     6: ("🧾 দোকানের ক্যাশ মেমো / রশিদ জেনারেটর", "গ্রাহকের বিক্রয় রশিদ ও ক্যাশ মেমো তৈরি।"),
     7: ("🛡️ ডিজিটাল ওয়ারেন্টি কার্ড জেনারেটর", "পণ্যের ডিজিটাল ওয়ারেন্টি কার্ড তৈরি।"),
-    8: ("📜 নাগরিক সনদ (Citizenship Certificate) জেনারেটর", "ইউনিয়ন পরিষদের নাগরিক সনদপত্র তৈরি।"),
+    8: ("📜 নাগরিক সনদ (Citizenship) জেনারেটর", "ইউনিয়ন পরিষদের নাগরিক সনদপত্র তৈরি।"),
     9: ("⚽ টুর্নামেন্ট আমন্ত্রণপত্র ও নিয়মাবলী", "ফুটবল বা ব্যাডমিন্টন টুর্নামেন্ট নোটিশ তৈরি।"),
     10: ("📏 ছবির সাইজ পরিবর্তন ও রিসাইজার", "পিক্সেল অনুযায়ী ছবির সাইজ ছোট-বড় করা।"),
     11: ("⬛ সাদাকালো (Black & White) কনভার্টার", "কালার ছবিকে সাদাকালো করা।"),
@@ -141,13 +161,59 @@ menu_dict = {
 for num, (item_name, desc) in menu_dict.items():
     if st.sidebar.button(item_name, key=f"menu_btn_{num}"):
         st.session_state.app_mode = num
-    st.sidebar.markdown(f"<p style='font-size:11px; color:gray; margin-top:-3px; margin-bottom:8px;'>ℹ️ {desc}</p>", unsafe_allow_html=True)
+    st.sidebar.markdown(f"<p style='font-size:10px; color:gray; margin-top:-2px; margin-bottom:5px;'>ℹ️ {desc}</p>", unsafe_allow_html=True)
 
+
+# ==============================================================================
+# নতুন স্ক্রিনশটের সবকটি সরকারি ও অনলাইন সেবা লিংক (বাটন অনুযায়ী সাজানো)
+# ==============================================================================
+st.sidebar.markdown(f"<div class='sidebar-section-title'>{t['portal_header']}</div>", unsafe_allow_html=True)
+
+st.sidebar.markdown("""
+<div class="link-box">
+    <b>📚 শিক্ষা ও বিশ্ববিদ্যালয় পোর্টাল:</b><br>
+    • উন্মুক্ত বিশ্ববিদ্যালয়: <a href="https://www.bou.ac.bd/" target="_blank">Link</a> | 
+    জাতীয় বিশ্ববিদ্যালয়: <a href="https://www.nu.ac.bd/" target="_blank">Link</a><br>
+    • পাবলিক বিশ্ববিদ্যালয়: <a href="https://www.ugc.gov.bd/" target="_blank">Link</a> | 
+    শিক্ষা বোর্ড: <a href="http://www.educationboard.gov.bd/" target="_blank">Link</a>
+</div>
+
+<div class="link-box">
+    <b>📇 নাগরিক ও পরিচয়পত্র সেবা:</b><br>
+    • জন্ম নিবন্ধন: <a href="https://bdris.gov.bd/" target="_blank">Link</a> | 
+    জাতীয় পরিচয়পত্র (NID): <a href="https://services.nidw.gov.bd/" target="_blank">Link</a><br>
+    • পাসপোর্ট: <a href="https://www.epassport.gov.bd/" target="_blank">Link</a> | 
+    পুলিশ ও নাগরিক: <a href="https://pcc.police.gov.bd/" target="_blank">Link</a>
+</div>
+
+<div class="link-box">
+    <b>🏥 স্বাস্থ্য, শিক্ষা ও অন্যান্য সেবা:</b><br>
+    • টিকা (Surokkha): <a href="https://surokkha.gov.bd/" target="_blank">Link</a> | 
+    মেডিকেল: <a href="https://dghs.gov.bd/" target="_blank">Link</a><br>
+    • টিকেট (Railway/Bus): <a href="https://eticket.railway.gov.bd/" target="_blank">Link</a> | 
+    রেজাল্ট: <a href="http://www.educationboardresults.gov.bd/" target="_blank">Link</a>
+</div>
+
+<div class="link-box">
+    <b>⚡ ইউটিলিটি, প্রবাস ও অন্যান্য:</b><br>
+    • বিদ্যুৎ (BPDB/DESCO): <a href="https://www.bpdb.gov.bd/" target="_blank">Link</a> | 
+    ভাতা: <a href="https://mis.mowca.gov.bd/" target="_blank">Link</a><br>
+    • প্রবাসী ও ভিসা: <a href="https://www.bmet.gov.bd/" target="_blank">Link</a> | 
+    ভূমি সংক্রান্ত: <a href="https://land.gov.bd/" target="_blank">Link</a><br>
+    • ভ্যাট / ই-টিন: <a href="https://etaxnbr.gov.bd/" target="_blank">Link</a> | 
+    মুক্তিযোদ্ধা: <a href="http://www.molwa.gov.bd/" target="_blank">Link</a><br>
+    • লাইসেন্স ও চাকরিজীবী: <a href="https://bangladesh.gov.bd/" target="_blank">Link</a>
+</div>
+""", unsafe_allow_html=True)
+
+st.sidebar.markdown("---")
+st.sidebar.markdown("ℹ️ **Hasanur Computer Studio** | 📞 01743-614359")
+
+
+# ==============================================================================
+# মূল ফিচার হ্যান্ডলিং (App Mode Logic)
+# ==============================================================================
 app_mode = st.session_state.app_mode
-
-# =====================================================================
-# ফিচারসমূহ হ্যান্ডলিং
-# =====================================================================
 
 if app_mode == 1:
     st.header("✨ ইমেজ ব্রাইটনেস ও কালার এডিটর")
@@ -167,45 +233,33 @@ if app_mode == 1:
 
 elif app_mode == 2:
     st.header("🎨 স্টুডিও ব্যাকগ্রাউন্ড রিমুভ ও কালার চেঞ্জার")
-    if global_file is not None:
+    if not has_rembg:
+        st.error("❌ 'rembg' লাইব্রেরিটি ইনস্টল করা নেই।")
+    elif global_file is not None:
         image = Image.open(global_file).convert("RGB")
         st.image(image, caption="মূল ছবি (Original Image)", width=300)
-        
-        st.markdown("### ব্যাকগ্রাউন্ড কালার নির্বাচন করুন:")
-        bg_color_picker = st.color_picker("নতুন ব্যাকগ্রাউন্ড রঙ (যেমন: নীল বা সাদা)", "#1A73E8")
-        
+        bg_color_picker = st.color_picker("নতুন ব্যাকগ্রাউন্ড রঙ নির্বাচন করুন", "#1A73E8")
         if st.button("ব্যাকগ্রাউন্ড পরিবর্তন করুন"):
-            with st.spinner("এআই দিয়ে ব্যাকগ্রাউন্ড রিমুভ করা হচ্ছে, অপেক্ষা করুন..."):
+            with st.spinner("প্রসেসিং হচ্ছে..."):
                 try:
-                    # বাইট রিড করে rembg দিয়ে ব্যাকগ্রাউন্ড রিমুভ
                     bytes_data = global_file.getvalue()
                     output_bytes = remove(bytes_data)
-                    
-                    # ট্রান্সপারেন্ট ছবি ওপেন করা
                     img_rgba = Image.open(io.BytesIO(output_bytes)).convert("RGBA")
-                    
-                    # হেক্স কালারকে RGB তে রূপান্তর
                     h_hex = bg_color_picker.lstrip('#')
                     new_rgb = tuple(int(h_hex[i:i+2], 16) for i in (0, 2, 4))
-                    
-                    # নতুন ব্যাকগ্রাউন্ড তৈরি
                     background = Image.new("RGBA", img_rgba.size, new_rgb + (255,))
-                    
-                    # ব্যাকগ্রাউন্ডের উপর মূল মানুষটিকে বসানো
                     final_img = Image.alpha_composite(background, img_rgba).convert("RGB")
-                    
-                    st.image(final_img, use_container_width=True, caption="নিখুঁত ব্যাকগ্রাউন্ড পরিবর্তিত ছবি")
-                    
+                    st.image(final_img, use_container_width=True, caption="ব্যাকগ্রাউন্ড পরিবর্তিত ছবি")
                     buf = io.BytesIO()
                     final_img.save(buf, format="JPEG", quality=95)
-                    st.download_button("Download Studio Image", buf.getvalue(), "studio_bg.jpg", "image/jpeg", key="dl_bg")
+                    st.download_button("Download Image", buf.getvalue(), "studio_bg.jpg", "image/jpeg", key="dl_bg")
                 except Exception as e:
-                    st.error(f"ত্রুটি দেখা দিয়েছে: {e}")
+                    st.error(f"ত্রুটি: {e}")
     else:
         st.warning("দয়া করে ছবি আপলোড করুন।")
 
 elif app_mode == 3:
-    st.header("🆔 আইডি কার্ড ক্রপ ও রোটেশন টুল")
+    st.header("🆔 আইডি কার্ড ক্রপ ও সোজা করার টুল")
     if global_file is not None:
         img = Image.open(global_file)
         rotation = st.slider("Rotate Image", -180, 180, 0)
@@ -214,12 +268,12 @@ elif app_mode == 3:
         st.image(img, use_container_width=True)
         buf = io.BytesIO()
         img.save(buf, format="JPEG", quality=95)
-        st.download_button("Download Image", buf.getvalue(), "id_card.jpg", "image/jpeg", key="dl_3")
+        st.download_button("Download", buf.getvalue(), "id_card.jpg", "image/jpeg", key="dl_3")
     else:
         st.warning("দয়া করে ছবি আপলোড করুন।")
 
 elif app_mode == 4:
-    st.header("🛂 পাসপোর্ট সাইজ ছবি শিট (৪ কপি)")
+    st.header("🛂 পাসপোর্ট সাইজ ছবি শিট তৈরি (৪ কপি)")
     if global_file is not None:
         img = Image.open(global_file).resize((300, 350))
         sheet = Image.new("RGB", (650, 750), (255, 255, 255))
@@ -230,12 +284,12 @@ elif app_mode == 4:
         st.image(sheet, use_container_width=True)
         buf = io.BytesIO()
         sheet.save(buf, format="JPEG", quality=95)
-        st.download_button("Download Sheet", buf.getvalue(), "passport_sheet.jpg", "image/jpeg", key="dl_4")
+        st.download_button("Download", buf.getvalue(), "passport_sheet.jpg", "image/jpeg", key="dl_4")
     else:
         st.warning("দয়া করে ছবি আপলোড করুন।")
 
 elif app_mode == 5:
-    st.header("🎂 বয়স ক্যালকুলেটর")
+    st.header("🎂 বয়স ক্যালকুলেটর (Age Calculator)")
     col1, col2 = st.columns(2)
     with col1:
         birth_date = st.date_input("Select Birth Date", date(1995, 1, 1))
@@ -254,13 +308,13 @@ elif app_mode == 5:
         st.success(f"🎉 বয়স: **{years} বছর, {months} মাস, এবং {days} দিন**")
 
 elif app_mode == 6:
-    st.header("🧾 দোকানের ক্যাশ মেমো জেনারেটর")
-    cust_name = st.text_input("Customer Name", "Md. Rahim")
-    cust_phone = st.text_input("Phone Number", "01700000000")
+    st.header("🧾 দোকানের ক্যাশ মেমো / রশিদ জেনারেটর")
+    c_name = st.text_input("Customer Name", "Md. Rahim")
+    c_phone = st.text_input("Phone Number", "01700000000")
     col1, col2 = st.columns(2)
     with col1:
-        item1 = st.text_input("Item Name", "Lamination & Print")
-        price1 = st.number_input("Price (TK)", 0, 10000, 150)
+        item1 = st.text_input("Item 1 Name", "Lamination & Print")
+        price1 = st.number_input("Price 1 (TK)", 0, 10000, 150)
     with col2:
         item2 = st.text_input("Item 2 Name", "Online Form Fillup")
         price2 = st.number_input("Price 2 (TK)", 0, 10000, 200)
@@ -271,7 +325,7 @@ elif app_mode == 6:
             <h3 style="text-align:center; color:#0B50FA; margin:0;">Hasanur Computer Studio</h3>
             <p style="text-align:center; font-size:12px;">Dighirpar, Monirampur, Jashore</p>
             <hr>
-            <p><b>Customer:</b> {cust_name} | <b>Mobile:</b> {cust_phone}</p>
+            <p><b>Customer:</b> {c_name} | <b>Mobile:</b> {c_phone}</p>
             <p><b>Date:</b> {date.today().strftime('%d-%m-%Y')}</p>
             <p>1. {item1} - <b>{price1} TK</b></p>
             <p>2. {item2} - <b>{price2} TK</b></p>
@@ -282,25 +336,25 @@ elif app_mode == 6:
 
 elif app_mode == 7:
     st.header("🛡️ ডিজিটাল ওয়ারেন্টি কার্ড জেনারেটর")
-    p_name = st.text_input("Product Name", "HP Printer")
-    buyer = st.text_input("Buyer Name", "Hasan Ali")
+    st.text_input("Product Name", "HP Printer")
+    st.text_input("Buyer Name", "Hasan Ali")
     if st.button("Generate Card"):
-        st.success(f"Warranty card generated successfully for {p_name}!")
+        st.success("Warranty card generated successfully!")
 
 elif app_mode == 8:
     st.header("📜 নাগরিক সনদপত্র জেনারেটর")
-    c_name = st.text_input("Applicant Name", "Al-Amin")
+    st.text_input("Applicant Name", "Al-Amin")
     if st.button("Generate Certificate"):
-        st.success(f"Citizenship certificate generated for {c_name}!")
+        st.success("Citizenship certificate generated!")
 
 elif app_mode == 9:
-    st.header("⚽ টুর্নামেন্ট আমন্ত্রণপত্র")
+    st.header("⚽ টুর্নামেন্ট আমন্ত্রণপত্র ও নিয়মাবলী")
     st.text_input("Tournament Name", "Premier League")
     if st.button("Generate Notice"):
         st.success("Tournament notice generated!")
 
 elif app_mode == 10:
-    st.header("📏 ছবির সাইজ পরিবর্তন")
+    st.header("📏 ছবির সাইজ পরিবর্তন ও রিসাইজার")
     if global_file is not None:
         img = Image.open(global_file)
         w = st.slider("Width", 100, 2000, img.width)
@@ -314,7 +368,7 @@ elif app_mode == 10:
         st.warning("দয়া করে ছবি আপলোড করুন।")
 
 elif app_mode == 11:
-    st.header("⬛ সাদাকালো ছবি কনভার্টার")
+    st.header("⬛ সাদাকালো (Black & White) কনভার্টার")
     if global_file is not None:
         img = Image.open(global_file).convert("L")
         st.image(img, use_container_width=True)
@@ -325,7 +379,7 @@ elif app_mode == 11:
         st.warning("দয়া করে ছবি আপলোড করুন।")
 
 elif app_mode == 12:
-    st.header("🔄 ছবি ঘোরানো (Rotate)")
+    st.header("🔄 ছবি ঘোরানো (Rotate & Flip)")
     if global_file is not None:
         img = Image.open(global_file)
         rot = st.selectbox("Angle", [90, 180, 270])
@@ -338,7 +392,7 @@ elif app_mode == 12:
         st.warning("দয়া করে ছবি আপলোড করুন।")
 
 elif app_mode == 13:
-    st.header("💧 ওয়াটারমার্ক টুল")
+    st.header("💧 ওয়াটারমার্ক যুক্ত করার টুল")
     if global_file is not None:
         st.image(Image.open(global_file), use_container_width=True)
         st.success("Watermark tool ready.")
@@ -346,7 +400,7 @@ elif app_mode == 13:
         st.warning("দয়া করে ছবি আপলোড করুন।")
 
 elif app_mode == 14:
-    st.header("📄 পিডিএফ টেক্সট এক্সট্র্যাক্ট")
+    st.header("📄 পিডিএফ টেক্সট এক্সট্র্যাক্ট টুল")
     if global_file is not None:
         try:
             reader = PdfReader(global_file)
@@ -356,67 +410,3 @@ elif app_mode == 14:
             st.error(f"Error: {e}")
     else:
         st.warning("দয়া করে একটি পিডিএফ ফাইল আপলোড করুন।")
-
-# =========================================================================
-# ক্যাটাগরি ও সমস্ত সার্ভিস লিংক ডিরেক্টরি
-# =========================================================================
-st.markdown("---")
-st.header("🌐 " + ("Complete Government & Online Service Directory" if is_eng else "সকল ক্যাটাগরি ভিত্তিক সরকারি ও অনলাইন সার্ভিস ডিরেক্টরি"))
-
-col_a, col_b = st.columns(2)
-
-with col_a:
-    st.markdown("""
-    <div class="link-box">
-        <h4>🏛️ উন্মুক্ত বিশ্ববিদ্যালয় (Open University)</h4>
-        <p><b>লিংক:</b> <a href="https://www.bou.ac.bd/" target="_blank">BOU Official Website</a></p>
-    </div>
-    <div class="link-box">
-        <h4>📜 জন্ম নিবন্ধন (Birth Registration)</h4>
-        <p><b>লিংক:</b> <a href="https://bdris.gov.bd/" target="_blank">BDRIS Portal</a></p>
-    </div>
-    <div class="link-box">
-        <h4>📇 জাতীয় পরিচয়পত্র (NID Services)</h4>
-        <p><b>লিংক:</b> <a href="https://services.nidw.gov.bd/" target="_blank">NID Card Portal</a></p>
-    </div>
-    <div class="link-box">
-        <h4>🎓 জাতীয় বিশ্ববিদ্যালয় (National University)</h4>
-        <p><b>লিংক:</b> <a href="https://www.nu.ac.bd/" target="_blank">NU Portal & Admissions</a></p>
-    </div>
-    <div class="link-box">
-        <h4>💉 টিকা (Vaccination Portal)</h4>
-        <p><b>লিংক:</b> <a href="https://surokkha.gov.bd/" target="_blank">Surokkha Vaccine Registration</a></p>
-    </div>
-    <div class="link-box">
-        <h4>🎫 টিকেট (Railway & Bus Tickets)</h4>
-        <p><b>লিংক:</b> <a href="https://eticket.railway.gov.bd/" target="_blank">Bangladesh Railway E-Ticket</a></p>
-    </div>
-    """, unsafe_allow_html=True)
-
-with col_b:
-    st.markdown("""
-    <div class="link-box">
-        <h4>🏫 পাবলিক বিশ্ববিদ্যালয় (Public Universities)</h4>
-        <p><b>লিংক:</b> <a href="https://uccas.gov.bd/" target="_blank">UG Admission Portal</a></p>
-    </div>
-    <div class="link-box">
-        <h4>🛂 পাসপোর্ট (e-Passport Portal)</h4>
-        <p><b>লিংক:</b> <a href="https://www.epassport.gov.bd/" target="_blank">Online e-Passport Application</a></p>
-    </div>
-    <div class="link-box">
-        <h4>👮 পুলিশ ও নাগরিক (Police Clearance)</h4>
-        <p><b>লিংক:</b> <a href="https://pcc.police.gov.bd/" target="_blank">Police Clearance Certificate Portal</a></p>
-    </div>
-    <div class="link-box">
-        <h4>✈️ প্রবাসী (BMET & Expatriates Welfare)</h4>
-        <p><b>লিংক:</b> <a href="https://www.bmet.gov.bd/" target="_blank">BMET Portal & Smart Card</a></p>
-    </div>
-    <div class="link-box">
-        <h4>📝 প্রবেশপত্র (Admit Card & Exam Portals)</h4>
-        <p><b>লিংক:</b> <a href="http://www.teletalk.com.bd/" target="_blank">Teletalk Job Portal</a></p>
-    </div>
-    <div class="link-box">
-        <h4>⚡ বিদ্যুৎ (Electricity Bill Pay)</h4>
-        <p><b>লিংক:</b> <a href="https://www.bpdb.gov.bd/" target="_blank">BPDB Portal</a></p>
-    </div>
-    """, unsafe_allow_html=True)
