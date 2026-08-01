@@ -88,7 +88,7 @@ for num, (item_name, desc) in menu_dict.items():
 
 app_mode = st.session_state.app_mode
 
-# A4 সাইজ পেপার এবং প্রিন্ট কনফিগারেশনসহ ডেডিকেটেড ফাংশন
+# নিখুঁত A4 সাইজ এবং মার্জিনসহ প্রিন্ট ফাংশন
 def print_content_html(html_content, button_text):
     full_html = f"""
     <!DOCTYPE html>
@@ -105,15 +105,18 @@ def print_content_html(html_content, button_text):
                 flex-direction: column;
                 align-items: center;
             }}
-            /* A4 পেপার স্টাইল (210mm x 297mm) */
+            /* নিখুঁত A4 পেপার সাইজ (210mm x 297mm) */
             .a4-page {{
                 background: white;
                 width: 210mm;
-                min-height: 297mm;
-                padding: 20mm 20mm;
+                height: 297mm;
+                padding: 12mm 15mm;
                 margin: 0 auto 20px auto;
-                box-shadow: 0 0 10px rgba(0,0,0,0.3);
+                box-shadow: 0 0 15px rgba(0,0,0,0.4);
                 box-sizing: border-box;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
                 position: relative;
             }}
             @media print {{
@@ -127,10 +130,11 @@ def print_content_html(html_content, button_text):
                 .a4-page {{
                     box-shadow: none;
                     margin: 0;
-                    width: 100%;
-                    min-height: 100vh;
-                    padding: 15mm;
+                    width: 210mm;
+                    height: 297mm;
+                    padding: 12mm 15mm;
                     page-break-after: avoid;
+                    page-break-inside: avoid;
                 }}
                 @page {{
                     size: A4;
@@ -225,7 +229,7 @@ if app_mode == 6:
             """
 
         memo_html_code = f"""
-        <div style='border: 2px solid #0B50FA; padding: 30px; border-radius: 8px; height: 100%; display: flex; flex-direction: column; justify-content: space-between; box-sizing: border-box;'>
+        <div style='border: 2px solid #0B50FA; padding: 25px; border-radius: 8px; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: space-between; box-sizing: border-box;'>
             <div>
                 <h2 style='text-align: center; color: #0B50FA; margin: 0; font-size: 26px;'>{shop_name}</h2>
                 <p style='text-align: center; font-size: 14px; color: #333; margin: 6px 0;'>{shop_address}</p>
@@ -263,7 +267,7 @@ if app_mode == 6:
                 </div>
             </div>
             
-            <table style="width: 100%; margin-top: 50px; font-size: 15px;">
+            <table style="width: 100%; margin-top: 30px; font-size: 15px;">
                 <tr>
                     <td><div style='border-top: 1px dashed black; width: 180px; text-align: center; padding-top: 6px;'>গ্রাহকের স্বাক্ষর</div></td>
                     <td style="text-align: right;"><div style='border-top: 1px solid black; width: 200px; text-align: center; padding-top: 6px; font-weight: bold; display: inline-block;'>বিক্রেতার স্বাক্ষর / সিল</div></td>
@@ -294,23 +298,23 @@ elif app_mode == 8:
         st.success("✅ নাগরিক সনদপত্র সম্পূর্ণ A4 পেজে প্রস্তুত!")
         
         cert_html_code = f"""
-        <div style='border: 6px double #0B50FA; padding: 40px; border-radius: 12px; height: 100%; display: flex; flex-direction: column; justify-content: space-between; box-sizing: border-box; background-color: #ffffff;'>
+        <div style='border: 6px double #0B50FA; padding: 35px; border-radius: 12px; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: space-between; box-sizing: border-box; background-color: #ffffff;'>
             <div>
                 <div style="text-align:center;">
-                    <h2 style="color:#0B50FA; margin:0; font-size: 28px; font-weight: bold;">ইউনিয়ন পরিষদ কার্যালয়</h2>
+                    <h2 style="color:#0B50FA; margin:0; font-size: 28px; font-weight: bold;">{cit_union} কার্যালয়</h2>
                     <p style="font-size:15px; margin:6px 0; color:#333;">দিঘীরপাড়, মনিরামপুর, যশোর।</p>
                     <hr style="border:1px solid #0B50FA; width:45%; margin: 15px auto;">
                     <h3 style="background:#0B50FA; color:white; display:inline-block; padding:6px 25px; border-radius:5px; margin-top:10px; font-size: 20px;">নাগরিক সনদপত্র</h3>
                 </div>
                 
-                <p style="font-size:17px; line-height:2.4; text-align:justify; margin-top:50px;">
+                <p style="font-size:17px; line-height:2.4; text-align:justify; margin-top:40px;">
                     এই মর্মে প্রত্যয়ন করা যাইতেছে যে, <b>{cit_name}</b>, পিতা: <b>{cit_father}</b>, মাতা: <b>{cit_mother}</b>, গ্রাম: <b>{cit_vill}</b>, {cit_word}, উপজেলা: মণিরামপুর, জেলা: যশোর এর অত্র ইউনিয়নের একজন স্থায়ী বাসিন্দা এবং জন্মসূত্রে বাংলাদেশের নাগরিক। আমার জানামতে তিনি দেশবিরোধী বা রাষ্ট্রবিরোধী কোনো কাজের সাথে জড়িত নন এবং তার চরিত্র অত্যন্ত ভালো।
                 </p>
                 
-                <p style="font-size:17px; margin-top:35px; line-height: 1.8;">আমি তার সর্বাঙ্গীন সাফল্য ও দীর্ঘায়ু কামনা করি।</p>
+                <p style="font-size:17px; margin-top:30px; line-height: 1.8;">আমি তার সর্বাঙ্গীন সাফল্য ও দীর্ঘায়ু কামনা করি।</p>
             </div>
             
-            <table style="width: 100%; margin-top: 80px; font-size: 15px;">
+            <table style="width: 100%; margin-top: 40px; font-size: 15px;">
                 <tr>
                     <td><div style="border-top:1px dashed black; width: 180px; text-align: center; padding-top:8px;">আবেদনকারীর স্বাক্ষর</div></td>
                     <td style="text-align: right;"><div style="border-top:1px solid black; width: 180px; text-align: center; padding-top:8px; font-weight:bold; display: inline-block;">চেয়ারম্যান</div></td>
@@ -335,7 +339,7 @@ elif app_mode == 9:
         st.success("✅ টুর্নামেন্ট আমন্ত্রণপত্র সম্পূর্ণ A4 পেজে প্রস্তুত!")
         
         notice_html_code = f"""
-        <div style='border: 4px solid #ff4b4b; padding: 35px; border-radius: 10px; height: 100%; display: flex; flex-direction: column; justify-content: space-between; box-sizing: border-box; background-color: #ffffff;'>
+        <div style='border: 4px solid #ff4b4b; padding: 30px; border-radius: 10px; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: space-between; box-sizing: border-box; background-color: #ffffff;'>
             <div>
                 <div style="text-align:center;">
                     <h2 style="color:#ff4b4b; margin:0; font-size: 24px;">🏆 টুর্নামেন্ট আমন্ত্রণপত্র ও নোটিশ 🏆</h2>
@@ -343,16 +347,16 @@ elif app_mode == 9:
                     <hr style="border:1px solid #ff4b4b; width:55%; margin: 12px auto;">
                 </div>
                 
-                <p style="font-size:16px; line-height:2; margin-top:30px; text-align:center;">
+                <p style="font-size:16px; line-height:2; margin-top:25px; text-align:center;">
                     সকল ক্রীড়াপ্রেমী ও দলের অবগতির জন্য জানানো যাচ্ছে যে, আগামী <b>{t_date}</b> তারিখে স্থানীয় মাঠে জমকালো আয়োজনের মাধ্যমে এই টুর্নামেন্ট শুরু হতে যাচ্ছে। আপনি বা আপনার দল এই প্রতিযোগিতায় স্বতঃস্ফূর্তভাবে অংশগ্রহণ করার জন্য আমন্ত্রিত।
                 </p>
                 
-                <div style="background:#f8f9fa; padding:15px; border-radius:6px; border-left:5px solid #ff4b4b; margin-top:25px;">
+                <div style="background:#f8f9fa; padding:15px; border-radius:6px; border-left:5px solid #ff4b4b; margin-top:20px;">
                     <h4 style="margin:0 0 8px 0; color:#333; font-size: 16px;">🎁 আকর্ষণীয় পুরস্কারসমূহ:</h4>
                     <p style="margin:0; font-size:15px; font-weight:bold; color:red;">{t_prize}</p>
                 </div>
                 
-                <div style="margin-top:25px;">
+                <div style="margin-top:20px;">
                     <h4 style="color:#333; margin-bottom:8px; font-size: 16px;">📋 প্রধান নিয়মাবলী:</h4>
                     <ol style="font-size:14px; line-height:1.8; margin:0; padding-left:20px;">
                         <li>ম্যাচ শুরুর নির্ধারিত সময়ের ১৫ মিনিট পূর্বে মাঠে উপস্থিত থাকতে হবে।</li>
@@ -363,7 +367,7 @@ elif app_mode == 9:
                 </div>
             </div>
             
-            <table style="width: 100%; margin-top: 60px; font-size: 15px;">
+            <table style="width: 100%; margin-top: 30px; font-size: 15px;">
                 <tr>
                     <td><div style="border-top:1px dashed black; width: 180px; text-align: center; padding-top:8px;">আয়োজক কমিটি</div></td>
                     <td style="text-align: right;"><div style="border-top:1px solid black; width: 180px; text-align: center; padding-top:8px; font-weight:bold; display: inline-block;">প্রধান সমন্বয়ক</div></td>
