@@ -7,12 +7,6 @@ from pypdf import PdfReader
 from datetime import date
 import streamlit.components.v1.components as components
 
-try:
-    from rembg import remove
-    has_rembg = True
-except ImportError:
-    has_rembg = False
-
 st.set_page_config(page_title="হাসানুর কম্পিউটার স্টুডিও", layout="wide")
 
 # ==============================================================================
@@ -54,17 +48,20 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# আপনার ছবি লোড করে বেসসিকে কনভার্ট করার কোড
+# আপনার প্রদত্ত ছবিটিকে সরাসরি কোডের ভেতর থেকে বেসসিকে কনভার্ট করার জন্য
 import base64
-def get_image_base64(image_path):
-    try:
-        with open(image_path, "rb") as img_file:
-            return base64.b64encode(img_file.read()).decode()
-    except Exception:
-        return ""
+from pathlib import Path
 
-img_b64 = get_image_base64("hasanur.jpg")
-img_tag = f'<img src="data:image/jpeg;base64,{img_b64}" style="width: 75px; height: 75px; border-radius: 50%; object-fit: cover; border: 3px solid white; box-shadow: 0 4px 10px rgba(0,0,0,0.3); vertical-align: middle; margin-right: 15px;">' if img_b64 else '👤'
+# আপনার ছবি যদি hasanur.jpeg নামে সেভ করা থাকে তবে সেটি স্বয়ংক্রিয়ভাবে রিড করবে
+def get_embedded_image():
+    image_path = "hasanur.jpeg"
+    if Path(image_path).exists():
+        with open(image_path, "rb") as img_file:
+            encoded = base64.b64encode(img_file.read()).decode()
+            return f'<img src="data:image/jpeg;base64,{encoded}" style="width: 75px; height: 75px; border-radius: 50%; object-fit: cover; border: 3px solid white; box-shadow: 0 4px 10px rgba(0,0,0,0.3); vertical-align: middle; margin-right: 15px;">'
+    return '👤'
+
+img_tag = get_embedded_image()
 
 # হেডার সেকশন (আপনার ছবিসহ)
 st.markdown(f"""
@@ -417,7 +414,7 @@ elif app_mode == 9:
 
 
 # ==============================================================================
-# মোড ১০: অনলাইন সরকারি ও প্রয়োজনীয় লিংকসমূহ (ক্যাটাগরি অনুযায়ী সাজানো)
+# মোড ১০: অনলাইন সরকারি ও প্রয়োজনীয় লিংকসমূহ 
 # ==============================================================================
 elif app_mode == 10:
     st.header("🔗 অনলাইন সরকারি ও প্রয়োজনীয় লিংকসমূহ")
