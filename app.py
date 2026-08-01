@@ -117,7 +117,8 @@ t = {
     "upload_header": "📁 Master File Uploader" if is_eng else "📁 ফাইল আপলোড (Master File Uploader)",
     "upload_label": "Upload Image or PDF file" if is_eng else "ছবি বা পিডিএফ ফাইল আপলোড করুন",
     "tools_header": "🛠️ ডিজিটাল টুলস ও এডিটর (১-১৪)" if not is_eng else "🛠️ Digital Tools & Editors",
-    "portal_header": "📋 সকল গুরুত্বপূর্ণ অনলাইন লিংক ও পোর্টাল" if not is_eng else "📋 All Important Online Links",
+    "result_header": "📊 রেজাল্ট ও মার্কশিট পোর্টাল (ক্লাস ৫ থেকে সর্বোচ্চ)" if not is_eng else "📊 Result & Marksheet Portal",
+    "portal_header": "📋 অন্যান্য গুরুত্বপূর্ণ অনলাইন লিংক ও পোর্টাল" if not is_eng else "📋 All Important Online Links",
 }
 
 st.markdown(f"""
@@ -165,19 +166,46 @@ for num, (item_name, desc) in menu_dict.items():
 
 
 # ==============================================================================
-# নতুন স্ক্রিনশটের সবকটি সরকারি ও অনলাইন সেবা লিংক (বাটন অনুযায়ী সাজানো)
+# নতুন ক্যাটাগরি: ক্লাস ৫ থেকে সর্বোচ্চ ক্লাস পর্যন্ত মার্কশিট ও রেজাল্ট পোর্টাল
+# ==============================================================================
+st.sidebar.markdown(f"<div class='sidebar-section-title'>{t['result_header']}</div>", unsafe_allow_html=True)
+
+st.sidebar.markdown("""
+<div class="link-box">
+    <b>🎓 পিএসসি, জেএসসি, এসএসসি ও এইচএসসি (মার্কশিট সহ):</b><br>
+    • অফিশিয়াল রেজাল্ট পোর্টাল: <a href="http://www.educationboardresults.gov.bd/" target="_blank">Web Link</a><br>
+    • শিক্ষা বোর্ড মার্কশিট কর্নার: <a href="https://eboardresults.com/" target="_blank">E-Board Marksheet</a>
+</div>
+
+<div class="link-box">
+    <b>🏫 প্রাথমিক শিক্ষা সমাপনী (PEC / Class 5):</b><br>
+    • প্রাথমিক শিক্ষা অধিদপ্তর: <a href="http://www.dpe.gov.bd/" target="_blank">DPE Portal</a>
+</div>
+
+<div class="link-box">
+    <b>🏛️ জাতীয় বিশ্ববিদ্যালয় (অনার্স, মাস্টার্স, ডিগ্রি):</b><br>
+    • এনইউ রেজাল্ট পোর্টাল: <a href="http://results.nu.ac.bd/" target="_blank">NU Results</a> | 
+    স্টুডেন্ট পোর্টাল: <a href="http://www.nu.ac.bd/" target="_blank">NU Portal</a>
+</div>
+
+<div class="link-box">
+    <b>📚 উন্মুক্ত বিশ্ববিদ্যালয় (SSC, HSC, BA, BSS):</b><br>
+    • বাউবি এক্সাম রেজাল্ট: <a href="https://www.bou.ac.bd/" target="_blank">BOU Portal</a>
+</div>
+
+<div class="link-box">
+    <b>🎓 পাবলিক ও অন্যান্য উচ্চশিক্ষা:</b><br>
+    • ইউজিসি (UGC) পোর্টাল: <a href="https://www.ugc.gov.bd/" target="_blank">UGC Link</a>
+</div>
+""", unsafe_allow_html=True)
+
+
+# ==============================================================================
+# অন্যান্য গুরুত্বপূর্ণ অনলাইন লিংক ও পোর্টাল
 # ==============================================================================
 st.sidebar.markdown(f"<div class='sidebar-section-title'>{t['portal_header']}</div>", unsafe_allow_html=True)
 
 st.sidebar.markdown("""
-<div class="link-box">
-    <b>📚 শিক্ষা ও বিশ্ববিদ্যালয় পোর্টাল:</b><br>
-    • উন্মুক্ত বিশ্ববিদ্যালয়: <a href="https://www.bou.ac.bd/" target="_blank">Link</a> | 
-    জাতীয় বিশ্ববিদ্যালয়: <a href="https://www.nu.ac.bd/" target="_blank">Link</a><br>
-    • পাবলিক বিশ্ববিদ্যালয়: <a href="https://www.ugc.gov.bd/" target="_blank">Link</a> | 
-    শিক্ষা বোর্ড: <a href="http://www.educationboard.gov.bd/" target="_blank">Link</a>
-</div>
-
 <div class="link-box">
     <b>📇 নাগরিক ও পরিচয়পত্র সেবা:</b><br>
     • জন্ম নিবন্ধন: <a href="https://bdris.gov.bd/" target="_blank">Link</a> | 
@@ -187,22 +215,17 @@ st.sidebar.markdown("""
 </div>
 
 <div class="link-box">
-    <b>🏥 স্বাস্থ্য, শিক্ষা ও অন্যান্য সেবা:</b><br>
+    <b>🏥 স্বাস্থ্য, টিকিট ও অন্যান্য সেবা:</b><br>
     • টিকা (Surokkha): <a href="https://surokkha.gov.bd/" target="_blank">Link</a> | 
-    মেডিকেল: <a href="https://dghs.gov.bd/" target="_blank">Link</a><br>
-    • টিকেট (Railway/Bus): <a href="https://eticket.railway.gov.bd/" target="_blank">Link</a> | 
-    রেজাল্ট: <a href="http://www.educationboardresults.gov.bd/" target="_blank">Link</a>
+    রেলওয়ে টিকিট: <a href="https://eticket.railway.gov.bd/" target="_blank">Link</a>
 </div>
 
 <div class="link-box">
     <b>⚡ ইউটিলিটি, প্রবাস ও অন্যান্য:</b><br>
-    • বিদ্যুৎ (BPDB/DESCO): <a href="https://www.bpdb.gov.bd/" target="_blank">Link</a> | 
+    • বিদ্যুৎ (BPDB): <a href="https://www.bpdb.gov.bd/" target="_blank">Link</a> | 
     ভাতা: <a href="https://mis.mowca.gov.bd/" target="_blank">Link</a><br>
-    • প্রবাসী ও ভিসা: <a href="https://www.bmet.gov.bd/" target="_blank">Link</a> | 
-    ভূমি সংক্রান্ত: <a href="https://land.gov.bd/" target="_blank">Link</a><br>
-    • ভ্যাট / ই-টিন: <a href="https://etaxnbr.gov.bd/" target="_blank">Link</a> | 
-    মুক্তিযোদ্ধা: <a href="http://www.molwa.gov.bd/" target="_blank">Link</a><br>
-    • লাইসেন্স ও চাকরিজীবী: <a href="https://bangladesh.gov.bd/" target="_blank">Link</a>
+    • ভূমি সংক্রান্ত: <a href="https://land.gov.bd/" target="_blank">Link</a> | 
+    ভ্যাট / ই-টিন: <a href="https://etaxnbr.gov.bd/" target="_blank">Link</a>
 </div>
 """, unsafe_allow_html=True)
 
