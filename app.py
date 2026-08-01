@@ -152,7 +152,7 @@ menu_dict = {
     6: ("🧾 দোকানের ক্যাশ মেমো / রশিদ জেনারেটর", "গ্রাহকের বিক্রয় রশিদ ও ক্যাশ মেমো তৈরি।"),
     7: ("🛡️ ডিজিটাল ওয়ারেন্টি কার্ড জেনারেটর", "পণ্যের ডিজিটাল ওয়ারেন্টি কার্ড তৈরি।"),
     8: ("📜 নাগরিক সনদ (Citizenship) জেনারেটর", "ইউনিয়ন পরিষদের নাগরিক সনদপত্র তৈরি।"),
-    9: ("⚽ টুর্নামেন্ট আমন্ত্রণপত্র ও নিয়মাবলী", "ফুটবল বা ব্যাডমিন্টন টুর্নামেন্ট নোটিশ তৈরি।"),
+    9: ("⚽ টুর্নামেন্ট আমন্ত্রণপত্র ও নিয়মাবলী", "ফুটবল বা ক্রিকেট টুর্নামেন্ট নোটিশ ও নিয়ম তৈরি।"),
     10: ("📏 ছবির সাইজ পরিবর্তন ও রিসাইজার", "পিক্সেল অনুযায়ী ছবির সাইজ ছোট-বড় করা।"),
     11: ("⬛ সাদাকালো (Black & White) কনভার্টার", "কালার ছবিকে সাদাকালো করা।"),
     12: ("🔄 ছবি ঘোরানো (Rotate & Flip)", "ছবি বিভিন্ন এঙ্গেলে ঘোরানো।"),
@@ -167,7 +167,7 @@ for num, (item_name, desc) in menu_dict.items():
 
 
 # ==============================================================================
-# নতুন সংযোজন: সরকারি ও বেসরকারি চাকরির পোর্টাল ক্যাটাগরি
+# সরকারি ও বেসরকারি চাকরির পোর্টাল ক্যাটাগরি
 # ==============================================================================
 st.sidebar.markdown(f"<div class='sidebar-section-title'>{t['job_header']}</div>", unsafe_allow_html=True)
 
@@ -223,7 +223,7 @@ st.sidebar.markdown("""
 
 # ==============================================================================
 # অন্যান্য গুরুত্বপূর্ণ অনলাইন লিংক ও পোর্টাল
-# ==============================================================================
+...
 st.sidebar.markdown(f"<div class='sidebar-section-title'>{t['portal_header']}</div>", unsafe_allow_html=True)
 
 st.sidebar.markdown("""
@@ -386,16 +386,98 @@ elif app_mode == 7:
         st.success("Warranty card generated successfully!")
 
 elif app_mode == 8:
-    st.header("📜 নাগরিক সনদপত্র জেনারেটর")
-    st.text_input("Applicant Name", "Al-Amin")
-    if st.button("Generate Certificate"):
-        st.success("Citizenship certificate generated!")
+    st.header("📜 নাগরিক সনদপত্র জেনারেটর (Citizenship Certificate)")
+    col1, col2 = st.columns(2)
+    with col1:
+        cit_name = st.text_input("আবেদনকারীর নাম (Applicant Name)", "মোঃ রফিকুল ইসলাম")
+        cit_father = st.text_input("পিতার নাম (Father's Name)", "মোঃ আব্দুল জব্বার")
+        cit_mother = st.text_input("মাতার নাম (Mother's Name)", "মোছাঃ মরিয়ম বেগম")
+    with col2:
+        cit_nid = st.text_input("এনআইডি / জন্ম নিবন্ধন নম্বর (NID/Birth No)", "19954125487123654")
+        cit_village = st.text_input("গ্রাম / মহল্লা (Village)", "দিঘীরপাড়")
+        cit_ward = st.text_input("ওয়ার্ড নম্বর ও ইউনিয়ন (Ward & Union)", "ওয়ার্ড নং- ০৪, ঝাঁপা ইউনিয়ন")
+
+    if st.button("নাগরিক সনদ জেনারেট করুন"):
+        certificate_html = f"""
+        <div style="background:#ffffff; padding:30px; border:6px double #0B50FA; border-radius:12px; color:black; font-family: Arial, sans-serif;">
+            <div style="text-align:center;">
+                <h2 style="color:#0B50FA; margin:0;">ইউনিয়ন পরিষদ কার্যালয়</h2>
+                <p style="font-size:14px; margin:2px 0;">{cit_ward}, মনিরামপুর, যশোর।</p>
+                <hr style="border: 1px solid #0B50FA; width:60%;">
+                <h3 style="background:#0B50FA; color:white; display:inline-block; padding:5px 20px; border-radius:5px; margin:10px 0;">নাগরিক সনদপত্র</h3>
+            </div>
+            <p style="text-align: right; font-size: 13px;">তারিখ: {date.today().strftime('%d-%m-%Y')}</p>
+            <p style="font-size: 15px; line-height: 1.8; text-align: justify; margin-top: 20px;">
+                এই মর্মে প্রত্যয়ন করা যাইতেছে যে, <b>{cit_name}</b>, 
+                পিতা: <b>{cit_father}</b>, 
+                মাতা: <b>{cit_mother}</b>, 
+                এনআইডি/জন্ম সনদ নম্বর: <b>{cit_nid}</b>, 
+                সাং: <b>{cit_village}</b>, 
+                ডাকঘর: মনিরামপুর, উপজেলা: মনিরামপুর, জেলা: যশোর। 
+                তিনি অত্র ইউনিয়নের একজন স্থায়ী বাসিন্দা এবং জন্মসূত্রে বাংলাদেশের নাগরিক। আমার জানামতে তার চরিত্র ও আচরণ সন্তোষজনক এবং তিনি রাষ্ট্রবিরোধী কোনো কাজের সাথে জড়িত নন।
+            </p>
+            <p style="font-size: 15px; margin-top: 15px;">আমি তাহার সর্বাঙ্গীন মঙ্গল ও দীর্ঘায়ু কামনা করি।</p>
+            <div style="margin-top: 60px; display: flex; justify-content: space-between;">
+                <div>
+                    <p style="border-top: 1px dashed black; padding-top: 5px; display: inline-block;">আবেদনকারীর স্বাক্ষর</p>
+                </div>
+                <div style="text-align: right;">
+                    <p style="border-top: 1px solid black; padding-top: 5px; display: inline-block; font-weight: bold;">চেয়ারম্যান<br>ইউনিয়ন পরিষদ</p>
+                </div>
+            </div>
+        </div>
+        """
+        st.markdown(certificate_html, unsafe_allow_html=True)
+        st.success("✅ নাগরিক সনদ সফলভাবে জেনারেট করা হয়েছে!")
 
 elif app_mode == 9:
-    st.header("⚽ টুর্নামেন্ট আমন্ত্রণপত্র ও নিয়মাবলী")
-    st.text_input("Tournament Name", "Premier League")
-    if st.button("Generate Notice"):
-        st.success("Tournament notice generated!")
+    st.header("⚽ টুর্নামেন্ট আমন্ত্রণপত্র ও নিয়মাবলী জেনারেটর")
+    
+    col1, col2 = st.columns(2)
+    with col1:
+        t_name = st.text_input("টুর্নামেন্টের নাম (Tournament Name)", "দিঘীরপাড় প্রিমিয়ার লিগ (ক্রিকেট/ফুটবল)")
+        t_organizer = st.text_input("আয়োজক কমিটি (Organizer)", "যুব সমাজ কল্যাণ সংঘ")
+        t_ground = st.text_input("খেলার স্থান (Venue)", "দিঘীরপাড় সরকারি প্রাথমিক বিদ্যালয় মাঠ")
+    with col2:
+        t_date = st.text_input("শুরুর তারিখ ও সময় (Date & Time)", "আগামী ১৫ ফেব্রুয়ারি ২০২৬, সকাল ১০:০০ টা")
+        t_fee = st.text_input("এন্ট্রি ফি (Entry Fee)", "৫০০/- টাকা মাত্র")
+        t_prize = st.text_input("পুরস্কার (Prize Money)", "চ্যাম্পিয়ন: ৫০০০/- টাকা + ট্রফি")
+
+    t_rules = st.text_area("খেলার নিয়মাবলী (Rules & Regulations)", 
+    "১. সকল দলকে নির্ধারিত সময়ের ১০ মিনিট পূর্বে মাঠে উপস্থিত থাকতে হবে।\n"
+    "২. আম্পায়ার বা রেফারির সিদ্ধান্তই চূড়ান্ত বলে গণ্য হবে।\n"
+    "৩. খেলার মাঠে শৃঙ্খলা বজায় রাখতে হবে, অন্যথায় কমিটি যে কোনো সিদ্ধান্ত নিতে বাধ্য থাকবে।")
+
+    if st.button("টুর্নামেন্ট নোটিশ জেনারেট করুন"):
+        notice_html = f"""
+        <div style="background:#ffffff; padding:30px; border:4px solid #ff4b4b; border-radius:12px; color:black; font-family: Arial, sans-serif;">
+            <div style="text-align:center;">
+                <h2 style="color:#ff4b4b; margin:0;">🏆 টুর্নামেন্ট আমন্ত্রণপত্র ও নোটিশ 🏆</h2>
+                <h3 style="color:#0B50FA; margin:5px 0;">{t_name}</h3>
+                <p style="font-size:13px; color:gray; margin:0;">আয়োজনে: {t_organizer}</p>
+                <hr style="border: 1px solid #ff4b4b; width:70%;">
+            </div>
+            
+            <div style="background:#f8f9fa; padding:15px; border-radius:8px; margin:15px 0; font-size:14px;">
+                <p>📍 <b>খেলার স্থান:</b> {t_ground}</p>
+                <p>📅 <b>শুরুর তারিখ ও সময়:</b> {t_date}</p>
+                <p>💰 <b>এন্ট্রি ফি:</b> {t_fee} | 🏆 <b>গ্র্যান্ড পুরস্কার:</b> {t_prize}</p>
+            </div>
+
+            <h4 style="color:#0B50FA; border-bottom: 2px solid #0B50FA; padding-bottom:3px;">📋 টুর্নামেন্টের বিশেষ নিয়মাবলী:</h4>
+            <div style="font-size: 14px; line-height: 1.6; white-space: pre-line; background:#fffdfd; padding:10px; border-left:4px solid #ff4b4b;">
+                {t_rules}
+            </div>
+
+            <p style="text-align:center; font-weight:bold; margin-top:20px; color:#ff4b4b;">সকল ক্রীড়াপ্রেমী ও দলগুলোকে টুর্নামেন্টে অংশগ্রহণের জন্য আন্তরিক আমন্ত্রণ জানানো যাচ্ছে!</p>
+            
+            <div style="margin-top: 40px; text-align: right;">
+                <p style="border-top: 1px solid black; padding-top: 5px; display: inline-block; font-weight: bold;">কর্তৃপক্ষ / সভাপতি<br>{t_organizer}</p>
+            </div>
+        </div>
+        """
+        st.markdown(notice_html, unsafe_allow_html=True)
+        st.success("✅ টুর্নামেন্টের নোটিশ ও আমন্ত্রণপত্র সফলভাবে তৈরি করা হয়েছে! এটি এখন প্রিন্ট বা শেয়ার করা যাবে।")
 
 elif app_mode == 10:
     st.header("📏 ছবির সাইজ পরিবর্তন ও রিসাইজার")
