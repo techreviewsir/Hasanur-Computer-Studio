@@ -69,24 +69,23 @@ st.markdown(f"""
     }}
     .studio-header {{
         background: {header_gradient};
-        padding: 30px 20px;
+        padding: 25px 20px;
         border-radius: 12px;
         color: white;
         text-align: center;
         margin: 0 auto 20px auto;
-        max-width: 500px;
+        max-width: 550px;
         box-shadow: 0 6px 20px rgba(0,0,0,0.2);
     }}
     .studio-header h1 {{
-        font-size: 26px;
-        margin-bottom: 12px;
+        font-size: 24px;
+        margin-bottom: 8px;
         font-weight: bold;
-        letter-spacing: 0.5px;
     }}
     .studio-header p {{
-        font-size: 14px;
-        margin: 8px 0;
-        line-height: 1.5;
+        font-size: 13px;
+        margin: 4px 0;
+        line-height: 1.4;
     }}
     .stButton > button {{
         width: 100% !important;
@@ -115,7 +114,6 @@ st.markdown(f"""
         margin-top: 15px;
         margin-bottom: 8px;
         text-transform: uppercase;
-        letter-spacing: 0.5px;
         border-bottom: 2px solid {accent_color};
         padding-bottom: 4px;
     }}
@@ -167,13 +165,16 @@ t = {
     "portal_header": "📋 অন্যান্য গুরুত্বপূর্ণ অনলাইন লিংক ও পোর্টাল" if not is_eng else "📋 All Important Online Links",
 }
 
+# আপনার ভিডিওতে দেখানো কার্ডের ডিজাইনের মতো সাজানো হেডার সেকশন
 st.markdown(f"""
 <div class="studio-header">
-    <h1>{t['title']}</h1>
-    <p>{t['address']}</p>
-    <p>{t['mobile']}</p>
-    <hr style="border:0.5px solid rgba(255,255,255,0.3); width:80%; margin: 10px auto;">
-    <p style="font-size: 13px; opacity: 0.9;">{t['subtitle']}</p>
+    <div style="background: rgba(255,255,255,0.15); padding: 15px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.3);">
+        <h1 style="margin: 0 0 8px 0; font-size: 24px; color: #ffffff; text-shadow: 1px 1px 2px rgba(0,0,0,0.3);">{t['title']}</h1>
+        <p style="margin: 3px 0; font-size: 13px;">{t['address']}</p>
+        <p style="margin: 3px 0; font-size: 13px;">{t['mobile']}</p>
+        <hr style="border: 0.5px solid rgba(255,255,255,0.3); width: 85%; margin: 10px auto;">
+        <p style="margin: 0; font-size: 12px; font-weight: 500; opacity: 0.95;">সকল ধরনের কম্পিউটার, ডিজাইন ও অনলাইন সার্ভিসের অল-ইন-ওয়ান মাস্টার ড্যাশবোর্ড</p>
+    </div>
 </div>
 """, unsafe_allow_html=True)
 
@@ -207,46 +208,29 @@ for num, (item_name, desc) in menu_dict.items():
         st.session_state.app_mode = num
     st.sidebar.markdown(f"<p style='font-size:10px; color:gray; margin-top:-2px; margin-bottom:5px;'>ℹ️ {desc}</p>", unsafe_allow_html=True)
 
-# সাইডবার লিংক সেকশনগুলো অপরিবর্তিত রাখা হলো
+# সাইডবারের অন্যান্য লিংক সেকশন
 st.sidebar.markdown(f"<div class='sidebar-section-title'>{t['job_header']}</div>", unsafe_allow_html=True)
 st.sidebar.markdown("""
 <div class="link-box">
-    <b>🏛️ সরকারি চাকরির পোর্টাল ও সার্কুলার:</b><br>
-    • সরকারি জবস পোর্টাল (Teletalk): <a href="https://alljobs.teletalk.com.bd/" target="_blank">All Jobs BD</a><br>
-    • বাংলাদেশ জাতীয় তথ্য বাতায়ন: <a href="https://bangladesh.gov.bd/" target="_blank">National Portal</a>
-</div>
-<div class="link-box">
-    <b>🏢 বেসরকারি ও করপোরেট জবস পোর্টাল:</b><br>
-    • বিডি জবস পোর্টাল: <a href="https://www.bdjobs.com/" target="_blank">Bdjobs.com</a><br>
-    • টেলিটক অফিশিয়াল পোর্টাল: <a href="https://teletalk.com.bd/" target="_blank">Teletalk Portal</a>
+    <b>🏛️ সরকারি চাকরির পোর্টাল:</b> <a href="https://alljobs.teletalk.com.bd/" target="_blank">All Jobs BD</a><br>
+    <b>🏢 বেসরকারি পোর্টাল:</b> <a href="https://www.bdjobs.com/" target="_blank">Bdjobs.com</a>
 </div>
 """, unsafe_allow_html=True)
 
 st.sidebar.markdown(f"<div class='sidebar-section-title'>{t['result_header']}</div>", unsafe_allow_html=True)
 st.sidebar.markdown("""
 <div class="link-box">
-    <b>🎓 পিএসসি, জেএসসি, এসএসসি ও এইচএসসি:</b><br>
-    • অফিশিয়াল রেজাল্ট পোর্টাল: <a href="http://www.educationboardresults.gov.bd/" target="_blank">Web Link</a><br>
-    • শিক্ষা বোর্ড মার্কশিট কর্নার: <a href="https://eboardresults.com/" target="_blank">E-Board Marksheet</a>
-</div>
-<div class="link-box">
-    <b>🏛️ জাতীয় বিশ্ববিদ্যালয় (অনার্স, মাস্টার্স, ডিগ্রি):</b><br>
-    • এনইউ রেজাল্ট পোর্টাল: <a href="http://results.nu.ac.bd/" target="_blank">NU Results</a>
+    <b>🎓 শিক্ষা বোর্ড রেজাল্ট:</b> <a href="http://www.educationboardresults.gov.bd/" target="_blank">Education Board</a><br>
+    <b>🏛️ জাতীয় বিশ্ববিদ্যালয়:</b> <a href="http://results.nu.ac.bd/" target="_blank">NU Results</a>
 </div>
 """, unsafe_allow_html=True)
 
 st.sidebar.markdown(f"<div class='sidebar-section-title'>{t['portal_header']}</div>", unsafe_allow_html=True)
 st.sidebar.markdown("""
 <div class="link-box">
-    <b>📇 নাগরিক ও পরিচয়পত্র সেবা:</b><br>
-    • জন্ম নিবন্ধন: <a href="https://bdris.gov.bd/" target="_blank">Link</a> | 
-    জাতীয় পরিচয়পত্র (NID): <a href="https://services.nidw.gov.bd/" target="_blank">Link</a><br>
-    • পাসপোর্ট: <a href="https://www.epassport.gov.bd/" target="_blank">Link</a>
+    <b>📇 নাগরিক সেবা:</b> जन्म নিবন্ধন | NID | পাসপোর্ট
 </div>
 """, unsafe_allow_html=True)
-
-st.sidebar.markdown("---")
-st.sidebar.markdown("ℹ️ **Hasanur Computer Studio** | 📞 01743-614359")
 
 app_mode = st.session_state.app_mode
 
@@ -269,7 +253,7 @@ if app_mode == 1:
 elif app_mode == 2:
     st.header("🎨 স্টুডিও ব্যাকগ্রাউন্ড রিমুভ ও কালার চেঞ্জার")
     if not has_rembg:
-        st.error("❌ 'rembg' লাইব্রেরিটি ইনস্টল করা নেই।")
+        st.error("❌ 'rembg' লাইব্রেরি ইনস্টল করা নেই।")
     elif global_file is not None:
         image = Image.open(global_file).convert("RGB")
         st.image(image, caption="মূল ছবি (Original Image)", width=300)
@@ -343,31 +327,20 @@ elif app_mode == 5:
         st.success(f"🎉 বয়স: **{years} বছর, {months} মাস, এবং {days} দিন**")
 
 elif app_mode == 6:
-    st.header("🧾 দোকানের ক্যাশ মেমো / রশিদ জেনারেটর (Items, Serial & Warranty)")
-    st.info("💡 টিপস: দোকানের নাম, ঠিকানা, ক্রেতার তথ্য এবং প্রয়োজনীয় আইটেম যোগ করুন। প্রতিটি পণ্যের সিরিয়াল নম্বর (S/N) এবং ওয়ারেন্টির তথ্য দিন।")
-
-    st.markdown("### 🏪 দোকানের তথ্য (Shop Info)")
+    st.header("🧾 দোকানের ক্যাশ মেমো / রশিদ জেনারেটর")
     shop_name = st.text_input("দোকানের নাম (Shop Name)", "হাসানুর কম্পিউটার স্টুডিও")
-    shop_address = st.text_input("দোকানের ঠিকানা ও ফোন (Address & Phone)", "দিঘীরপাড়, মনিরামপুর, যশোর | মোবাইল: ০১৭৪৩-৬১৪৩৫৯")
+    shop_address = st.text_input("দোকানের ঠিকানা ও ফোন", "দিঘীরপাড়, মনিরামপুর, যশোর | মোবাইল: ০১৭৪৩-৬১৪৩৫৯")
 
-    st.markdown("---")
-    st.markdown("### 🛒 ক্রেতা ও পণ্যের তালিকা (Customer & Items with Serial & Warranty)")
     c_name = st.text_input("গ্রাহকের নাম (Customer Name)", "মোঃ রহিম")
-    c_phone = st.text_input("মোবাইল নম্বর (Phone Number)", "01700000000")
+    c_phone = st.text_input("মোবাইল নম্বর", "01700000000")
 
     if 'memo_items' not in st.session_state:
         st.session_state.memo_items = [
-            {'name': 'ল্যামিনেশন ও প্রিন্ট', 'serial': 'N/A', 'price': 150, 'has_warranty': 'না', 'warranty_period': '-'},
-            {'name': 'এইচপি প্রিন্টার', 'serial': 'HP-SN987654', 'price': 8500, 'has_warranty': 'হ্যাঁ', 'warranty_period': '১ বছর'}
+            {'name': 'ল্যামিনেশন ও প্রিন্ট', 'serial': 'N/A', 'price': 150, 'has_warranty': 'না', 'warranty_period': '-'}
         ]
 
-    col_btn1, col_btn2 = st.columns(2)
-    with col_btn1:
-        if st.button("➕ নতুন আইটেম যোগ করুন (Add Item)"):
-            st.session_state.memo_items.append({'name': '', 'serial': '', 'price': 0, 'has_warranty': 'না', 'warranty_period': '-'})
-    with col_btn2:
-        if len(st.session_state.memo_items) > 1 and st.button("➖ শেষের আইটেমটি বাদ দিন"):
-            st.session_state.memo_items.pop()
+    if st.button("➕ নতুন আইটেম যোগ করুন"):
+        st.session_state.memo_items.append({'name': '', 'serial': '', 'price': 0, 'has_warranty': 'না', 'warranty_period': '-'})
 
     updated_items = []
     total_amount = 0
@@ -376,92 +349,73 @@ elif app_mode == 6:
         st.markdown(f"**আইটেম #{i+1}**")
         c1, c2, c3, c4, c5 = st.columns([3, 2, 2, 2, 2])
         with c1:
-            item_name = st.text_input(f"পণ্যের নাম", item['name'], key=f"item_name_{i}")
+            it_name = st.text_input("পণ্যের নাম", item['name'], key=f"item_name_{i}")
         with c2:
-            item_serial = st.text_input(f"সিরিয়াল নম্বর (S/N)", item.get('serial', ''), key=f"item_serial_{i}")
+            it_serial = st.text_input("সিরিয়াল নম্বর", item.get('serial', ''), key=f"item_serial_{i}")
         with c3:
-            item_price = st.number_input(f"মূল্য (TK)", 0, 1000000, int(item['price']), key=f"item_price_{i}")
+            it_price = st.number_input("মূল্য (TK)", 0, 1000000, int(item['price']), key=f"item_price_{i}")
         with c4:
-            default_w_idx = 0 if item['has_warranty'] == 'হ্যাঁ' else 1
-            has_war = st.selectbox(f"ওয়ারেন্টি?", ["হ্যাঁ", "না"], index=default_w_idx, key=f"has_war_{i}")
+            has_war = st.selectbox("ওয়ারেন্টি?", ["হ্যাঁ", "না"], index=0 if item['has_warranty']=='হ্যাঁ' else 1, key=f"has_war_{i}")
         with c5:
-            default_period = item['warranty_period'] if item['warranty_period'] else "১ বছর"
-            war_period = st.text_input(f"ওয়ারেন্টি মেয়াদ", default_period, key=f"war_period_{i}")
+            war_per = st.text_input("মেয়াদ", item['warranty_period'], key=f"war_per_{i}")
         
-        updated_items.append({
-            'name': item_name, 
-            'serial': item_serial if item_serial else "N/A",
-            'price': item_price, 
-            'has_warranty': has_war, 
-            'warranty_period': war_period if has_war == "হ্যাঁ" else "প্রযোজ্য নয়"
-        })
-        total_amount += item_price
+        updated_items.append({'name': it_name, 'serial': it_serial or "N/A", 'price': it_price, 'has_warranty': has_war, 'warranty_period': war_per})
+        total_amount += it_price
         st.markdown("---")
 
     if st.button("🖨️ ক্যাশ মেমো জেনারেট করুন (A4 Print Ready)"):
-        rows_html = ""
-        for idx, itm in enumerate(updated_items):
-            rows_html += (
-                "<tr>"
-                f"<td style='padding: 10px; border-bottom: 1px solid #ddd; text-align: center;'>{idx + 1}</td>"
-                f"<td style='padding: 10px; border-bottom: 1px solid #ddd;'>{itm['name']}</td>"
-                f"<td style='padding: 10px; border-bottom: 1px solid #ddd; text-align: center; font-family: monospace; font-weight: bold;'>{itm['serial']}</td>"
-                f"<td style='padding: 10px; border-bottom: 1px solid #ddd; text-align: center;'>{itm['has_warranty']} ({itm['warranty_period']})</td>"
-                f"<td style='padding: 10px; border-bottom: 1px solid #ddd; text-align: right;'>{itm['price']} TK</td>"
-                "</tr>"
-            )
+        rows_html = "".join([
+            f"<tr><td style='padding:8px; border-bottom:1px solid #ddd; text-align:center;'>{idx+1}</td>"
+            f"<td style='padding:8px; border-bottom:1px solid #ddd;'>{itm['name']}</td>"
+            f"<td style='padding:8px; border-bottom:1px solid #ddd; text-align:center; font-family:monospace;'>{itm['serial']}</td>"
+            f"<td style='padding:8px; border-bottom:1px solid #ddd; text-align:center;'>{itm['has_warranty']} ({itm['warranty_period']})</td>"
+            f"<td style='padding:8px; border-bottom:1px solid #ddd; text-align:right;'>{itm['price']} TK</td></tr>"
+            for idx, itm in enumerate(updated_items)
+        ])
 
-        final_memo_html = f"""
+        st.markdown(f"""
         <div class="a4-paper-box" style="border: 3px solid #0B50FA;">
             <div style="text-align:center;">
-                <h2 style="color:#0B50FA; margin:0; font-size:28px;">{shop_name}</h2>
-                <p style="font-size:14px; margin:5px 0; color:#333;">{shop_address}</p>
-                <hr style="border: 1px solid #0B50FA; width:70%; margin:15px auto;">
-                <h3 style="background:#0B50FA; color:white; display:inline-block; padding:6px 25px; border-radius:4px; margin:5px 0;">ক্যাশ মেমো / রসিদ</h3>
+                <h2 style="color:#0B50FA; margin:0; font-size:26px;">{shop_name}</h2>
+                <p style="font-size:13px; margin:4px 0;">{shop_address}</p>
+                <hr style="border: 1px solid #0B50FA; width:65%; margin:12px auto;">
+                <h3 style="background:#0B50FA; color:white; display:inline-block; padding:5px 20px; border-radius:4px;">ক্যাশ মেমো / রসিদ</h3>
             </div>
             
-            <div style="margin-top:25px; display:flex; justify-content:space-between; font-size:14px; background:#f8f9fa; padding:12px; border-radius:5px;">
+            <div style="margin-top:20px; display:flex; justify-content:space-between; font-size:13px; background:#f8f9fa; padding:10px; border-radius:5px;">
                 <div>
-                    <p style="margin:3px 0;"><b>গ্রাহকের নাম:</b> {c_name}</p>
-                    <p style="margin:3px 0;"><b>মোবাইল নম্বর:</b> {c_phone}</p>
+                    <p style="margin:2px 0;"><b>গ্রাহকের নাম:</b> {c_name}</p>
+                    <p style="margin:2px 0;"><b>মোবাইল নম্বর:</b> {c_phone}</p>
                 </div>
                 <div style="text-align:right;">
-                    <p style="margin:3px 0;"><b>তারিখ:</b> {date.today().strftime('%d-%m-%Y')}</p>
+                    <p style="margin:2px 0;"><b>তারিখ:</b> {date.today().strftime('%d-%m-%Y')}</p>
                 </div>
             </div>
 
-            <table style="width:100%; border-collapse: collapse; margin-top:20px; font-size:14px;">
+            <table style="width:100%; border-collapse: collapse; margin-top:15px; font-size:13px;">
                 <thead>
                     <tr style="background:#0B50FA; color:white;">
-                        <th style="padding: 12px; text-align: center; width: 8%;">ক্রমিক</th>
-                        <th style="padding: 12px; text-align: left; width: 32%;">পণ্যের বিবরণ / সেবার নাম</th>
-                        <th style="padding: 12px; text-align: center; width: 20%;">সিরিয়াল নম্বর (S/N)</th>
-                        <th style="padding: 12px; text-align: center; width: 22%;">ওয়ারেন্টি স্ট্যাটাস ও মেয়াদ</th>
-                        <th style="padding: 12px; text-align: right; width: 18%;">মূল্য</th>
+                        <th style="padding:10px; text-align:center; width:8%;">ক্রমিক</th>
+                        <th style="padding:10px; text-align:left; width:35%;">পণ্যের বিবরণ</th>
+                        <th style="padding:10px; text-align:center; width:20%;">সিরিয়াল নম্বর</th>
+                        <th style="padding:10px; text-align:center; width:20%;">ওয়ারেন্টি</th>
+                        <th style="padding:10px; text-align:right; width:17%;">মূল্য</th>
                     </tr>
                 </thead>
-                <tbody>
-                    {rows_html}
-                </tbody>
+                <tbody>{rows_html}</tbody>
             </table>
 
-            <div style="margin-top: 25px; text-align: right; font-size: 16px; background:#f1f3f5; padding: 12px; border-radius: 5px;">
-                <b>সর্বমোট প্রদেয় টাকা (Total): <span style="color:red; font-size:19px;">{total_amount} TK</span></b>
+            <div style="margin-top:20px; text-align:right; font-size:15px; background:#f1f3f5; padding:10px; border-radius:5px;">
+                <b>সর্বমোট প্রদেয় টাকা (Total): <span style="color:red; font-size:18px;">{total_amount} TK</span></b>
             </div>
 
-            <div style="margin-top: 120px; display: flex; justify-content: space-between; font-size: 14px;">
-                <div>
-                    <p style="border-top: 1px dashed black; padding-top: 5px; display: inline-block;">গ্রাহকের স্বাক্ষর</p>
-                </div>
-                <div style="text-align: right;">
-                    <p style="border-top: 1px solid black; padding-top: 5px; display: inline-block; font-weight: bold;">বিক্রেতার স্বাক্ষর / সিল</p>
-                </div>
+            <div style="margin-top:100px; display:flex; justify-content:space-between; font-size:13px;">
+                <div><p style="border-top:1px dashed black; padding-top:4px; display:inline-block;">গ্রাহকের স্বাক্ষর</p></div>
+                <div style="text-align:right;"><p style="border-top:1px solid black; padding-top:4px; display:inline-block; font-weight:bold;">বিক্রেতার স্বাক্ষর / সিল</p></div>
             </div>
         </div>
-        """
-        
-        st.markdown(final_memo_html, unsafe_allow_html=True)
-        st.success("✅ ফুল-উইথ A4 ক্যাশ মেমো সফলভাবে জেনারেট হয়েছে!")
+        """, unsafe_allow_html=True)
+        st.success("✅ ক্যাশ মেমো সফলভাবে জেনারেট হয়েছে!")
 
 elif app_mode == 7:
     st.header("🛡️ ডিজিটাল ওয়ারেন্টি কার্ড জেনারেটর")
@@ -474,98 +428,47 @@ elif app_mode == 8:
     st.header("📜 নাগরিক সনদপত্র জেনারেটর (A4 Print Ready)")
     col1, col2 = st.columns(2)
     with col1:
-        cit_name = st.text_input("আবেদনকারীর নাম (Applicant Name)", "মোঃ রফিকুল ইসলাম")
-        cit_father = st.text_input("পিতার নাম (Father's Name)", "মোঃ আব্দুল জব্বার")
-        cit_mother = st.text_input("মাতার নাম (Mother's Name)", "মোছাঃ মরিয়ম বেগম")
+        cit_name = st.text_input("আবেদনকারীর নাম", "মোঃ রফিকুল ইসলাম")
+        cit_father = st.text_input("পিতার নাম", "মোঃ আব্দুল জব্বার")
     with col2:
-        cit_nid = st.text_input("এনআইডি / জন্ম নিবন্ধন নম্বর (NID/Birth No)", "19954125487123654")
-        cit_village = st.text_input("গ্রাম / মহল্লা (Village)", "দিঘীরপাড়")
-        cit_ward = st.text_input("ওয়ার্ড নম্বর ও ইউনিয়ন (Ward & Union)", "ওয়ার্ড নং- ০৪, ঝাঁপা ইউনিয়ন")
+        cit_village = st.text_input("গ্রাম / মহল্লা", "দিঘীরপাড়")
+        cit_ward = st.text_input("ওয়ার্ড ও ইউনিয়ন", "ওয়ার্ড নং- ০৪, ঝাঁপা ইউনিয়ন")
 
     if st.button("নাগরিক সনদ জেনারেট করুন"):
-        cert_p1 = f"""
+        st.markdown(f"""
         <div class="a4-paper-box" style="border:6px double #0B50FA;">
             <div style="text-align:center;">
                 <h2 style="color:#0B50FA; margin:0;">ইউনিয়ন পরিষদ কার্যালয়</h2>
-                <p style="font-size:14px; margin:2px 0;">{cit_ward}, মনিরামপুর, যশোর।</p>
-                <hr style="border: 1px solid #0B50FA; width:60%;">
-                <h3 style="background:#0B50FA; color:white; display:inline-block; padding:6px 25px; border-radius:5px; margin:15px 0;">নাগরিক সনদপত্র</h3>
+                <p style="font-size:13px; margin:2px 0;">{cit_ward}, মনিরামপুর, যশোর।</p>
+                <hr style="border:1px solid #0B50FA; width:50%;">
+                <h3 style="background:#0B50FA; color:white; display:inline-block; padding:5px 20px; border-radius:4px;">নাগরিক সনদপত্র</h3>
             </div>
-            <p style="text-align: right; font-size: 13px; margin-top:20px;">তারিখ: {date.today().strftime('%d-%m-%Y')}</p>
-        """
-        cert_p2 = f"""
-            <p style="font-size: 15px; line-height: 1.9; text-align: justify; margin-top: 25px;">
-                এই মর্মে প্রত্যয়ন করা যাইতেছে যে, <b>{cit_name}</b>, 
-                পিতা: <b>{cit_father}</b>, 
-                মাতা: <b>{cit_mother}</b>, 
-                এনআইডি/জন্ম সনদ নম্বর: <b>{cit_nid}</b>, 
-                সাং: <b>{cit_village}</b>, 
-                ডাকঘর: মনিরামপুর, উপজেলা: মনিরামপুর, জেলা: যশোর। 
-                তিনি অত্র ইউনিয়নের একজন স্থায়ী বাসিন্দা এবং জন্মসূত্রে বাংলাদেশের নাগরিক। আমার জানামতে তার চরিত্র ও আচরণ সন্তোষজনক এবং তিনি রাষ্ট্রবিরোধী কোনো কাজের সাথে জড়িত নন।
+            <p style="font-size:14px; line-height:1.8; text-align:justify; margin-top:25px;">
+                এই মর্মে প্রত্যয়ন করা যাইতেছে যে, <b>{cit_name}</b>, পিতা: <b>{cit_father}</b>, সাং: <b>{cit_village}</b>, উপজেলা: মনিরামপুর, জেলা: যশোর। তিনি অত্র ইউনিয়নের একজন স্থায়ী বাসিন্দা এবং জন্মসূত্রে বাংলাদেশের নাগরিক।
             </p>
-            <p style="font-size: 15px; margin-top: 20px;">আমি তাহার সর্বাঙ্গীন মঙ্গল ও দীর্ঘায়ু কামনা করি।</p>
-            
-            <div style="margin-top: 100px; display: flex; justify-content: space-between;">
-                <div>
-                    <p style="border-top: 1px dashed black; padding-top: 5px; display: inline-block;">আবেদনকারীর স্বাক্ষর</p>
-                </div>
-                <div style="text-align: right;">
-                    <p style="border-top: 1px solid black; padding-top: 5px; display: inline-block; font-weight: bold;">চেয়ারম্যান<br>ইউনিয়ন পরিষদ</p>
-                </div>
+            <div style="margin-top:100px; display:flex; justify-content:space-between;">
+                <div><p style="border-top:1px dashed black; padding-top:4px; display:inline-block;">আবেদনকারীর স্বাক্ষর</p></div>
+                <div style="text-align:right;"><p style="border-top:1px solid black; padding-top:4px; display:inline-block; font-weight:bold;">চেয়ারম্যান</p></div>
             </div>
         </div>
-        """
-        st.markdown(cert_p1 + cert_p2, unsafe_allow_html=True)
-        st.success("✅ A4 প্রিন্ট ফরম্যাটে নাগরিক সনদ সফলভাবে তৈরি হয়েছে!")
+        """, unsafe_allow_html=True)
+        st.success("✅ নাগরিক সনদ সফলভাবে তৈরি হয়েছে!")
 
 elif app_mode == 9:
-    st.header("⚽ টুর্নামেন্ট আমন্ত্রণপত্র ও নিয়মাবলী জেনারেটর (A4 Print Ready)")
-    col1, col2 = st.columns(2)
-    with col1:
-        t_name = st.text_input("টুর্নামেন্টের নাম (Tournament Name)", "দিঘীরপাড় প্রিমিয়ার লিগ (ক্রিকেট/ফুটবল)")
-        t_organizer = st.text_input("আয়োজক কমিটি (Organizer)", "যুব সমাজ কল্যাণ সংঘ")
-        t_ground = st.text_input("খেলার স্থান (Venue)", "দিঘীরপাড় সরকারি প্রাথমিক বিদ্যালয় মাঠ")
-    with col2:
-        t_date = st.text_input("শুরুর তারিখ ও সময় (Date & Time)", "আগামী ১৫ ফেব্রুয়ারি ২০২৬, সকাল ১০:০০ টা")
-        t_fee = st.text_input("এন্ট্রি ফি (Entry Fee)", "৫০০/- টাকা মাত্র")
-        t_prize = st.text_input("পুরস্কার (Prize Money)", "চ্যাম্পিয়ন: ৫০০০/- টাকা + ট্রফি")
-
-    t_rules = st.text_area("খেলার নিয়মাবলী (Rules & Regulations)", 
-    "১. সকল দলকে নির্ধারিত সময়ের ১০ মিনিট পূর্বে মাঠে উপস্থিত থাকতে হবে।\n"
-    "২. আম্পায়ার বা রেফারির সিদ্ধান্তই চূড়ান্ত বলে গণ্য হবে।\n"
-    "৩. খেলার মাঠে শৃঙ্খলা বজায় রাখতে হবে, অন্যথায় কমিটি যে কোনো সিদ্ধান্ত নিতে বাধ্য থাকবে।")
-
+    st.header("⚽ টুর্নামেন্ট আমন্ত্রণপত্র ও নিয়মাবলী জেনারেটর")
+    t_name = st.text_input("টুর্নামেন্টের নাম", "দিঘীরপাড় প্রিমিয়ার লিগ")
+    t_ground = st.text_input("খেলার স্থান", "দিঘীরপাড় সরকারি প্রাথমিক বিদ্যালয় মাঠ")
     if st.button("টুর্নামেন্ট নোটিশ জেনারেট করুন"):
-        notice_p1 = f"""
+        st.markdown(f"""
         <div class="a4-paper-box" style="border:4px solid #ff4b4b;">
             <div style="text-align:center;">
-                <h2 style="color:#ff4b4b; margin:0;">🏆 টুর্নামেন্ট আমন্ত্রণপত্র ও নোটিশ 🏆</h2>
-                <h3 style="color:#0B50FA; margin:6px 0; font-size:22px;">{t_name}</h3>
-                <p style="font-size:13px; color:gray; margin:0;">আয়োজনে: {t_organizer}</p>
-                <hr style="border: 1px solid #ff4b4b; width:70%; margin:15px auto;">
-            </div>
-            
-            <div style="background:#f8f9fa; padding:15px; border-radius:8px; margin:15px 0; font-size:14px; border-left:5px solid #0B50FA;">
-                <p>📍 <b>খেলার স্থান:</b> {t_ground}</p>
-                <p>📅 <b>শুরুর তারিখ ও সময়:</b> {t_date}</p>
-                <p>💰 <b>এন্ট্রি ফি:</b> {t_fee} | 🏆 <b>গ্র্যান্ড পুরস্কার:</b> {t_prize}</p>
-            </div>
-        """
-        notice_p2 = f"""
-            <h4 style="color:#0B50FA; border-bottom: 2px solid #0B50FA; padding-bottom:4px; margin-top:20px;">📋 টুর্নামেন্টের বিশেষ নিয়মাবলী:</h4>
-            <div style="font-size: 14px; line-height: 1.7; white-space: pre-line; background:#fffdfd; padding:12px; border-left:4px solid #ff4b4b; margin-top:8px;">
-                {t_rules}
-            </div>
-
-            <p style="text-align:center; font-weight:bold; margin-top:25px; color:#ff4b4b; font-size:15px;">সকল ক্রীড়াপ্রেমী ও দলগুলোকে টুর্নামেন্টে অংশগ্রহণের জন্য আন্তরিক আমন্ত্রণ জানানো যাচ্ছে!</p>
-            
-            <div style="margin-top: 80px; text-align: right;">
-                <p style="border-top: 1px solid black; padding-top: 5px; display: inline-block; font-weight: bold;">কর্তৃপক্ষ / সভাপতি<br>{t_organizer}</p>
+                <h2 style="color:#ff4b4b; margin:0;">🏆 টুর্নামেন্ট আমন্ত্রণপত্র 🏆</h2>
+                <h3 style="color:#0B50FA; margin:6px 0;">{t_name}</h3>
+                <p style="font-size:13px;">📍 স্থান: {t_ground}</p>
             </div>
         </div>
-        """
-        st.markdown(notice_p1 + notice_p2, unsafe_allow_html=True)
-        st.success("✅ A4 পেপার প্রিন্ট ফরম্যাটে টুর্নামেন্টের নোটিশ সফলভাবে তৈরি করা হয়েছে!")
+        """, unsafe_allow_html=True)
+        st.success("✅ টুর্নামেন্টের নোটিশ তৈরি হয়েছে!")
 
 elif app_mode == 10:
     st.header("📏 ছবির সাইজ পরিবর্তন ও রিসাইজার")
@@ -582,7 +485,7 @@ elif app_mode == 10:
         st.warning("দয়া করে ছবি আপলোড করুন।")
 
 elif app_mode == 11:
-    st.header("⬛ সাদাকালো (Black & White) কনভার্টার")
+    st.header("⬛ সাদাকালো কনভার্টার")
     if global_file is not None:
         img = Image.open(global_file).convert("L")
         st.image(img, use_container_width=True)
