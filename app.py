@@ -17,38 +17,37 @@ except ImportError:
 st.set_page_config(page_title="হাসানুর কম্পিউটার স্টুডিও", layout="wide")
 
 # ==============================================================================
-# মূল স্টাইল ও পুরো পেজের হলুদ গ্রেডিয়েন্ট ব্যাকগ্রাউন্ড
+# মূল স্টাইল ও পুরো পেজ, সাইডবার ও হেডারের সমন্বিত হলুদ থিম ব্যাকগ্রাউন্ড
 # ==============================================================================
 st.markdown("""
 <style>
     .stApp {
-        background: linear-gradient(135deg, #1a1500, #3d3100, #594700, #261f00);
-        background-attachment: fixed;
-        color: #ffffff;
+        background-color: #fffde7;
+        color: #222222;
     }
     section[data-testid="stSidebar"] {
-        background-color: #2b2300;
+        background-color: #fff9c4;
     }
     .studio-header {
-        background: linear-gradient(135deg, #f1a80a, #d4380d);
+        background: linear-gradient(135deg, #fbc02d, #f57f17);
         padding: 25px 20px;
         border-radius: 12px;
-        color: white;
+        color: #ffffff;
         text-align: center;
         margin-bottom: 25px;
-        box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        box-shadow: 0 6px 20px rgba(0,0,0,0.15);
     }
     .studio-header h1 {
         font-size: 26px;
         margin-bottom: 8px;
         font-weight: bold;
-        color: white;
+        color: #ffffff;
     }
     .studio-header p {
         font-size: 14px;
         margin: 4px 0;
         line-height: 1.5;
-        color: white;
+        color: #ffffff;
     }
     .header-profile-img {
         width: 70px;
@@ -58,7 +57,7 @@ st.markdown("""
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        border: 2px solid rgba(255, 255, 255, 0.8);
+        border: 2px solid rgba(255, 255, 255, 0.9);
         box-shadow: 0 4px 10px rgba(0,0,0,0.2);
         margin-bottom: 10px;
     }
@@ -85,7 +84,7 @@ img_tag = f'<img src="data:image/jpeg;base64,{img_base64}" alt="Hasanur">' if im
 # হেডার সেকশন
 st.markdown(f"""
 <div class="studio-header">
-    <div style="background: rgba(255,255,255,0.15); padding: 18px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.3); text-align: center;">
+    <div style="background: rgba(0,0,0,0.1); padding: 18px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.3); text-align: center;">
         <div class="header-profile-img">
             {img_tag}
         </div>
@@ -158,7 +157,7 @@ def print_content_html(html_content, button_text):
                 flex-direction: column;
                 justify-content: space-between;
                 position: relative;
-                border: 2px solid #f1a80a;
+                border: 2px solid #fbc02d;
             }}
             @media print {{
                 body {{ background: none; padding: 0; }}
@@ -166,16 +165,16 @@ def print_content_html(html_content, button_text):
                 .a4-page {{
                     box-shadow: none; margin: 0; width: 210mm; height: 297mm;
                     padding: 12mm 15mm; page-break-after: avoid; page-break-inside: avoid;
-                    border: 2px solid #f1a80a !important; -webkit-print-color-adjust: exact;
+                    border: 2px solid #fbc02d !important; -webkit-print-color-adjust: exact;
                 }}
                 @page {{ size: A4; margin: 0; }}
             }}
             .print-btn {{
-                background-color: #f1a80a; color: white; padding: 12px 30px;
+                background-color: #fbc02d; color: white; padding: 12px 30px;
                 border: none; border-radius: 8px; cursor: pointer; font-size: 16px;
                 font-weight: bold; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.2);
             }}
-            .print-btn:hover {{ background-color: #d48f00; }}
+            .print-btn:hover {{ background-color: #f57f17; }}
         </style>
     </head>
     <body>
@@ -330,10 +329,10 @@ elif app_mode == 6:
         memo_html_code = f"""
         <div style='padding: 10px; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: space-between; box-sizing: border-box;'>
             <div>
-                <h2 style='text-align: center; color: #f1a80a; margin: 0; font-size: 26px;'>{shop_name}</h2>
+                <h2 style='text-align: center; color: #fbc02d; margin: 0; font-size: 26px;'>{shop_name}</h2>
                 <p style='text-align: center; font-size: 14px; color: #333; margin: 6px 0;'>{shop_address}</p>
-                <hr style='border: 1px solid #f1a80a; margin-bottom: 20px;'>
-                <h3 style='text-align: center; background-color: #f1a80a; color: white; padding: 8px; border-radius: 4px; margin: 0 0 25px 0; font-size: 18px;'>ক্যাশ মেমো / রসিদ</h3>
+                <hr style='border: 1px solid #fbc02d; margin-bottom: 20px;'>
+                <h3 style='text-align: center; background-color: #fbc02d; color: white; padding: 8px; border-radius: 4px; margin: 0 0 25px 0; font-size: 18px;'>ক্যাশ মেমো / রসিদ</h3>
                 
                 <table style="width: 100%; margin-bottom: 25px; font-size: 15px;">
                     <tr>
@@ -348,7 +347,7 @@ elif app_mode == 6:
                 
                 <table style="width: 100%; border-collapse: collapse; font-size: 15px; margin-bottom: 25px;">
                     <thead>
-                        <tr style="background-color: #f1f3f5; border-bottom: 2px solid #f1a80a;">
+                        <tr style="background-color: #f1f3f5; border-bottom: 2px solid #fbc02d;">
                             <th style="padding: 10px; text-align: center;">ক্রমিক</th>
                             <th style="padding: 10px; text-align: left;">পণ্যের বিবরণ</th>
                             <th style="padding: 10px; text-align: center;">সিরিয়াল নম্বর</th>
@@ -396,10 +395,10 @@ elif app_mode == 8:
         <div style='padding: 15px; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: space-between; box-sizing: border-box; background-color: #ffffff;'>
             <div>
                 <div style="text-align:center;">
-                    <h2 style="color:#f1a80a; margin:0; font-size: 28px; font-weight: bold;">{cit_union} কার্যালয়</h2>
+                    <h2 style="color:#fbc02d; margin:0; font-size: 28px; font-weight: bold;">{cit_union} কার্যালয়</h2>
                     <p style="font-size:15px; margin:6px 0; color:#333;">দিঘীরপাড়, মনিরামপুর, যশোর।</p>
-                    <hr style="border:1px solid #f1a80a; width:45%; margin: 15px auto;">
-                    <h3 style="background:#f1a80a; color:white; display:inline-block; padding:6px 25px; border-radius:5px; margin-top:10px; font-size: 20px;">নাগরিক সনদপত্র</h3>
+                    <hr style="border:1px solid #fbc02d; width:45%; margin: 15px auto;">
+                    <h3 style="background:#fbc02d; color:white; display:inline-block; padding:6px 25px; border-radius:5px; margin-top:10px; font-size: 20px;">নাগরিক সনদপত্র</h3>
                 </div>
                 <p style="font-size:17px; line-height:2.4; text-align:justify; margin-top:40px;">
                     এই মর্মে প্রত্যয়ন করা যাইতেছে যে, <b>{cit_name}</b>, পিতা: <b>{cit_father}</b>, মাতা: <b>{cit_mother}</b>, গ্রাম: <b>{cit_vill}</b>, {cit_word}, উপজেলা: মণিরামপুর, জেলা: যশোর এর অত্র ইউনিয়নের একজন স্থায়ী বাসিন্দা এবং জন্মসূত্রে বাংলাদেশের নাগরিক। আমার জানামতে তিনি দেশবিরোধী বা রাষ্ট্রবিরোধী কোনো কাজের সাথে জড়িত নন এবং তার চরিত্র অত্যন্ত ভালো।
@@ -432,14 +431,14 @@ elif app_mode == 9:
         <div style='padding: 15px; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: space-between; box-sizing: border-box; background-color: #ffffff;'>
             <div>
                 <div style="text-align:center;">
-                    <h2 style="color:#d4380d; margin:0; font-size: 24px;">🏆 টুর্নামেন্ট আমন্ত্রণপত্র ও নোটিশ 🏆</h2>
-                    <h3 style="color:#f1a80a; margin:10px 0; font-size:22px;">{t_name}</h3>
-                    <hr style="border:1px solid #d4380d; width:55%; margin: 12px auto;">
+                    <h2 style="color:#f57f17; margin:0; font-size: 24px;">🏆 টুর্নামেন্ট আমন্ত্রণপত্র ও নোটিশ 🏆</h2>
+                    <h3 style="color:#fbc02d; margin:10px 0; font-size:22px;">{t_name}</h3>
+                    <hr style="border:1px solid #f57f17; width:55%; margin: 12px auto;">
                 </div>
                 <p style="font-size:16px; line-height:2; margin-top:25px; text-align:center;">
                     সকল ক্রীড়াপ্রেমী ও দলের অবগতির জন্য জানানো যাচ্ছে যে, আগামী <b>{t_date}</b> তারিখে স্থানীয় মাঠে জমকালো আয়োজনের মাধ্যমে এই টুর্নামেন্ট শুরু হতে যাচ্ছে। আপনি বা আপনার দল এই প্রতিযোগিতায় স্বতঃস্ফূর্তভাবে অংশগ্রহণ করার জন্য আমন্ত্রিত।
                 </p>
-                <div style="background:#f8f9fa; padding:15px; border-radius:6px; border-left:5px solid #d4380d; margin-top:20px;">
+                <div style="background:#fffde7; padding:15px; border-radius:6px; border-left:5px solid #f57f17; margin-top:20px;">
                     <h4 style="margin:0 0 8px 0; color:#333; font-size: 16px;">🎁 আকর্ষণীয় পুরস্কারসমূহ:</h4>
                     <p style="margin:0; font-size:15px; font-weight:bold; color:red;">{t_prize}</p>
                 </div>
