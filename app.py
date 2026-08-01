@@ -117,6 +117,7 @@ t = {
     "upload_header": "📁 Master File Uploader" if is_eng else "📁 ফাইল আপলোড (Master File Uploader)",
     "upload_label": "Upload Image or PDF file" if is_eng else "ছবি বা পিডিএফ ফাইল আপলোড করুন",
     "tools_header": "🛠️ ডিজিটাল টুলস ও এডিটর (১-১৪)" if not is_eng else "🛠️ Digital Tools & Editors",
+    "job_header": "💼 সরকারি ও বেসরকারি চাকরির পোর্টাল" if not is_eng else "💼 Job Portals",
     "result_header": "📊 রেজাল্ট ও মার্কশিট পোর্টাল (ক্লাস ৫ থেকে সর্বোচ্চ)" if not is_eng else "📊 Result & Marksheet Portal",
     "portal_header": "📋 অন্যান্য গুরুত্বপূর্ণ অনলাইন লিংক ও পোর্টাল" if not is_eng else "📋 All Important Online Links",
 }
@@ -166,7 +167,27 @@ for num, (item_name, desc) in menu_dict.items():
 
 
 # ==============================================================================
-# নতুন ক্যাটাগরি: ক্লাস ৫ থেকে সর্বোচ্চ ক্লাস পর্যন্ত মার্কশিট ও রেজাল্ট পোর্টাল
+# নতুন সংযোজন: সরকারি ও বেসরকারি চাকরির পোর্টাল ক্যাটাগরি
+# ==============================================================================
+st.sidebar.markdown(f"<div class='sidebar-section-title'>{t['job_header']}</div>", unsafe_allow_html=True)
+
+st.sidebar.markdown("""
+<div class="link-box">
+    <b>🏛️ সরকারি চাকরির পোর্টাল ও সার্কুলার:</b><br>
+    • সরকারি জবস পোর্টাল (Teletalk): <a href="https://alljobs.teletalk.com.bd/" target="_blank">All Jobs BD</a><br>
+    • বাংলাদেশ জাতীয় তথ্য বাতায়ন: <a href="https://bangladesh.gov.bd/" target="_blank">National Portal</a>
+</div>
+
+<div class="link-box">
+    <b>🏢 বেসরকারি ও করপোরেট জবস পোর্টাল:</b><br>
+    • বিডি জবস পোর্টাল: <a href="https://www.bdjobs.com/" target="_blank">Bdjobs.com</a><br>
+    • টেলিটক অফিশিয়াল পোর্টাল: <a href="https://teletalk.com.bd/" target="_blank">Teletalk Portal</a>
+</div>
+""", unsafe_allow_html=True)
+
+
+# ==============================================================================
+# ক্লাস ৫ থেকে সর্বোচ্চ ক্লাস পর্যন্ত মার্কশিট ও রেজাল্ট পোর্টাল
 # ==============================================================================
 st.sidebar.markdown(f"<div class='sidebar-section-title'>{t['result_header']}</div>", unsafe_allow_html=True)
 
