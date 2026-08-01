@@ -61,7 +61,7 @@ global_file = st.file_uploader("ছবি বা পিডিএফ ফাইল
 st.markdown("---")
 
 if 'app_mode' not in st.session_state:
-    st.session_state.app_mode = 6
+    st.session_state.app_mode = 8
 
 st.sidebar.header("⚙️ টুলস ও মেনুবার")
 
@@ -88,7 +88,7 @@ for num, (item_name, desc) in menu_dict.items():
 
 app_mode = st.session_state.app_mode
 
-# নির্দিষ্ট ডিজাইন প্রিন্ট করার জন্য ডেডিকেটেড ফাংশন
+# A4 সাইজ পেপার এবং প্রিন্ট কনফিগারেশনসহ ডেডিকেটেড ফাংশন
 def print_content_html(html_content, button_text):
     full_html = f"""
     <!DOCTYPE html>
@@ -98,32 +98,56 @@ def print_content_html(html_content, button_text):
         <style>
             body {{
                 font-family: 'SolaimanLipi', Arial, sans-serif;
-                background: white;
+                background: #525659;
                 margin: 0;
                 padding: 20px;
-                color: black;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }}
+            /* A4 পেপার স্টাইল (210mm x 297mm) */
+            .a4-page {{
+                background: white;
+                width: 210mm;
+                min-height: 297mm;
+                padding: 20mm 20mm;
+                margin: 0 auto 20px auto;
+                box-shadow: 0 0 10px rgba(0,0,0,0.3);
+                box-sizing: border-box;
+                position: relative;
             }}
             @media print {{
+                body {{
+                    background: none;
+                    padding: 0;
+                }}
                 .no-print {{
                     display: none !important;
                 }}
+                .a4-page {{
+                    box-shadow: none;
+                    margin: 0;
+                    width: 100%;
+                    min-height: 100vh;
+                    padding: 15mm;
+                    page-break-after: avoid;
+                }}
                 @page {{
                     size: A4;
-                    margin: 15mm;
+                    margin: 0;
                 }}
             }}
             .print-btn {{
                 background-color: #0B50FA;
                 color: white;
-                padding: 12px 25px;
+                padding: 12px 30px;
                 border: none;
                 border-radius: 8px;
                 cursor: pointer;
                 font-size: 16px;
                 font-weight: bold;
-                display: block;
-                margin: 20px auto;
-                box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+                margin-bottom: 20px;
+                box-shadow: 0 4px 6px rgba(0,0,0,0.2);
             }}
             .print-btn:hover {{
                 background-color: #083cb3;
@@ -131,14 +155,14 @@ def print_content_html(html_content, button_text):
         </style>
     </head>
     <body>
-        <div>
+        <button class="print-btn no-print" onclick="window.print()">🖨️ {button_text}</button>
+        <div class="a4-page">
             {html_content}
         </div>
-        <button class="print-btn no-print" onclick="window.print()">🖨️ {button_text}</button>
     </body>
     </html>
     """
-    components.html(full_html, height=750, scrolling=True)
+    components.html(full_html, height=1150, scrolling=True)
 
 
 # ==============================================================================
@@ -186,61 +210,63 @@ if app_mode == 6:
         st.markdown("---")
 
     if st.button("🖨️ ক্যাশ মেমো ফাইনাল প্রিভিউ ও প্রিন্ট দেখুন"):
-        st.success("✅ ক্যাশ মেমো প্রস্তুত! নিচে সরাসরি প্রিন্ট করার অপশন দেখতে পাবেন।")
+        st.success("✅ ক্যাশ মেমো সম্পূর্ণ A4 পেজে প্রস্তুত!")
         
         items_html = ""
         for idx, itm in enumerate(updated_items):
             items_html += f"""
             <tr style="border-bottom: 1px solid #ddd;">
-                <td style="padding: 8px; text-align: center;">{idx + 1}</td>
-                <td style="padding: 8px;">{itm['name']}</td>
-                <td style="padding: 8px; text-align: center;">{itm['serial']}</td>
-                <td style="padding: 8px; text-align: center;">{itm['has_warranty']} ({itm['warranty_period']})</td>
-                <td style="padding: 8px; text-align: right;">{itm['price']} TK</td>
+                <td style="padding: 10px; text-align: center;">{idx + 1}</td>
+                <td style="padding: 10px;">{itm['name']}</td>
+                <td style="padding: 10px; text-align: center;">{itm['serial']}</td>
+                <td style="padding: 10px; text-align: center;">{itm['has_warranty']} ({itm['warranty_period']})</td>
+                <td style="padding: 10px; text-align: right;">{itm['price']} TK</td>
             </tr>
             """
 
         memo_html_code = f"""
-        <div style='border: 2px solid #0B50FA; padding: 25px; border-radius: 8px; background-color: #ffffff; max-width: 700px; margin: auto;'>
-            <h2 style='text-align: center; color: #0B50FA; margin: 0;'>{shop_name}</h2>
-            <p style='text-align: center; font-size: 13px; color: #333; margin: 4px 0;'>{shop_address}</p>
-            <hr style='border: 1px solid #0B50FA;'>
-            <h3 style='text-align: center; background-color: #0B50FA; color: white; padding: 6px; border-radius: 4px; margin: 15px 0;'>ক্যাশ মেমো / রসিদ</h3>
-            
-            <table style="width: 100%; margin-bottom: 15px; font-size: 14px;">
-                <tr>
-                    <td><b>গ্রাহকের নাম:</b> {c_name}</td>
-                    <td style="text-align: right;"><b>তারিখ:</b> {date.today().strftime('%d-%m-%Y')}</td>
-                </tr>
-                <tr>
-                    <td><b>মোবাইল নম্বর:</b> {c_phone}</td>
-                    <td></td>
-                </tr>
-            </table>
-            
-            <table style="width: 100%; border-collapse: collapse; font-size: 14px; margin-bottom: 20px;">
-                <thead>
-                    <tr style="background-color: #f1f3f5; border-bottom: 2px solid #0B50FA;">
-                        <th style="padding: 8px; text-align: center;">ক্রমিক</th>
-                        <th style="padding: 8px; text-align: left;">পণ্যের বিবরণ</th>
-                        <th style="padding: 8px; text-align: center;">সিরিয়াল নম্বর</th>
-                        <th style="padding: 8px; text-align: center;">ওয়ারেন্টি</th>
-                        <th style="padding: 8px; text-align: right;">মূল্য</th>
+        <div style='border: 2px solid #0B50FA; padding: 30px; border-radius: 8px; height: 100%; display: flex; flex-direction: column; justify-content: space-between; box-sizing: border-box;'>
+            <div>
+                <h2 style='text-align: center; color: #0B50FA; margin: 0; font-size: 26px;'>{shop_name}</h2>
+                <p style='text-align: center; font-size: 14px; color: #333; margin: 6px 0;'>{shop_address}</p>
+                <hr style='border: 1px solid #0B50FA; margin-bottom: 20px;'>
+                <h3 style='text-align: center; background-color: #0B50FA; color: white; padding: 8px; border-radius: 4px; margin: 0 0 25px 0; font-size: 18px;'>ক্যাশ মেমো / রসিদ</h3>
+                
+                <table style="width: 100%; margin-bottom: 25px; font-size: 15px;">
+                    <tr>
+                        <td><b>গ্রাহকের নাম:</b> {c_name}</td>
+                        <td style="text-align: right;"><b>তারিখ:</b> {date.today().strftime('%d-%m-%Y')}</td>
                     </tr>
-                </thead>
-                <tbody>
-                    {items_html}
-                </tbody>
-            </table>
-            
-            <div style='text-align: right; font-size: 15px; background-color: #f8f9fa; padding: 10px; border-radius: 5px; margin-bottom: 40px;'>
-                <b>সর্বমোট প্রদেয় টাকা (Total): <span style='color: red; font-size: 17px;'>{total_amount} TK</span></b>
+                    <tr>
+                        <td style="padding-top: 8px;"><b>মোবাইল নম্বর:</b> {c_phone}</td>
+                        <td></td>
+                    </tr>
+                </table>
+                
+                <table style="width: 100%; border-collapse: collapse; font-size: 15px; margin-bottom: 25px;">
+                    <thead>
+                        <tr style="background-color: #f1f3f5; border-bottom: 2px solid #0B50FA;">
+                            <th style="padding: 10px; text-align: center;">ক্রমিক</th>
+                            <th style="padding: 10px; text-align: left;">পণ্যের বিবরণ</th>
+                            <th style="padding: 10px; text-align: center;">সিরিয়াল নম্বর</th>
+                            <th style="padding: 10px; text-align: center;">ওয়ারেন্টি</th>
+                            <th style="padding: 10px; text-align: right;">মূল্য</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {items_html}
+                    </tbody>
+                </table>
+                
+                <div style='text-align: right; font-size: 16px; background-color: #f8f9fa; padding: 12px; border-radius: 5px;'>
+                    <b>সর্বমোট প্রদেয় টাকা (Total): <span style='color: red; font-size: 18px;'>{total_amount} TK</span></b>
+                </div>
             </div>
             
-            <table style="width: 100%; margin-top: 50px; font-size: 14px;">
+            <table style="width: 100%; margin-top: 50px; font-size: 15px;">
                 <tr>
-                    <td><div style='border-top: 1px dashed black; width: 150px; text-align: center; padding-top: 4px;'>গ্রাহকের স্বাক্ষর</div></td>
-                    <td style="text-align: right;"><div style='border-top: 1px solid black; width: 170px; text-align: center; padding-top: 4px; font-weight: bold; display: inline-block;'>বিক্রেতার স্বাক্ষর / সিল</div></td>
+                    <td><div style='border-top: 1px dashed black; width: 180px; text-align: center; padding-top: 6px;'>গ্রাহকের স্বাক্ষর</div></td>
+                    <td style="text-align: right;"><div style='border-top: 1px solid black; width: 200px; text-align: center; padding-top: 6px; font-weight: bold; display: inline-block;'>বিক্রেতার স্বাক্ষর / সিল</div></td>
                 </tr>
             </table>
         </div>
@@ -265,27 +291,29 @@ elif app_mode == 8:
         cit_union = st.text_input("ইউনিয়ন / পৌরসভা", "মণিরামপুর সদর ইউনিয়ন")
 
     if st.button("📜 নাগরিক সনদ প্রিভিউ ও প্রিন্ট দেখুন"):
-        st.success("✅ নাগরিক সনদপত্র প্রস্তুত! নিচে সরাসরি প্রিন্ট করার অপশন দেখতে পাবেন।")
+        st.success("✅ নাগরিক সনদপত্র সম্পূর্ণ A4 পেজে প্রস্তুত!")
         
         cert_html_code = f"""
-        <div style='border: 5px double #0B50FA; padding: 35px; border-radius: 10px; background-color: #ffffff; max-width: 750px; margin: auto; box-sizing: border-box;'>
-            <div style="text-align:center;">
-                <h2 style="color:#0B50FA; margin:0; font-size: 24px;">ইউনিয়ন পরিষদ কার্যালয়</h2>
-                <p style="font-size:13px; margin:4px 0; color:#333;">দিঘীরপাড়, মনিরামপুর, যশোর।</p>
-                <hr style="border:1px solid #0B50FA; width:40%; margin: 10px auto;">
-                <h3 style="background:#0B50FA; color:white; display:inline-block; padding:4px 20px; border-radius:4px; margin-top:5px; font-size: 18px;">নাগরিক সনদপত্র</h3>
+        <div style='border: 6px double #0B50FA; padding: 40px; border-radius: 12px; height: 100%; display: flex; flex-direction: column; justify-content: space-between; box-sizing: border-box; background-color: #ffffff;'>
+            <div>
+                <div style="text-align:center;">
+                    <h2 style="color:#0B50FA; margin:0; font-size: 28px; font-weight: bold;">ইউনিয়ন পরিষদ কার্যালয়</h2>
+                    <p style="font-size:15px; margin:6px 0; color:#333;">দিঘীরপাড়, মনিরামপুর, যশোর।</p>
+                    <hr style="border:1px solid #0B50FA; width:45%; margin: 15px auto;">
+                    <h3 style="background:#0B50FA; color:white; display:inline-block; padding:6px 25px; border-radius:5px; margin-top:10px; font-size: 20px;">নাগরিক সনদপত্র</h3>
+                </div>
+                
+                <p style="font-size:17px; line-height:2.4; text-align:justify; margin-top:50px;">
+                    এই মর্মে প্রত্যয়ন করা যাইতেছে যে, <b>{cit_name}</b>, পিতা: <b>{cit_father}</b>, মাতা: <b>{cit_mother}</b>, গ্রাম: <b>{cit_vill}</b>, {cit_word}, উপজেলা: মণিরামপুর, জেলা: যশোর এর অত্র ইউনিয়নের একজন স্থায়ী বাসিন্দা এবং জন্মসূত্রে বাংলাদেশের নাগরিক। আমার জানামতে তিনি দেশবিরোধী বা রাষ্ট্রবিরোধী কোনো কাজের সাথে জড়িত নন এবং তার চরিত্র অত্যন্ত ভালো।
+                </p>
+                
+                <p style="font-size:17px; margin-top:35px; line-height: 1.8;">আমি তার সর্বাঙ্গীন সাফল্য ও দীর্ঘায়ু কামনা করি।</p>
             </div>
             
-            <p style="font-size:15px; line-height:2.2; text-align:justify; margin-top:35px;">
-                এই মর্মে প্রত্যয়ন করা যাইতেছে যে, <b>{cit_name}</b>, পিতা: <b>{cit_father}</b>, মাতা: <b>{cit_mother}</b>, গ্রাম: <b>{cit_vill}</b>, {cit_word}, উপজেলা: মণিরামপুর, জেলা: যশোর এর অত্র ইউনিয়নের একজন স্থায়ী বাসিন্দা এবং জন্মসূত্রে বাংলাদেশের নাগরিক। আমার জানামতে তিনি দেশবিরোধী বা রাষ্ট্রবিরোধী কোনো কাজের সাথে জড়িত নন এবং তার চরিত্র অত্যন্ত ভালো।
-            </p>
-            
-            <p style="font-size:15px; margin-top:25px;">আমি তার সর্বাঙ্গীন সাফল্য ও দীর্ঘায়ু কামনা করি।</p>
-            
-            <table style="width: 100%; margin-top: 90px; font-size: 14px;">
+            <table style="width: 100%; margin-top: 80px; font-size: 15px;">
                 <tr>
-                    <td><div style="border-top:1px dashed black; width: 160px; text-align: center; padding-top:6px;">আবেদনকারীর স্বাক্ষর</div></td>
-                    <td style="text-align: right;"><div style="border-top:1px solid black; width: 160px; text-align: center; padding-top:6px; font-weight:bold; display: inline-block;">চেয়ারম্যান</div></td>
+                    <td><div style="border-top:1px dashed black; width: 180px; text-align: center; padding-top:8px;">আবেদনকারীর স্বাক্ষর</div></td>
+                    <td style="text-align: right;"><div style="border-top:1px solid black; width: 180px; text-align: center; padding-top:8px; font-weight:bold; display: inline-block;">চেয়ারম্যান</div></td>
                 </tr>
             </table>
         </div>
@@ -304,39 +332,41 @@ elif app_mode == 9:
     t_prize = st.text_input("পুরস্কারের বিবরণ", "চ্যাম্পিয়ন: ১০,০০০ টাকা + ট্রফি | রানার্সআপ: ৫,০০০ টাকা + ট্রফি")
 
     if st.button("⚽ টুর্নামেন্ট নোটিশ প্রিভিউ ও প্রিন্ট দেখুন"):
-        st.success("✅ টুর্নামেন্ট আমন্ত্রণপত্র প্রস্তুত! নিচে সরাসরি প্রিন্ট করার অপশন দেখতে পাবেন।")
+        st.success("✅ টুর্নামেন্ট আমন্ত্রণপত্র সম্পূর্ণ A4 পেজে প্রস্তুত!")
         
         notice_html_code = f"""
-        <div style='border: 4px solid #ff4b4b; padding: 30px; border-radius: 8px; background-color: #ffffff; max-width: 750px; margin: auto; box-sizing: border-box;'>
-            <div style="text-align:center;">
-                <h2 style="color:#ff4b4b; margin:0; font-size: 22px;">🏆 টুর্নামেন্ট আমন্ত্রণপত্র ও নোটিশ 🏆</h2>
-                <h3 style="color:#0B50FA; margin:8px 0; font-size:20px;">{t_name}</h3>
-                <hr style="border:1px solid #ff4b4b; width:50%; margin: 10px auto;">
+        <div style='border: 4px solid #ff4b4b; padding: 35px; border-radius: 10px; height: 100%; display: flex; flex-direction: column; justify-content: space-between; box-sizing: border-box; background-color: #ffffff;'>
+            <div>
+                <div style="text-align:center;">
+                    <h2 style="color:#ff4b4b; margin:0; font-size: 24px;">🏆 টুর্নামেন্ট আমন্ত্রণপত্র ও নোটিশ 🏆</h2>
+                    <h3 style="color:#0B50FA; margin:10px 0; font-size:22px;">{t_name}</h3>
+                    <hr style="border:1px solid #ff4b4b; width:55%; margin: 12px auto;">
+                </div>
+                
+                <p style="font-size:16px; line-height:2; margin-top:30px; text-align:center;">
+                    সকল ক্রীড়াপ্রেমী ও দলের অবগতির জন্য জানানো যাচ্ছে যে, আগামী <b>{t_date}</b> তারিখে স্থানীয় মাঠে জমকালো আয়োজনের মাধ্যমে এই টুর্নামেন্ট শুরু হতে যাচ্ছে। আপনি বা আপনার দল এই প্রতিযোগিতায় স্বতঃস্ফূর্তভাবে অংশগ্রহণ করার জন্য আমন্ত্রিত।
+                </p>
+                
+                <div style="background:#f8f9fa; padding:15px; border-radius:6px; border-left:5px solid #ff4b4b; margin-top:25px;">
+                    <h4 style="margin:0 0 8px 0; color:#333; font-size: 16px;">🎁 আকর্ষণীয় পুরস্কারসমূহ:</h4>
+                    <p style="margin:0; font-size:15px; font-weight:bold; color:red;">{t_prize}</p>
+                </div>
+                
+                <div style="margin-top:25px;">
+                    <h4 style="color:#333; margin-bottom:8px; font-size: 16px;">📋 প্রধান নিয়মাবলী:</h4>
+                    <ol style="font-size:14px; line-height:1.8; margin:0; padding-left:20px;">
+                        <li>ম্যাচ শুরুর নির্ধারিত সময়ের ১৫ মিনিট পূর্বে মাঠে উপস্থিত থাকতে হবে।</li>
+                        <li>আম্পায়ারের সিদ্ধান্তই চূড়ান্ত সিদ্ধান্ত বলে গণ্য হবে।</li>
+                        <li>খেলার মাঠে শৃঙ্খলা বজায় রাখা বাধ্যতামূলক। বিশৃঙ্খলা সৃষ্টিকারী দলকে বহিষ্কার করা হবে।</li>
+                        <li>এন্ট্রি ফি জমা দিয়ে নির্দিষ্ট সময়ের মধ্যে টিম রেজিস্ট্রেশন সম্পন্ন করতে হবে।</li>
+                    </ol>
+                </div>
             </div>
             
-            <p style="font-size:15px; line-height:1.8; margin-top:20px; text-align:center;">
-                সকল ক্রীড়াপ্রেমী ও দলের অবগতির জন্য জানানো যাচ্ছে যে, আগামী <b>{t_date}</b> তারিখে স্থানীয় মাঠে জমকালো আয়োজনের মাধ্যমে এই টুর্নামেন্ট শুরু হতে যাচ্ছে। আপনি বা আপনার দল এই প্রতিযোগিতায় স্বতঃস্ফূর্তভাবে অংশগ্রহণ করার জন্য আমন্ত্রিত।
-            </p>
-            
-            <div style="background:#f8f9fa; padding:12px; border-radius:6px; border-left:4px solid #ff4b4b; margin-top:20px;">
-                <h4 style="margin:0 0 5px 0; color:#333; font-size: 15px;">🎁 আকর্ষণীয় পুরস্কারসমূহ:</h4>
-                <p style="margin:0; font-size:14px; font-weight:bold; color:red;">{t_prize}</p>
-            </div>
-            
-            <div style="margin-top:20px;">
-                <h4 style="color:#333; margin-bottom:5px; font-size: 15px;">📋 প্রধান নিয়মাবলী:</h4>
-                <ol style="font-size:13px; line-height:1.6; margin:0; padding-left:20px;">
-                    <li>ম্যাচ শুরুর নির্ধারিত সময়ের ১৫ মিনিট পূর্বে মাঠে উপস্থিত থাকতে হবে।</li>
-                    <li>আম্পায়ারের সিদ্ধান্তই চূড়ান্ত সিদ্ধান্ত বলে গণ্য হবে।</li>
-                    <li>খেলার মাঠে শৃঙ্খলা বজায় রাখা বাধ্যতামূলক। বিশৃঙ্খলা সৃষ্টিকারী দলকে বহিষ্কার করা হবে।</li>
-                    <li>এন্ট্রি ফি জমা দিয়ে নির্দিষ্ট সময়ের মধ্যে টিম রেজিস্ট্রেশন সম্পন্ন করতে হবে।</li>
-                </ol>
-            </div>
-            
-            <table style="width: 100%; margin-top: 70px; font-size: 14px;">
+            <table style="width: 100%; margin-top: 60px; font-size: 15px;">
                 <tr>
-                    <td><div style="border-top:1px dashed black; width: 160px; text-align: center; padding-top:6px;">আয়োজক কমিটি</div></td>
-                    <td style="text-align: right;"><div style="border-top:1px solid black; width: 160px; text-align: center; padding-top:6px; font-weight:bold; display: inline-block;">প্রধান সমন্বয়ক</div></td>
+                    <td><div style="border-top:1px dashed black; width: 180px; text-align: center; padding-top:8px;">আয়োজক কমিটি</div></td>
+                    <td style="text-align: right;"><div style="border-top:1px solid black; width: 180px; text-align: center; padding-top:8px; font-weight:bold; display: inline-block;">প্রধান সমন্বয়ক</div></td>
                 </tr>
             </table>
         </div>
