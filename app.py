@@ -5,7 +5,7 @@ from PIL import Image
 import streamlit as st
 from pypdf import PdfReader
 from datetime import date
-import streamlit.components.v1 as components
+import streamlit.components.v1.components as components
 
 try:
     from rembg import remove
@@ -20,7 +20,6 @@ st.set_page_config(page_title="হাসানুর কম্পিউটার
 # ==============================================================================
 st.markdown("""
 <style>
-    /* Streamlit এর মেইন অ্যাপ ব্যাকগ্রাউন্ড এবং সাইডবার কালার পরিবর্তন */
     .stApp {
         background: linear-gradient(135deg, #071952, #0b2f64, #1b032d, #381123);
         background-attachment: fixed;
@@ -55,11 +54,26 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# হেডার সেকশন
-st.markdown("""
+# আপনার ছবি লোড করে বেসসিকে কনভার্ট করার কোড
+import base64
+def get_image_base64(image_path):
+    try:
+        with open(image_path, "rb") as img_file:
+            return base64.b64encode(img_file.read()).decode()
+    except Exception:
+        return ""
+
+img_b64 = get_image_base64("hasanur.jpg")
+img_tag = f'<img src="data:image/jpeg;base64,{img_b64}" style="width: 75px; height: 75px; border-radius: 50%; object-fit: cover; border: 3px solid white; box-shadow: 0 4px 10px rgba(0,0,0,0.3); vertical-align: middle; margin-right: 15px;">' if img_b64 else '👤'
+
+# হেডার সেকশন (আপনার ছবিসহ)
+st.markdown(f"""
 <div class="studio-header">
     <div style="background: rgba(255,255,255,0.15); padding: 18px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.3);">
-        <h1 style="margin: 0 0 6px 0;">🖨️ হাসানুর কম্পিউটার স্টুডিও</h1>
+        <div style="display: flex; align-items: center; justify-content: center; flex-wrap: wrap; margin-bottom: 8px;">
+            {img_tag}
+            <h1 style="margin: 0; display: inline-block;">হাসানুর কম্পিউটার স্টুডিও</h1>
+        </div>
         <p style="margin: 3px 0;"><b>ঠিকানা:</b> দিঘীরপাড়, মনিরামপুর, যশোর</p>
         <p style="margin: 3px 0;"><b>মোবাইল:</b> ০১৭৪৩-৬১৪৩৫৯</p>
         <hr style="border: 0.5px solid rgba(255,255,255,0.3); width: 80%; margin: 10px auto;">
