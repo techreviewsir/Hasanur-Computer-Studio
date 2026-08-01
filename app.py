@@ -468,13 +468,49 @@ elif app_mode == 9:
     t_prize = st.text_input("পুরস্কারের বিবরণ", "চ্যাম্পিয়ন: ১০,০০০ টাকা + ট্রফি | রানার্সআপ: ৫,০০০ টাকা + ট্রফি")
 
     st.markdown("### 📋 টুর্নামেন্টের প্রধান নিয়মাবলী কাস্টমাইজ করুন")
-    rule_1 = st.text_input("নিয়ম ১", "ম্যাচ শুরুর নির্ধারিত সময়ের ১৫ মিনিট পূর্বে মাঠে উপস্থিত থাকতে হবে।")
-    rule_2 = st.text_input("নিয়ম ২", "আম্পায়ারের সিদ্ধান্তই চূড়ান্ত সিদ্ধান্ত বলে গণ্য হবে।")
-    rule_3 = st.text_input("নিয়ম ৩", "খেলার মাঠে শৃঙ্খলা বজায় রাখা বাধ্যতামূলক। বিশৃঙ্খলা সৃষ্টিকারী দলকে বহিষ্কার করা হবে।")
-    rule_4 = st.text_input("নিয়ম ৪", "এন্ট্রি ফি জমা দিয়ে নির্দিষ্ট সময়ের মধ্যে টিম রেজিস্ট্রেশন সম্পন্ন করতে হবে।")
+
+    if 'tournament_rules' not in st.session_state:
+        st.session_state.tournament_rules = [
+            "ম্যাচ শুরুর নির্ধারিত সময়ের ১৫ মিনিট পূর্বে মাঠে উপস্থিত থাকতে হবে।",
+            "আম্পায়ারের সিদ্ধান্তই চূড়ান্ত সিদ্ধান্ত বলে গণ্য হবে।",
+            "খেলার মাঠে শৃঙ্খলা বজায় রাখা বাধ্যতামূলক। বিশৃঙ্খলা সৃষ্টিকারী দলকে বহিষ্কার করা হবে।",
+            "এন্ট্রি ফি জমা দিয়ে নির্দিষ্ট সময়ের মধ্যে টিম রেজিস্ট্রেশন সম্পন্ন করতে হবে।"
+        ]
+
+    # নতুন নিয়ম যোগ করার বাটন
+    if st.button("➕ নিয়ম যোগ করুন"):
+        st.session_state.tournament_rules.append("")
+        st.rerun()
+
+    updated_rules = []
+    rules_to_delete = []
+
+    for i, rule_text in enumerate(st.session_state.tournament_rules):
+        col_r1, col_r2 = st.columns([5, 1])
+        with col_r1:
+            r_val = st.text_input(f"নিয়ম #{i+1}", rule_text, key=f"rule_input_{i}")
+        with col_r2:
+            st.markdown("<div style='margin-top: 28px;'></div>", unsafe_allow_html=True)
+            if st.button("❌ রিমুভ", key=f"del_rule_{i}"):
+                rules_to_delete.append(i)
+        updated_rules.append(r_val)
+
+    if rules_to_delete:
+        for idx in sorted(rules_to_delete, reverse=True):
+            del st.session_state.tournament_rules[idx]
+        st.rerun()
+
+    # সেশন স্টেট আপডেট রাখা
+    st.session_state.tournament_rules = updated_rules
 
     if st.button("⚽ টুর্নামেন্ট নোটিশ প্রিভিউ ও প্রিন্ট দেখুন"):
         st.success("✅ টুর্নামেন্ট আমন্ত্রণপত্র সম্পূর্ণ A4 পেজে প্রস্তুত!")
+        
+        rules_li_html = ""
+        for r in updated_rules:
+            if r.strip():
+                rules_li_html += f"<li>{r}</li>"
+
         notice_html_code = f"""
         <div style='padding: 15px; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: space-between; box-sizing: border-box; background-color: #ffffff;'>
             <div>
@@ -493,10 +529,7 @@ elif app_mode == 9:
                 <div style="margin-top:20px;">
                     <h4 style="color:#333; margin-bottom:8px; font-size: 16px;">📋 প্রধান নিয়মাবলী:</h4>
                     <ol style="font-size:14px; line-height:1.8; margin:0; padding-left:20px;">
-                        <li>{rule_1}</li>
-                        <li>{rule_2}</li>
-                        <li>{rule_3}</li>
-                        <li>{rule_4}</li>
+                        {rules_li_html}
                     </ol>
                 </div>
             </div>
