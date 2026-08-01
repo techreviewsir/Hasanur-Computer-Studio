@@ -67,14 +67,27 @@ st.markdown(f"""
         box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         font-size: 11px;
     }}
+    /* লম্বালম্বি ও আকর্ষণীয় স্টুডিও হেডার কার্ড */
     .studio-header {{
         background: {header_gradient};
-        padding: 22px;
+        padding: 30px 20px;
         border-radius: 12px;
         color: white;
         text-align: center;
-        margin-bottom: 20px;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        margin: 0 auto 20px auto;
+        max-width: 500px;
+        box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+    }}
+    .studio-header h1 {{
+        font-size: 26px;
+        margin-bottom: 12px;
+        font-weight: bold;
+        letter-spacing: 0.5px;
+    }}
+    .studio-header p {{
+        font-size: 14px;
+        margin: 8px 0;
+        line-height: 1.5;
     }}
     .stButton > button {{
         width: 100% !important;
@@ -130,11 +143,9 @@ st.markdown(f"""
             background: white !important;
             color: black !important;
         }}
-        /* সাইডবার, হেডার এবং ফালতু বাটনগুলো প্রিন্ট থেকে লুকিয়ে রাখা হবে */
         [data-testid="stSidebar"], .studio-header, .stButton, header, footer {{
             display: none !important;
         }}
-        /* শুধুমাত্র A4 পেপার বক্সটি প্রিন্ট পেজে দেখাবে এবং মার্জিন ঠিক রাখবে */
         .a4-paper-box {{
             box-shadow: none !important;
             margin: 0 !important;
@@ -153,8 +164,9 @@ st.markdown(f"""
 
 t = {
     "title": "Hasanur Computer Studio" if is_eng else "🖨️ হাসানুর কম্পিউটার স্টুডিও",
-    "address": "<b>Address:</b> Dighirpar, Monirampur, Jashore | <b>Mobile:</b> 01743-614359" if is_eng else "<b>ঠিকানা:</b> দিঘীরপাড়, মনিরামপুর, যশোর | <b>মোবাইল:</b> ০১৭৪৩-৬১৪৩৫৯",
-    "subtitle": "All-in-one Master Dashboard for Computer, Design & Online Services" if is_eng else "সকল ধরনের কম্পিউটার, ডিজাইন ও অনলাইন সার্ভিসের অল-ইন-ওয়ান মাস্টার ড্যাশবোর্ড",
+    "address": "<b>ঠিকানা:</b> দিঘীরপাড়, মনিরামপুর, যশোর" if not is_eng else "<b>Address:</b> Dighirpar, Monirampur, Jashore",
+    "mobile": "<b>মোবাইল:</b> ০১৭৪৩-৬১৪৩৫৯" if not is_eng else "<b>Mobile:</b> 01743-614359",
+    "subtitle": "সকল ধরনের কম্পিউটার, ডিজাইন ও অনলাইন সার্ভিসের অল-ইন-ওয়ান মাস্টার ড্যাশবোর্ড" if not is_eng else "All-in-one Master Dashboard for Computer, Design & Online Services",
     "upload_header": "📁 Master File Uploader" if is_eng else "📁 ফাইল আপলোড (Master File Uploader)",
     "upload_label": "Upload Image or PDF file" if is_eng else "ছবি বা পিডিএফ ফাইল আপলোড করুন",
     "tools_header": "🛠️ ডিজিটাল টুলস ও এডিটর (১-১৪)" if not is_eng else "🛠️ Digital Tools & Editors",
@@ -163,11 +175,14 @@ t = {
     "portal_header": "📋 অন্যান্য গুরুত্বপূর্ণ অনলাইন লিংক ও পোর্টাল" if not is_eng else "📋 All Important Online Links",
 }
 
+# লম্বালম্বি সুবিন্যস্ত হেডার লেআউট
 st.markdown(f"""
 <div class="studio-header">
     <h1>{t['title']}</h1>
-    <p style="font-size: 16px; margin: 5px 0;">{t['address']}</p>
-    <p style="font-size: 13px; margin: 0;">{t['subtitle']}</p>
+    <p>{t['address']}</p>
+    <p>{t['mobile']}</p>
+    <hr style="border:0.5px solid rgba(255,255,255,0.3); width:80%; margin: 10px auto;">
+    <p style="font-size: 13px; opacity: 0.9;">{t['subtitle']}</p>
 </div>
 """, unsafe_allow_html=True)
 
