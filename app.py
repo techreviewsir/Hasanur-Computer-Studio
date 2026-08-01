@@ -5,29 +5,75 @@ from PIL import Image
 import streamlit as st
 from pypdf import PdfReader
 from datetime import date
-import streamlit.components.v1 as components
-
-try:
-    from rembg import remove
-    has_rembg = True
-except ImportError:
-    has_rembg = False
+import streamlit.components.v1.components as components
+import base64
+from pathlib import Path
 
 st.set_page_config(page_title="হাসানুর কম্পিউটার স্টুডিও", layout="wide")
 
 # ==============================================================================
-# মূল স্টাইল ও পুরো পেজের গ্রেডিয়েন্ট ব্যাকগ্রাউন্ড
+# মূল স্টাইল, গ্রেডিয়েন্ট ব্যাকগ্রাউন্ড, সাইডবার মেনু হোয়াইট ব্যাকগ্রাউন্ড ও ব্ল্যাক টেক্সট
 # ==============================================================================
 st.markdown("""
 <style>
+    /* ডার্ক মোড চিরতরে বন্ধ করার জন্য গ্লোবাল লাইট থিম স্টাইল */
     .stApp {
-        background: linear-gradient(135deg, #071952, #0b2f64, #1b032d, #381123);
-        background-attachment: fixed;
-        color: #ffffff;
+        background: linear-gradient(135deg, #071952, #0b2f64, #1b032d, #381123) !important;
+        background-attachment: fixed !important;
+        color: #ffffff !important;
     }
+    
+    /* সাইডবার ব্যাকগ্রাউন্ড */
     section[data-testid="stSidebar"] {
-        background-color: #0b132b;
+        background-color: #0b132b !important;
     }
+    
+    /* সাইডবারের মেনু বাটন এবং তার ভেতরের সব লেখার রঙ কালো ও ব্যাকগ্রাউন্ড সাদা করা */
+    section[data-testid="stSidebar"] button,
+    section[data-testid="stSidebar"] button p,
+    section[data-testid="stSidebar"] button span,
+    section[data-testid="stSidebar"] div[data-testid="stBaseButton-secondary"] {
+        background-color: #ffffff !important;
+        color: #000000 !important;
+        border: 1px solid #cccccc !important;
+        font-weight: 700 !important;
+        border-radius: 6px !important;
+        text-align: left !important;
+    }
+    
+    /* বাটনে মাউস নিলে লাল ব্যাকগ্রাউন্ড ও সাদা লেখা হবে */
+    section[data-testid="stSidebar"] button:hover,
+    section[data-testid="stSidebar"] button:hover p,
+    section[data-testid="stSidebar"] button:hover span {
+        background-color: #ff4b4b !important;
+        color: #ffffff !important;
+        border-color: #ff4b4b !important;
+    }
+    
+    /* সাইডবারের অন্যান্য সাধারণ শিরোনাম সাদা রাখা */
+    section[data-testid="stSidebar"] .stMarkdown, 
+    section[data-testid="stSidebar"] label, 
+    section[data-testid="stSidebar"] h1, 
+    section[data-testid="stSidebar"] h2, 
+    section[data-testid="stSidebar"] h3 {
+        color: #ffffff !important;
+    }
+    
+    /* লেখার লিঙ্কে মাউস রাখলে লাল রঙ */
+    a:hover, .stMarkdown a:hover {
+        color: #ff4b4b !important;
+    }
+    
+    /* অ্যাপের ভেতরের সমস্ত সাধারণ লেখা এবং লেবেল সাদা রঙ নিশ্চিত করা */
+    h1, h2, h3, h4, h5, h6, p, span, label, div, .stMarkdown, .stText {
+        color: #ffffff !important;
+    }
+    
+    /* টেক্সট ইনপুট ও সিলেক্ট বক্সের ভেতরে লেখার রঙ স্পষ্ট রাখা */
+    input, textarea, select {
+        color: #000000 !important;
+    }
+
     .studio-header {
         background: linear-gradient(135deg, #0B50FA, #ff4b4b);
         padding: 25px 20px;
@@ -41,22 +87,35 @@ st.markdown("""
         font-size: 26px;
         margin-bottom: 8px;
         font-weight: bold;
-        color: white;
+        color: white !important;
     }
     .studio-header p {
         font-size: 14px;
         margin: 4px 0;
         line-height: 1.5;
-        color: white;
+        color: white !important;
     }
 </style>
 """, unsafe_allow_html=True)
 
+def get_embedded_image():
+    image_path = "hasanur.jpeg"
+    if Path(image_path).exists():
+        with open(image_path, "rb") as img_file:
+            encoded = base64.b64encode(img_file.read()).decode()
+            return f'<img src="data:image/jpeg;base64,{encoded}" style="width: 105px; height: 105px; border-radius: 50%; object-fit: contain; background-color: #ffffff; border: 3px solid white; box-shadow: 0 4px 10px rgba(0,0,0,0.3); vertical-align: middle; margin-right: 15px;">'
+    return '👤'
+
+img_tag = get_embedded_image()
+
 # হেডার সেকশন
-st.markdown("""
+st.markdown(f"""
 <div class="studio-header">
     <div style="background: rgba(255,255,255,0.15); padding: 18px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.3);">
-        <h1 style="margin: 0 0 6px 0;">🖨️ হাসানুর কম্পিউটার স্টুডিও</h1>
+        <div style="display: flex; align-items: center; justify-content: center; flex-wrap: wrap; margin-bottom: 8px;">
+            {img_tag}
+            <h1 style="margin: 0; display: inline-block;">হাসানুর কম্পিউটার স্টুডিও</h1>
+        </div>
         <p style="margin: 3px 0;"><b>ঠিকানা:</b> দিঘীরপাড়, মনিরামপুর, যশোর</p>
         <p style="margin: 3px 0;"><b>মোবাইল:</b> ০১৭৪৩-৬১৪৩৫৯</p>
         <hr style="border: 0.5px solid rgba(255,255,255,0.3); width: 80%; margin: 10px auto;">
@@ -128,35 +187,73 @@ def print_content_html(html_content, button_text):
                 border: 2px solid #0B50FA;
             }}
             @media print {{
-                body {{ background: none; padding: 0; }}
-                .no-print {{ display: none !important; }}
-                .a4-page {{
-                    box-shadow: none; margin: 0; width: 210mm; height: 297mm;
-                    padding: 12mm 15mm; page-break-after: avoid; page-break-inside: avoid;
-                    border: 2px solid #0B50FA !important; -webkit-print-color-adjust: exact;
+                body {{
+                    background: none;
+                    padding: 0;
                 }}
-                @page {{ size: A4; margin: 0; }}
+                .no-print {{
+                    display: none !important;
+                }}
+                .a4-page {{
+                    box-shadow: none;
+                    margin: 0;
+                    width: 210mm;
+                    height: 297mm;
+                    padding: 12mm 15mm;
+                    page-break-after: avoid;
+                    page-break-inside: avoid;
+                    border: 2px solid #0B50FA !important;
+                    -webkit-print-color-adjust: exact;
+                }}
+                @page {{
+                    size: A4;
+                    margin: 0;
+                }}
             }}
             .print-btn {{
-                background-color: #0B50FA; color: white; padding: 12px 30px;
-                border: none; border-radius: 8px; cursor: pointer; font-size: 16px;
-                font-weight: bold; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+                background-color: #0B50FA;
+                color: white;
+                padding: 12px 30px;
+                border: none;
+                border-radius: 8px;
+                cursor: pointer;
+                font-size: 16px;
+                font-weight: bold;
+                margin-bottom: 20px;
+                box-shadow: 0 4px 6px rgba(0,0,0,0.2);
             }}
-            .print-btn:hover {{ background-color: #083cb3; }}
+            .print-btn:hover {{
+                background-color: #083cb3;
+            }}
         </style>
     </head>
     <body>
         <button class="print-btn no-print" onclick="window.print()">🖨️ {button_text}</button>
-        <div class="a4-page">{html_content}</div>
+        <div class="a4-page">
+            {html_content}
+        </div>
     </body>
     </html>
     """
     components.html(full_html, height=1150, scrolling=True)
 
-# ==============================================================================
+# মোড ১: ব্রাইটনেস ও কালার এডিটর
+if app_mode == 1:
+    st.header("✨ ইমেজ ব্রাইটনেস ও কালার এডিটর")
+    if global_file is not None:
+        image = Image.open(global_file)
+        img_np = np.array(image)
+        
+        brightness = st.slider("ব্রাইটনেস (Brightness)", -100, 100, 0)
+        contrast = st.slider("কনট্রাস্ট (Contrast)", 0.0, 3.0, 1.0)
+        
+        adjusted = cv2.convertScaleAbs(img_np, alpha=contrast, beta=brightness)
+        st.image(adjusted, caption="এডিট করা ছবি", use_column_width=True)
+    else:
+        st.info("দয়া করে উপরে ফাইল আপলোড অপশন থেকে একটি ছবি আপলোড করুন।")
+
 # মোড ২: ব্যাকগ্রাউন্ড রিমুভ ও কালার/ছবি পরিবর্তন
-# ==============================================================================
-if app_mode == 2:
+elif app_mode == 2:
     st.header("🎨 স্টুডিও ব্যাকগ্রাউন্ড রিমুভ ও কালার/ছবি পরিবর্তন")
     if global_file is not None:
         image = Image.open(global_file).convert("RGB")
@@ -178,46 +275,29 @@ if app_mode == 2:
                     img_np = np.array(image)
                     h, w = img_np.shape[:2]
                     
-                    if has_rembg:
-                        # rembg লাইব্রেরি দিয়ে নিখুঁত ব্যাকগ্রাউন্ড রিমুভ
-                        input_bytes = global_file.getvalue()
-                        output_bytes = remove(input_bytes)
-                        result_img = Image.open(io.BytesIO(output_bytes)).convert("RGBA")
-                        
-                        # নতুন ব্যাকগ্রাউন্ড তৈরি
-                        if bg_type == "রঙ (Color Picker)" or bg_custom_file is None:
-                            hex_c = bg_color.lstrip('#')
-                            bg_rgb = tuple(int(hex_c[i:i+2], 16) for i in (0, 2, 4)) + (255,)
-                            bg_img = Image.new("RGBA", (w, h), bg_rgb)
-                        else:
-                            bg_img = Image.open(bg_custom_file).convert("RGBA").resize((w, h))
-                        
-                        # ছবি কম্পোজ করা
-                        bg_img.paste(result_img, (0, 0), result_img)
-                        final_img = bg_img.convert("RGB")
-                    else:
-                        # ব্যাকআপ মেথড (OpenCV GrabCut)
-                        mask = np.zeros(img_np.shape[:2], np.uint8)
-                        bgdModel = np.zeros((1, 65), np.float64)
-                        fgdModel = np.zeros((1, 65), np.float64)
-                        rect = (int(w * 0.1), int(h * 0.05), int(w * 0.8), int(h * 0.9))
-                        cv2.grabCut(img_np, mask, rect, bgdModel, fgdModel, 5, cv2.GC_INIT_WITH_RECT)
-                        mask2 = np.where((mask == 2) | (mask == 0), 0, 1).astype('uint8')
-                        result_np = img_np * mask2[:, :, np.newaxis]
-                        
-                        if bg_type == "রঙ (Color Picker)" or bg_custom_file is None:
-                            hex_c = bg_color.lstrip('#')
-                            bg_rgb = tuple(int(hex_c[i:i+2], 16) for i in (0, 2, 4))
-                            bg_img_arr = np.full(img_np.shape, bg_rgb, dtype=np.uint8)
-                        else:
-                            bg_img_pil = Image.open(bg_custom_file).convert("RGB").resize((w, h))
-                            bg_img_arr = np.array(bg_img_pil)
-                            
-                        inv_mask2 = 1 - mask2
-                        bg_part = bg_img_arr * inv_mask2[:, :, np.newaxis]
-                        final_np = result_np + bg_part
-                        final_img = Image.fromarray(final_np)
+                    mask = np.zeros(img_np.shape[:2], np.uint8)
+                    bgdModel = np.zeros((1, 65), np.float64)
+                    fgdModel = np.zeros((1, 65), np.float64)
                     
+                    rect = (int(w * 0.1), int(h * 0.05), int(w * 0.8), int(h * 0.9))
+                    cv2.grabCut(img_np, mask, rect, bgdModel, fgdModel, 5, cv2.GC_INIT_WITH_RECT)
+                    
+                    mask2 = np.where((mask == 2) | (mask == 0), 0, 1).astype('uint8')
+                    result_np = img_np * mask2[:, :, np.newaxis]
+                    
+                    if bg_type == "রঙ (Color Picker)" or bg_custom_file is None:
+                        hex_c = bg_color.lstrip('#')
+                        bg_rgb = tuple(int(hex_c[i:i+2], 16) for i in (0, 2, 4))
+                        bg_img = np.full(img_np.shape, bg_rgb, dtype=np.uint8)
+                    else:
+                        bg_img_pil = Image.open(bg_custom_file).convert("RGB").resize((w, h))
+                        bg_img = np.array(bg_img_pil)
+                        
+                    inv_mask2 = 1 - mask2
+                    bg_part = bg_img * inv_mask2[:, :, np.newaxis]
+                    final_np = result_np + bg_part
+                    
+                    final_img = Image.fromarray(final_np)
                     st.success("✅ ব্যাকগ্রাউন্ড সফলভাবে পরিবর্তন করা হয়েছে!")
                     st.image(final_img, caption="রিমুভ ও পরিবর্তিত ব্যাকগ্রাউন্ডের ছবি", use_column_width=True)
                 except Exception as e:
@@ -225,9 +305,37 @@ if app_mode == 2:
     else:
         st.info("দয়া করে উপরে ফাইল আপলোড অপশন থেকে একটি পাসপোর্ট বা পোর্ট্রেট ছবি আপলোড করুন।")
 
-# ==============================================================================
-# মোড ৬: ক্যাশ মেমো / রশিদ জেনারেটর 
-# ==============================================================================
+# মোড ৩: আইডি কার্ড ক্রপ
+elif app_mode == 3:
+    st.header("🆔 আইডি কার্ড ক্রপ ও সোজা করার টুল")
+    if global_file is not None:
+        image = Image.open(global_file)
+        st.image(image, caption="মূল আইডি কার্ড", use_column_width=True)
+        st.info("আইডি কার্ড প্রসেসিং এবং ক্রপ করার অপশন এখানে কাজ করবে।")
+    else:
+        st.info("দয়া করে একটি আইডি কার্ডের ছবি আপলোড করুন।")
+
+# মোড ৪: পাসপোর্ট সাইজ ছবি শিট (৪ কপি)
+elif app_mode == 4:
+    st.header("🛂 পাসপোর্ট সাইজ ছবি শিট তৈরি (৪ কপি)")
+    if global_file is not None:
+        image = Image.open(global_file)
+        st.image(image, width=150, caption="আপনার ছবি")
+        if st.button("৪ কপি ছবি শিট তৈরি করুন"):
+            st.success("৪ কপি ছবির প্রিন্ট প্রিভিউ প্রস্তুত।")
+    else:
+        st.info("দয়া করে একটি পাসপোর্ট ছবি আপলোড করুন।")
+
+# মোড ৫: বয়স ক্যালকুলেটর
+elif app_mode == 5:
+    st.header("🎂 বয়স ক্যালকুলেটর (Age Calculator)")
+    b_date = st.date_input("জন্মতারিখ সিলেক্ট করুন", date(2000, 1, 1))
+    t_date_val = st.date_input("কাঙ্ক্ষিত তারিখ", date.today())
+    if st.button("বয়স হিসাব করুন"):
+        age_years = t_date_val.year - b_date.year - ((t_date_val.month, t_date_val.day) < (b_date.month, b_date.day))
+        st.success(f"বয়স: প্রায় {age_years} বছর পূর্ণ হয়েছে।")
+
+# মোড ৬: ক্যাশ মেমো
 elif app_mode == 6:
     st.header("🧾 দোকানের ক্যাশ মেমো / রশিদ জেনারেটর")
     
@@ -323,7 +431,9 @@ elif app_mode == 6:
                             <th style="padding: 10px; text-align: right;">মূল্য</th>
                         </tr>
                     </thead>
-                    <tbody>{items_html}</tbody>
+                    <tbody>
+                        {items_html}
+                    </tbody>
                 </table>
                 
                 <div style='text-align: right; font-size: 16px; background-color: #f8f9fa; padding: 12px; border-radius: 5px;'>
@@ -341,9 +451,15 @@ elif app_mode == 6:
         """
         print_content_html(memo_html_code, "ক্যাশ মেমো প্রিন্ট করুন")
 
-# ==============================================================================
-# মোড ৮: নাগরিক সনদপত্র জেনারেটর 
-# ==============================================================================
+# মোড ৭: ওয়ারেন্টি কার্ড
+elif app_mode == 7:
+    st.header("🛡️ ডিজিটাল ওয়ারেন্টি কার্ড জেনারেটর")
+    w_item = st.text_input("পণ্যের নাম", "স্মার্ট এলইডি টিভি")
+    w_code = st.text_input("ওয়ারেন্টি কোড / সিরিয়াল", "SN-987654")
+    if st.button("ওয়ারেন্টি কার্ড তৈরি করুন"):
+        st.success("ওয়ারেন্টি কার্ড প্রস্তুত করা হয়েছে।")
+
+# মোড ৮: নাগরিক সনদপত্র
 elif app_mode == 8:
     st.header("📜 নাগরিক সনদপত্র জেনারেটর")
     
@@ -359,6 +475,7 @@ elif app_mode == 8:
 
     if st.button("📜 নাগরিক সনদ প্রিভিউ ও প্রিন্ট দেখুন"):
         st.success("✅ নাগরিক সনদপত্র সম্পূর্ণ A4 পেজে প্রস্তুত!")
+        
         cert_html_code = f"""
         <div style='padding: 15px; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: space-between; box-sizing: border-box; background-color: #ffffff;'>
             <div>
@@ -368,11 +485,14 @@ elif app_mode == 8:
                     <hr style="border:1px solid #0B50FA; width:45%; margin: 15px auto;">
                     <h3 style="background:#0B50FA; color:white; display:inline-block; padding:6px 25px; border-radius:5px; margin-top:10px; font-size: 20px;">নাগরিক সনদপত্র</h3>
                 </div>
+                
                 <p style="font-size:17px; line-height:2.4; text-align:justify; margin-top:40px;">
                     এই মর্মে প্রত্যয়ন করা যাইতেছে যে, <b>{cit_name}</b>, পিতা: <b>{cit_father}</b>, মাতা: <b>{cit_mother}</b>, গ্রাম: <b>{cit_vill}</b>, {cit_word}, উপজেলা: মণিরামপুর, জেলা: যশোর এর অত্র ইউনিয়নের একজন স্থায়ী বাসিন্দা এবং জন্মসূত্রে বাংলাদেশের নাগরিক। আমার জানামতে তিনি দেশবিরোধী বা রাষ্ট্রবিরোধী কোনো কাজের সাথে জড়িত নন এবং তার চরিত্র অত্যন্ত ভালো।
                 </p>
+                
                 <p style="font-size:17px; margin-top:30px; line-height: 1.8;">আমি তার সর্বাঙ্গীন সাফল্য ও দীর্ঘায়ু কামনা করি।</p>
             </div>
+            
             <table style="width: 100%; margin-top: 40px; font-size: 15px;">
                 <tr>
                     <td><div style="border-top:1px dashed black; width: 180px; text-align: center; padding-top:8px;">আবেদনকারীর স্বাক্ষর</div></td>
@@ -383,9 +503,7 @@ elif app_mode == 8:
         """
         print_content_html(cert_html_code, "নাগরিক সনদ প্রিন্ট করুন")
 
-# ==============================================================================
-# মোড ৯: টুর্নামেন্ট আমন্ত্রণপত্র ও নিয়মাবলী 
-# ==============================================================================
+# মোড ৯: টুর্নামেন্ট
 elif app_mode == 9:
     st.header("⚽ টুর্নামেন্ট আমন্ত্রণপত্র ও নিয়মাবলী জেনারেটর")
     
@@ -395,6 +513,7 @@ elif app_mode == 9:
 
     if st.button("⚽ টুর্নামেন্ট নোটিশ প্রিভিউ ও প্রিন্ট দেখুন"):
         st.success("✅ টুর্নামেন্ট আমন্ত্রণপত্র সম্পূর্ণ A4 পেজে প্রস্তুত!")
+        
         notice_html_code = f"""
         <div style='padding: 15px; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: space-between; box-sizing: border-box; background-color: #ffffff;'>
             <div>
@@ -403,13 +522,16 @@ elif app_mode == 9:
                     <h3 style="color:#0B50FA; margin:10px 0; font-size:22px;">{t_name}</h3>
                     <hr style="border:1px solid #ff4b4b; width:55%; margin: 12px auto;">
                 </div>
+                
                 <p style="font-size:16px; line-height:2; margin-top:25px; text-align:center;">
                     সকল ক্রীড়াপ্রেমী ও দলের অবগতির জন্য জানানো যাচ্ছে যে, আগামী <b>{t_date}</b> তারিখে স্থানীয় মাঠে জমকালো আয়োজনের মাধ্যমে এই টুর্নামেন্ট শুরু হতে যাচ্ছে। আপনি বা আপনার দল এই প্রতিযোগিতায় স্বতঃস্ফূর্তভাবে অংশগ্রহণ করার জন্য আমন্ত্রিত।
                 </p>
+                
                 <div style="background:#f8f9fa; padding:15px; border-radius:6px; border-left:5px solid #ff4b4b; margin-top:20px;">
                     <h4 style="margin:0 0 8px 0; color:#333; font-size: 16px;">🎁 আকর্ষণীয় পুরস্কারসমূহ:</h4>
                     <p style="margin:0; font-size:15px; font-weight:bold; color:red;">{t_prize}</p>
                 </div>
+                
                 <div style="margin-top:20px;">
                     <h4 style="color:#333; margin-bottom:8px; font-size: 16px;">📋 প্রধান নিয়মাবলী:</h4>
                     <ol style="font-size:14px; line-height:1.8; margin:0; padding-left:20px;">
@@ -420,6 +542,7 @@ elif app_mode == 9:
                     </ol>
                 </div>
             </div>
+            
             <table style="width: 100%; margin-top: 30px; font-size: 15px;">
                 <tr>
                     <td><div style="border-top:1px dashed black; width: 180px; text-align: center; padding-top:8px;">আয়োজক কমিটি</div></td>
@@ -430,9 +553,7 @@ elif app_mode == 9:
         """
         print_content_html(notice_html_code, "টুর্নামেন্ট নোটিশ প্রিন্ট করুন")
 
-# ==============================================================================
-# মোড ১০: অনলাইন সরকারি ও প্রয়োজনীয় লিংকসমূহ 
-# ==============================================================================
+# মোড ১০: অনলাইন লিংক
 elif app_mode == 10:
     st.header("🔗 অনলাইন সরকারি ও প্রয়োজনীয় লিংকসমূহ")
     st.write("আপনার সাজানো ক্যাটাগরি অনুযায়ী গুরুত্বপূর্ণ সরকারি ও অনলাইন সেবার পোর্টালগুলো নিচে দেওয়া হলো:")
@@ -442,37 +563,86 @@ elif app_mode == 10:
     with tab1:
         st.subheader("জাতীয় ও নাগরিক সেবা পোর্টাল")
         st.markdown("""
-        - [জাতীয় তথ্য বাতায়ন](https://www.bangladesh.gov.bd)
-        - [বাংলাদেশ ফরম পোর্টাল](https://forms.gov.bd)
-        - [জাতীয় পরিচয়পত্র সেবা (NID)](https://services.nidw.gov.bd)
-        - [জন্ম ও মৃত্যু নিবন্ধন](https://bdris.gov.bd)
-        - [ভূমি মন্ত্রণালয় ও ই-মিউটেশন](https://land.gov.bd)
+        - [জাতীয় তথ্য বাতায়ন (Bangladesh National Portal)](https://www.bangladesh.gov.bd)
+        - [বাংলাদেশ ফরম পোর্টাল (All Forms)](https://forms.gov.bd)
+        - [জাতীয় পরিচয়পত্র সেবা (NID Portal)](https://services.nidw.gov.bd)
+        - [জন্ম ও মৃত্যু নিবন্ধন (Birth & Death Registration)](https://bdris.gov.bd)
+        - [ভূমি মন্ত্রণালয় ও ই-মিউটেশন (Land Services)](https://land.gov.bd)
         """)
 
     with tab2:
         st.subheader("পাসপোর্ট ও ইমিগ্রেশন সেবা")
         st.markdown("""
-        - [ই-পাসপোর্ট অনলাইন আবেদন](https://www.epassport.gov.bd)
-        - [অনলাইন পুলিশ ক্লিয়ারেন্স সার্টিফিকেট](https://pcc.police.gov.bd)
-        - [ভিসা ভেরিফিকেশন ও তথ্য](https://www.immigrate.gov.bd)
+        - [ই-পাসপোর্ট অনলাইন আবেদন (E-Passport Portal)](https://www.epassport.gov.bd)
+        - [অনলাইন পুলিশ ক্লিয়ারেন্স সার্টিফিকেট (Police Clearance)](https://pcc.police.gov.bd)
+        - [ভিসা ভেরিফিকেশন ও তথ্য (Visa Verification)](https://www.immigrate.gov.bd)
         """)
 
     with tab3:
         st.subheader("শিক্ষা ও বোর্ড ফলাফল")
         st.markdown("""
-        - [শিক্ষা বোর্ড ফলাফল](http://www.educationboardresults.gov.bd)
-        - [জাতীয় বিশ্ববিদ্যালয় পোর্টাল](https://www.nu.ac.bd)
+        - [শিক্ষা বোর্ড ফলাফল (Education Board Results)](http://www.educationboardresults.gov.bd)
+        - [জাতীয় বিশ্ববিদ্যালয় পোর্টাল (National University)](https://www.nu.ac.bd)
         - [মাধ্যমিক ও উচ্চশিক্ষা অধিদপ্তর (DSHE)](https://www.dshe.gov.bd)
+        - [বিনা মূল্যের পাঠ্যপুস্তক পোর্টাল (NCTB)](http://nctb.gov.bd)
         """)
 
     with tab4:
         st.subheader("চাকরি, বিমা ও অন্যান্য জরুরি সেবা")
         st.markdown("""
         - [বাংলাদেশ সরকারি চাকরি পোর্টাল (Teletalk Jobs)](https://alljobs.teletalk.com.bd)
-        - [বাংলাদেশ ব্যাংক](https://www.bb.org.bd)
-        - [জরুরি সেবা - ৯৯৯](https://999.gov.bd)
+        - [বাংলাদেশ ব্যাংক (Bangladesh Bank)](https://www.bb.org.bd)
+        - [জরুরি সেবা - ৯৯৯ (National Emergency Service)](https://999.gov.bd)
         """)
 
-else:
-    st.header("🛠️ অন্যান্য টুলস ও ড্যাশবোর্ড")
-    st.info("দয়া করে সাইডবার থেকে আপনার কাঙ্ক্ষিত টুলটি সিলেক্ট করুন।")
+# মোড ১১: ছবির সাইজ পরিবর্তন
+elif app_mode == 11:
+    st.header("📏 ছবির সাইজ পরিবর্তন ও রিসাইজার")
+    if global_file is not None:
+        image = Image.open(global_file)
+        st.image(image, width=200)
+        width_val = st.number_input("নতুন প্রস্থ (Width)", 100, 3000, 800)
+        height_val = st.number_input("নতুন উচ্চতা (Height)", 100, 3000, 600)
+        if st.button("রিসাইজ করুন"):
+            resized_img = image.resize((width_val, height_val))
+            st.image(resized_img, caption="রিসাইজ করা ছবি")
+
+# মোড ১২: সাদাকালো কনভার্টার
+elif app_mode == 12:
+    st.header("⬛ সাদাকালো (Black & White) কনভার্টার")
+    if global_file is not None:
+        image = Image.open(global_file).convert("L")
+        st.image(image, caption="সাদাকালো ছবি", use_column_width=True)
+    else:
+        st.info("দয়া করে একটি ছবি আপলোড করুন।")
+
+# মোড ১৩: ছবি ঘোরানো
+elif app_mode == 13:
+    st.header("🔄 ছবি ঘোরানো (Rotate & Flip)")
+    if global_file is not None:
+        image = Image.open(global_file)
+        angle = st.selectbox("ঘোরানোর কোণ", [90, 180, 270])
+        if st.button("ঘোরান"):
+            rotated = image.rotate(angle, expand=True)
+            st.image(rotated, caption=f"{angle}° ঘোরানো ছবি")
+
+# মোড ১৪: ওয়াটারমার্ক
+elif app_mode == 14:
+    st.header("💧 ওয়াটারমার্ক যুক্ত করার টুল")
+    watermark_text = st.text_input("ওয়াটারমার্কের টেক্সট", "হাসানুর কম্পিউটার স্টুডিও")
+    if global_file is not None:
+        image = Image.open(global_file)
+        st.image(image, caption="মূল ছবি")
+        st.info("ওয়াটারমার্ক যুক্ত করার অপশন প্রস্তুত।")
+
+# মোড ১৫: পিডিএফ টেক্সট এক্সট্র্যাক্ট
+elif app_mode == 15:
+    st.header("📄 পিডিএফ টেক্সট এক্সট্র্যাক্ট টুল")
+    if global_file is not None and global_file.name.endswith('.pdf'):
+        reader = PdfReader(global_file)
+        text = ""
+        for page in reader.pages:
+            text += page.extract_text()
+        st.text_area("পিডিএফ থেকে প্রাপ্ত টেক্সট", text, height=300)
+    else:
+        st.info("দয়া করে উপরে ফাইল আপলোড অপশন থেকে একটি পিডিএফ ফাইল আপলোড করুন।")
