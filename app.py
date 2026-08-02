@@ -1,8 +1,7 @@
 import io
 import cv2
-import base64
 import numpy as np
-from PIL import Image, ImageEnhance
+from PIL import Image
 import streamlit as st
 from pypdf import PdfReader
 from datetime import date
@@ -17,78 +16,47 @@ except ImportError:
 st.set_page_config(page_title="হাসানুর কম্পিউটার স্টুডিও", layout="wide")
 
 # ==============================================================================
-# মূল স্টাইল ও পুরো পেজ, সাইডবার ও হেডারের সমন্বিত হলুদ থিম ব্যাকগ্রাউন্ড
+# মূল স্টাইল ও পুরো পেজের গ্রেডিয়েন্ট ব্যাকগ্রাউন্ড
 # ==============================================================================
 st.markdown("""
 <style>
     .stApp {
-        background-color: #fffde7;
-        color: #222222;
+        background: linear-gradient(135deg, #071952, #0b2f64, #1b032d, #381123);
+        background-attachment: fixed;
+        color: #ffffff;
     }
     section[data-testid="stSidebar"] {
-        background-color: #fff9c4;
+        background-color: #0b132b;
     }
     .studio-header {
-        background: linear-gradient(135deg, #fbc02d, #f57f17);
+        background: linear-gradient(135deg, #0B50FA, #ff4b4b);
         padding: 25px 20px;
         border-radius: 12px;
-        color: #ffffff;
+        color: white;
         text-align: center;
         margin-bottom: 25px;
-        box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+        box-shadow: 0 6px 20px rgba(0,0,0,0.3);
     }
     .studio-header h1 {
         font-size: 26px;
         margin-bottom: 8px;
         font-weight: bold;
-        color: #ffffff;
+        color: white;
     }
     .studio-header p {
         font-size: 14px;
         margin: 4px 0;
         line-height: 1.5;
-        color: #ffffff;
-    }
-    .header-profile-img {
-        width: 70px;
-        height: 70px;
-        border-radius: 50%;
-        overflow: hidden;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        border: 2px solid rgba(255, 255, 255, 0.9);
-        box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-        margin-bottom: 10px;
-    }
-    .header-profile-img img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
+        color: white;
     }
 </style>
 """, unsafe_allow_html=True)
 
-# লোকাল ফাইল থেকে ছবি রিড করে Base64 এ রূপান্তর করার ফাংশন (যাতে গিটহাবে কোনো পাথ মিসিং বা লোডিং এরর না হয়)
-def get_img_as_base64(file_path):
-    try:
-        with open(file_path, "rb") as f:
-            data = f.read()
-        return base64.b64encode(data).decode()
-    except Exception:
-        return ""
-
-img_base64 = get_img_as_base64("hasanur.jpg")
-img_tag = f'<img src="data:image/jpeg;base64,{img_base64}" alt="Hasanur">' if img_base64 else '<span style="font-size:35px;">🖨️</span>'
-
 # হেডার সেকশন
-st.markdown(f"""
+st.markdown("""
 <div class="studio-header">
-    <div style="background: rgba(0,0,0,0.1); padding: 18px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.3); text-align: center;">
-        <div class="header-profile-img">
-            {img_tag}
-        </div>
-        <h1 style="margin: 0 0 6px 0;">হাসানুর কম্পিউটার স্টুডিও</h1>
+    <div style="background: rgba(255,255,255,0.15); padding: 18px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.3);">
+        <h1 style="margin: 0 0 6px 0;">🖨️ হাসানুর কম্পিউটার স্টুডিও</h1>
         <p style="margin: 3px 0;"><b>ঠিকানা:</b> দিঘীরপাড়, মনিরামপুর, যশোর</p>
         <p style="margin: 3px 0;"><b>মোবাইল:</b> ০১৭৪৩-৬১৪৩৫৯</p>
         <hr style="border: 0.5px solid rgba(255,255,255,0.3); width: 80%; margin: 10px auto;">
@@ -106,15 +74,21 @@ if 'app_mode' not in st.session_state:
 st.sidebar.header("⚙️ টুলস ও মেনুবার")
 
 menu_dict = {
+    1: ("✨ ইমেজ ব্রাইটনেস ও কালার এডিটর", "ছবির আলো ও ব্রাইটনেস ঠিক করুন"),
     2: ("🎨 স্টুডিও ব্যাকগ্রাউন্ড রিমুভ ও কালার", "পাসপোর্ট ছবির ব্যাকগ্রাউন্ড পরিবর্তন"),
+    3: ("🆔 আইডি কার্ড ক্রপ ও সোজা করার টুল", "আইডি কার্ড ক্রপ করুন"),
+    4: ("🛂 পাসপোর্ট সাইজ ছবি শিট তৈরি (৪ কপি)", "এক ক্লিকে ৪ কপি ছবি তৈরি"),
     5: ("🎂 বয়স ক্যালকুলেটর (Age Calculator)", "নির্ভুল বয়স হিসাব"),
     6: ("🧾 দোকানের ক্যাশ মেমো / রশিদ জেনারেটর", "বিক্রয় রশিদ ও ক্যাশ মেমো তৈরি"),
     7: ("🛡️ ডিজিটাল ওয়ারেন্টি কার্ড জেনারেটর", "ওয়ারেন্টি কার্ড তৈরি"),
     8: ("📜 নাগরিক সনদ (Citizenship) জেনারেটর", "নাগরিক সনদপত্র তৈরি"),
     9: ("⚽ টুর্নামেন্ট আমন্ত্রণপত্র ও নিয়মাবলী", "টুর্নামেন্ট নোটিশ তৈরি"),
     10: ("🔗 অনলাইন সরকারি ও প্রয়োজনীয় লিংকসমূহ", "গুরুত্বপূর্ণ অনলাইন সেবা ও পোর্টাল"),
+    11: ("📏 ছবির সাইজ পরিবর্তন ও রিসাইজার", "পিক্সেল অনুযায়ী সাইজ পরিবর্তন"),
     12: ("⬛ সাদাকালো (Black & White) কনভার্টার", "সাদাকালো ছবি তৈরি"),
-    13: ("🔄 ছবি ঘোরানো (Rotate & Flip)", "ছবি এঙ্গেলে ঘোরানো")
+    13: ("🔄 ছবি ঘোরানো (Rotate & Flip)", "ছবি এঙ্গেলে ঘোরানো"),
+    14: ("💧 ওয়াটারমার্ক যুক্ত করার টুল", "নাম বা লোগো ওয়াটারমার্ক"),
+    15: ("📄 পিডিএফ টেক্সট এক্সট্র্যাক্ট টুল", "পিডিএফ থেকে টেক্সট আলাদা করা")
 }
 
 for num, (item_name, desc) in menu_dict.items():
@@ -151,7 +125,7 @@ def print_content_html(html_content, button_text):
                 flex-direction: column;
                 justify-content: space-between;
                 position: relative;
-                border: 2px solid #fbc02d;
+                border: 2px solid #0B50FA;
             }}
             @media print {{
                 body {{ background: none; padding: 0; }}
@@ -159,16 +133,16 @@ def print_content_html(html_content, button_text):
                 .a4-page {{
                     box-shadow: none; margin: 0; width: 210mm; height: 297mm;
                     padding: 12mm 15mm; page-break-after: avoid; page-break-inside: avoid;
-                    border: 2px solid #fbc02d !important; -webkit-print-color-adjust: exact;
+                    border: 2px solid #0B50FA !important; -webkit-print-color-adjust: exact;
                 }}
                 @page {{ size: A4; margin: 0; }}
             }}
             .print-btn {{
-                background-color: #fbc02d; color: white; padding: 12px 30px;
+                background-color: #0B50FA; color: white; padding: 12px 30px;
                 border: none; border-radius: 8px; cursor: pointer; font-size: 16px;
                 font-weight: bold; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.2);
             }}
-            .print-btn:hover {{ background-color: #f57f17; }}
+            .print-btn:hover {{ background-color: #083cb3; }}
         </style>
     </head>
     <body>
@@ -180,122 +154,70 @@ def print_content_html(html_content, button_text):
     components.html(full_html, height=1150, scrolling=True)
 
 # ==============================================================================
-# মোড ২: ব্যাকগ্রাউন্ড রিমুভ, কালার পরিবর্তন ও লাইভ অ্যাডজাস্টমেন্ট টুল
+# মোড ২: ব্যাকগ্রাউন্ড রিমুভ ও কালার/ছবি পরিবর্তন
 # ==============================================================================
 if app_mode == 2:
-    st.header("🎨 স্টুডিও ব্যাকগ্রাউন্ড রিমুভ, কালার ও অ্যাডজাস্টমেন্ট টুল")
+    st.header("🎨 স্টুডিও ব্যাকগ্রাউন্ড রিমুভ ও কালার/ছবি পরিবর্তন")
     if global_file is not None:
         image = Image.open(global_file).convert("RGB")
+        st.image(image, caption="মূল আপলোড করা ছবি", width=300)
         
-        col_orig, col_proc = st.columns(2)
+        bg_type = st.radio("ব্যাকগ্রাউন্ড পরিবর্তনের মাধ্যম বেছে নিন:", ["রঙ (Color Picker)", "কম্পিউটার থেকে ছবি আপলোড (Custom Image)"])
         
-        # বাম কলাম: মূল আপলোড করা ছবি (অক্ষুন্ন থাকবে)
-        with col_orig:
-            st.image(image, caption="মূল আপলোড করা ছবি (অক্ষুন্ন)", use_column_width=True)
-            st.info("💡 মূল ছবিতে কোনো প্রভাব পড়বে না।")
+        bg_color = "#ffffff"
+        bg_custom_file = None
         
-        # ডান কলাম: প্রসেস করা ছবি ও ঠিক তার নিচে ব্যাকগ্রাউন্ড ও কালার কন্ট্রোল অপশনসমূহ
-        with col_proc:
-            if 'base_processed_img' in st.session_state:
-                # লাইভ ইফেক্ট অ্যাপ্লাই করার জন্য স্লাইডার ও সিলেক্ট বক্স (ড্রপডাউন মেনু)
-                brightness_val = st.slider("ব্রাইটনেস (Brightness)", 0.2, 3.0, 1.0, 0.1, key="live_bright")
-                contrast_val = st.slider("কনট্রাস্ট (Contrast)", 0.2, 3.0, 1.0, 0.1, key="live_contrast")
-                selected_color_mode = st.selectbox("সিলেক্টিভ কালার টোন", ["সব স্বাভাবিক (Normal)", "লালচে টোন (Redish)", "নীলাভ টোন (Bluish)", "সবুজাভ টোন (Greenish)"], key="live_color_mode")
-                color_intensity = st.slider("টোন মাত্রা (Intensity)", -50, 50, 0, 5, key="live_intensity")
-
-                # লাইভ প্রসেসিং
-                current_img = st.session_state['base_processed_img'].copy()
-                
-                enhancer_b = ImageEnhance.Brightness(current_img)
-                current_img = enhancer_b.enhance(brightness_val)
-                enhancer_c = ImageEnhance.Contrast(current_img)
-                current_img = enhancer_c.enhance(contrast_val)
-                
-                arr = np.array(current_img)
-                if selected_color_mode == "লালচে টোন (Redish)":
-                    arr[:, :, 0] = np.clip(arr[:, :, 0].astype(int) + color_intensity, 0, 255)
-                elif selected_color_mode == "নীলাভ টোন (Bluish)":
-                    arr[:, :, 2] = np.clip(arr[:, :, 2].astype(int) + color_intensity, 0, 255)
-                elif selected_color_mode == "সবুজাভ টোন (Greenish)":
-                    arr[:, :, 1] = np.clip(arr[:, :, 1].astype(int) + color_intensity, 0, 255)
-                current_img = Image.fromarray(arr)
-
-                st.image(current_img, caption="প্রসেস করা ও লাইভ অ্যাডজাস্টকৃত ছবি", use_column_width=True)
-                
-                # ডাউনলোড বাটন
-                buffered = io.BytesIO()
-                current_img.save(buffered, format="JPEG")
-                img_bytes = buffered.getvalue()
-                
-                st.download_button(
-                    label="📥 প্রসেস করা ছবি ডাউনলোড করুন",
-                    data=img_bytes,
-                    file_name="processed_studio_image.jpg",
-                    mime="image/jpeg",
-                    key="download_processed_img"
-                )
-            else:
-                st.info("প্রথমে নিচের অপশন থেকে ব্যাকগ্রাউন্ড রিমুভ ও প্রসেস করুন।")
-
-            st.markdown("---")
-            st.markdown("### 🛠️ ব্যাকগ্রাউন্ড পরিবর্তনের সেটিংস")
-            bg_type = st.radio("ব্যাকগ্রাউন্ড পরিবর্তনের মাধ্যম বেছে নিন:", ["রঙ (Color Picker)", "কম্পিউটার থেকে ছবি আপলোড (Custom Image)"], key="bg_type_radio")
-            
-            bg_color = "#ffffff"
-            bg_custom_file = None
-            
-            if bg_type == "রঙ (Color Picker)":
-                bg_color = st.color_picker("নতুন ব্যাকগ্রাউন্ড কালার সিলেক্ট করুন", "#ffffff", key="bg_color_picker")
-            else:
-                bg_custom_file = st.file_uploader("ব্যাকগ্রাউন্ডের জন্য একটি ছবি আপলোড করুন", type=["jpg", "jpeg", "png"], key="bg_img_upload")
-
-            if st.button("🚀 ব্যাকগ্রাউন্ড রিমুভ ও প্রসেস করুন", key="process_btn_right"):
-                with st.spinner("প্রসেসিং হচ্ছে, দয়া করে অপেক্ষা করুন..."):
-                    try:
-                        img_np = np.array(image)
-                        h, w = img_np.shape[:2]
+        if bg_type == "রঙ (Color Picker)":
+            bg_color = st.color_picker("নতুন ব্যাকগ্রাউন্ড কালার সিলেক্ট করুন", "#ffffff")
+        else:
+            bg_custom_file = st.file_uploader("ব্যাকগ্রাউন্ডের জন্য একটি ছবি আপলোড করুন", type=["jpg", "jpeg", "png"], key="bg_img_upload")
+        
+        if st.button("🚀 ব্যাকগ্রাউন্ড রিমুভ ও নতুন ব্যাকগ্রাউন্ড সেট করুন"):
+            with st.spinner("প্রসেসিং হচ্ছে, দয়া করে অপেক্ষা করুন..."):
+                try:
+                    img_np = np.array(image)
+                    h, w = img_np.shape[:2]
+                    
+                    if has_rembg:
+                        input_bytes = global_file.getvalue()
+                        output_bytes = remove(input_bytes)
+                        result_img = Image.open(io.BytesIO(output_bytes)).convert("RGBA")
                         
-                        if has_rembg:
-                            input_bytes = global_file.getvalue()
-                            output_bytes = remove(input_bytes)
-                            result_img = Image.open(io.BytesIO(output_bytes)).convert("RGBA")
-                            
-                            if bg_type == "রঙ (Color Picker)" or bg_custom_file is None:
-                                hex_c = bg_color.lstrip('#')
-                                bg_rgb = tuple(int(hex_c[i:i+2], 16) for i in (0, 2, 4)) + (255,)
-                                bg_img = Image.new("RGBA", (w, h), bg_rgb)
-                            else:
-                                bg_img = Image.open(bg_custom_file).convert("RGBA").resize((w, h))
-                            
-                            bg_img.paste(result_img, (0, 0), result_img)
-                            base_processed = bg_img.convert("RGB")
+                        if bg_type == "রঙ (Color Picker)" or bg_custom_file is None:
+                            hex_c = bg_color.lstrip('#')
+                            bg_rgb = tuple(int(hex_c[i:i+2], 16) for i in (0, 2, 4)) + (255,)
+                            bg_img = Image.new("RGBA", (w, h), bg_rgb)
                         else:
-                            mask = np.zeros(img_np.shape[:2], np.uint8)
-                            bgdModel = np.zeros((1, 65), np.float64)
-                            fgdModel = np.zeros((1, 65), np.float64)
-                            rect = (int(w * 0.1), int(h * 0.05), int(w * 0.8), int(h * 0.9))
-                            cv2.grabCut(img_np, mask, rect, bgdModel, fgdModel, 5, cv2.GC_INIT_WITH_RECT)
-                            mask2 = np.where((mask == 2) | (mask == 0), 0, 1).astype('uint8')
-                            result_np = img_np * mask2[:, :, np.newaxis]
-                            
-                            if bg_type == "রঙ (Color Picker)" or bg_custom_file is None:
-                                hex_c = bg_color.lstrip('#')
-                                bg_rgb = tuple(int(hex_c[i:i+2], 16) for i in (0, 2, 4))
-                                bg_img_arr = np.full(img_np.shape, bg_rgb, dtype=np.uint8)
-                            else:
-                                bg_img_pil = Image.open(bg_custom_file).convert("RGB").resize((w, h))
-                                bg_img_arr = np.array(bg_img_pil)
-                                
-                            inv_mask2 = 1 - mask2
-                            bg_part = bg_img_arr * inv_mask2[:, :, np.newaxis]
-                            final_np = result_np + bg_part
-                            base_processed = Image.fromarray(final_np)
+                            bg_img = Image.open(bg_custom_file).convert("RGBA").resize((w, h))
                         
-                        st.session_state['base_processed_img'] = base_processed
-                        st.success("✅ ব্যাকগ্রাউন্ড সফলভাবে পরিবর্তন করা হয়েছে!")
-                        st.rerun()
-                    except Exception as e:
-                        st.error(f"⚠️ ত্রুটি ঘটেছে: {e}")
+                        bg_img.paste(result_img, (0, 0), result_img)
+                        final_img = bg_img.convert("RGB")
+                    else:
+                        mask = np.zeros(img_np.shape[:2], np.uint8)
+                        bgdModel = np.zeros((1, 65), np.float64)
+                        fgdModel = np.zeros((1, 65), np.float64)
+                        rect = (int(w * 0.1), int(h * 0.05), int(w * 0.8), int(h * 0.9))
+                        cv2.grabCut(img_np, mask, rect, bgdModel, fgdModel, 5, cv2.GC_INIT_WITH_RECT)
+                        mask2 = np.where((mask == 2) | (mask == 0), 0, 1).astype('uint8')
+                        result_np = img_np * mask2[:, :, np.newaxis]
+                        
+                        if bg_type == "রঙ (Color Picker)" or bg_custom_file is None:
+                            hex_c = bg_color.lstrip('#')
+                            bg_rgb = tuple(int(hex_c[i:i+2], 16) for i in (0, 2, 4))
+                            bg_img_arr = np.full(img_np.shape, bg_rgb, dtype=np.uint8)
+                        else:
+                            bg_img_pil = Image.open(bg_custom_file).convert("RGB").resize((w, h))
+                            bg_img_arr = np.array(bg_img_pil)
+                            
+                        inv_mask2 = 1 - mask2
+                        bg_part = bg_img_arr * inv_mask2[:, :, np.newaxis]
+                        final_np = result_np + bg_part
+                        final_img = Image.fromarray(final_np)
+                    
+                    st.success("✅ ব্যাকগ্রাউন্ড সফলভাবে পরিবর্তন করা হয়েছে!")
+                    st.image(final_img, caption="রিমুভ ও পরিবর্তিত ব্যাকগ্রাউন্ডের ছবি", use_column_width=True)
+                except Exception as e:
+                    st.error(f"⚠️ ত্রুটি ঘটেছে: {e}")
     else:
         st.info("দয়া করে উপরে ফাইল আপলোড অপশন থেকে একটি পাসপোর্ট বা পোর্ট্রেট ছবি আপলোড করুন।")
 
@@ -353,6 +275,20 @@ elif app_mode == 6:
             del st.session_state.memo_items[idx]
         st.rerun()
 
+    # পেমেন্ট স্ট্যাটাস এবং জমা টাকা নির্ধারণের অপশন
+    st.markdown("### 💰 পেমেন্ট তথ্য")
+    payment_status = st.selectbox("পরিশোধের মাধ্যম সিলেক্ট করুন:", ["সম্পূর্ণ পরিশোধ (Paid)", "কিছু টাকা জমা (Advance/Due)"])
+    
+    paid_amount = total_amount
+    due_amount = 0
+
+    if payment_status == "কিছু টাকা জমা (Advance/Due)":
+        paid_amount = st.number_input("জমা দেওয়া টাকার পরিমাণ (TK)", 0, int(total_amount), int(total_amount // 2))
+        due_amount = total_amount - paid_amount
+    else:
+        paid_amount = total_amount
+        due_amount = 0
+
     if st.button("🖨️ ক্যাশ মেমো ফাইনাল প্রিভিউ ও প্রিন্ট দেখুন"):
         st.success("✅ ক্যাশ মেমো সম্পূর্ণ A4 পেজে প্রস্তুত!")
         
@@ -371,10 +307,10 @@ elif app_mode == 6:
         memo_html_code = f"""
         <div style='padding: 10px; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: space-between; box-sizing: border-box;'>
             <div>
-                <h2 style='text-align: center; color: #fbc02d; margin: 0; font-size: 26px;'>{shop_name}</h2>
+                <h2 style='text-align: center; color: #0B50FA; margin: 0; font-size: 26px;'>{shop_name}</h2>
                 <p style='text-align: center; font-size: 14px; color: #333; margin: 6px 0;'>{shop_address}</p>
-                <hr style='border: 1px solid #fbc02d; margin-bottom: 20px;'>
-                <h3 style='text-align: center; background-color: #fbc02d; color: white; padding: 8px; border-radius: 4px; margin: 0 0 25px 0; font-size: 18px;'>ক্যাশ মেমো / রসিদ</h3>
+                <hr style='border: 1px solid #0B50FA; margin-bottom: 20px;'>
+                <h3 style='text-align: center; background-color: #0B50FA; color: white; padding: 8px; border-radius: 4px; margin: 0 0 25px 0; font-size: 18px;'>ক্যাশ মেমো / রসিদ</h3>
                 
                 <table style="width: 100%; margin-bottom: 25px; font-size: 15px;">
                     <tr>
@@ -389,7 +325,7 @@ elif app_mode == 6:
                 
                 <table style="width: 100%; border-collapse: collapse; font-size: 15px; margin-bottom: 25px;">
                     <thead>
-                        <tr style="background-color: #f1f3f5; border-bottom: 2px solid #fbc02d;">
+                        <tr style="background-color: #f1f3f5; border-bottom: 2px solid #0B50FA;">
                             <th style="padding: 10px; text-align: center;">ক্রমিক</th>
                             <th style="padding: 10px; text-align: left;">পণ্যের বিবরণ</th>
                             <th style="padding: 10px; text-align: center;">সিরিয়াল নম্বর</th>
@@ -400,8 +336,12 @@ elif app_mode == 6:
                     <tbody>{items_html}</tbody>
                 </table>
                 
-                <div style='text-align: right; font-size: 16px; background-color: #f8f9fa; padding: 12px; border-radius: 5px;'>
-                    <b>সর্বমোট প্রদেয় টাকা (Total): <span style='color: red; font-size: 18px;'>{total_amount} TK</span></b>
+                <div style='text-align: right; font-size: 15px; background-color: #f8f9fa; padding: 12px; border-radius: 5px; line-height: 1.6;'>
+                    <b>সর্বমোট বিল (Total): <span style='color: #0B50FA;'>{total_amount} TK</span></b><br>
+                    <b>জমা দেওয়া টাকা (Paid): <span style='color: green;'>{paid_amount} TK</span></b><br>
+                    <b>বাকি টাকা (Due): <span style='color: red; font-size: 17px;'>{due_amount} TK</span></b><br>
+                    <hr style='border: 0.5px dashed #ccc; margin: 6px 0;'>
+                    <b>স্ট্যাটাস: <span style='color: {"green" if due_amount == 0 else "red"};'>{"সম্পূর্ণ পরিশোধ (Paid)" if due_amount == 0 else "বাকি আছে (Due)"}</span></b>
                 </div>
             </div>
             
@@ -437,10 +377,10 @@ elif app_mode == 8:
         <div style='padding: 15px; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: space-between; box-sizing: border-box; background-color: #ffffff;'>
             <div>
                 <div style="text-align:center;">
-                    <h2 style="color:#fbc02d; margin:0; font-size: 28px; font-weight: bold;">{cit_union} কার্যালয়</h2>
+                    <h2 style="color:#0B50FA; margin:0; font-size: 28px; font-weight: bold;">{cit_union} কার্যালয়</h2>
                     <p style="font-size:15px; margin:6px 0; color:#333;">দিঘীরপাড়, মনিরামপুর, যশোর।</p>
-                    <hr style="border:1px solid #fbc02d; width:45%; margin: 15px auto;">
-                    <h3 style="background:#fbc02d; color:white; display:inline-block; padding:6px 25px; border-radius:5px; margin-top:10px; font-size: 20px;">নাগরিক সনদপত্র</h3>
+                    <hr style="border:1px solid #0B50FA; width:45%; margin: 15px auto;">
+                    <h3 style="background:#0B50FA; color:white; display:inline-block; padding:6px 25px; border-radius:5px; margin-top:10px; font-size: 20px;">নাগরিক সনদপত্র</h3>
                 </div>
                 <p style="font-size:17px; line-height:2.4; text-align:justify; margin-top:40px;">
                     এই মর্মে প্রত্যয়ন করা যাইতেছে যে, <b>{cit_name}</b>, পিতা: <b>{cit_father}</b>, মাতা: <b>{cit_mother}</b>, গ্রাম: <b>{cit_vill}</b>, {cit_word}, উপজেলা: মণিরামপুর, জেলা: যশোর এর অত্র ইউনিয়নের একজন স্থায়ী বাসিন্দা এবং জন্মসূত্রে বাংলাদেশের নাগরিক। আমার জানামতে তিনি দেশবিরোধী বা রাষ্ট্রবিরোধী কোনো কাজের সাথে জড়িত নন এবং তার চরিত্র অত্যন্ত ভালো।
@@ -467,69 +407,30 @@ elif app_mode == 9:
     t_date = st.text_input("শুরুর তারিখ ও সময়", "১৫ ই ফেব্রুয়ারি, ২০২৬ খ্রিঃ, সকাল ১০:০০ টা")
     t_prize = st.text_input("পুরস্কারের বিবরণ", "চ্যাম্পিয়ন: ১০,০০০ টাকা + ট্রফি | রানার্সআপ: ৫,০০০ টাকা + ট্রফি")
 
-    st.markdown("### 📋 টুর্নামেন্টের প্রধান নিয়মাবলী কাস্টমাইজ করুন")
-
-    if 'tournament_rules' not in st.session_state:
-        st.session_state.tournament_rules = [
-            "ম্যাচ শুরুর নির্ধারিত সময়ের ১৫ মিনিট পূর্বে মাঠে উপস্থিত থাকতে হবে।",
-            "আম্পায়ারের সিদ্ধান্তই চূড়ান্ত সিদ্ধান্ত বলে গণ্য হবে।",
-            "খেলার মাঠে শৃঙ্খলা বজায় রাখা বাধ্যতামূলক। বিশৃঙ্খলা সৃষ্টিকারী দলকে বহিষ্কার করা হবে।",
-            "এন্ট্রি ফি জমা দিয়ে নির্দিষ্ট সময়ের মধ্যে টিম রেজিস্ট্রেশন সম্পন্ন করতে হবে।"
-        ]
-
-    # নতুন নিয়ম যোগ করার বাটন
-    if st.button("➕ নিয়ম যোগ করুন"):
-        st.session_state.tournament_rules.append("")
-        st.rerun()
-
-    updated_rules = []
-    rules_to_delete = []
-
-    for i, rule_text in enumerate(st.session_state.tournament_rules):
-        col_r1, col_r2 = st.columns([5, 1])
-        with col_r1:
-            r_val = st.text_input(f"নিয়ম #{i+1}", rule_text, key=f"rule_input_{i}")
-        with col_r2:
-            st.markdown("<div style='margin-top: 28px;'></div>", unsafe_allow_html=True)
-            if st.button("❌ রিমুভ", key=f"del_rule_{i}"):
-                rules_to_delete.append(i)
-        updated_rules.append(r_val)
-
-    if rules_to_delete:
-        for idx in sorted(rules_to_delete, reverse=True):
-            del st.session_state.tournament_rules[idx]
-        st.rerun()
-
-    # সেশন স্টেট আপডেট রাখা
-    st.session_state.tournament_rules = updated_rules
-
     if st.button("⚽ টুর্নামেন্ট নোটিশ প্রিভিউ ও প্রিন্ট দেখুন"):
         st.success("✅ টুর্নামেন্ট আমন্ত্রণপত্র সম্পূর্ণ A4 পেজে প্রস্তুত!")
-        
-        rules_li_html = ""
-        for r in updated_rules:
-            if r.strip():
-                rules_li_html += f"<li>{r}</li>"
-
         notice_html_code = f"""
         <div style='padding: 15px; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: space-between; box-sizing: border-box; background-color: #ffffff;'>
             <div>
                 <div style="text-align:center;">
-                    <h2 style="color:#f57f17; margin:0; font-size: 24px;">🏆 টুর্নামেন্ট আমন্ত্রণপত্র ও নোটিশ 🏆</h2>
-                    <h3 style="color:#fbc02d; margin:10px 0; font-size:22px;">{t_name}</h3>
-                    <hr style="border:1px solid #f57f17; width:55%; margin: 12px auto;">
+                    <h2 style="color:#ff4b4b; margin:0; font-size: 24px;">🏆 টুর্নামেন্ট আমন্ত্রণপত্র ও নোটিশ 🏆</h2>
+                    <h3 style="color:#0B50FA; margin:10px 0; font-size:22px;">{t_name}</h3>
+                    <hr style="border:1px solid #ff4b4b; width:55%; margin: 12px auto;">
                 </div>
                 <p style="font-size:16px; line-height:2; margin-top:25px; text-align:center;">
                     সকল ক্রীড়াপ্রেমী ও দলের অবগতির জন্য জানানো যাচ্ছে যে, আগামী <b>{t_date}</b> তারিখে স্থানীয় মাঠে জমকালো আয়োজনের মাধ্যমে এই টুর্নামেন্ট শুরু হতে যাচ্ছে। আপনি বা আপনার দল এই প্রতিযোগিতায় স্বতঃস্ফূর্তভাবে অংশগ্রহণ করার জন্য আমন্ত্রিত।
                 </p>
-                <div style="background:#fffde7; padding:15px; border-radius:6px; border-left:5px solid #f57f17; margin-top:20px;">
+                <div style="background:#f8f9fa; padding:15px; border-radius:6px; border-left:5px solid #ff4b4b; margin-top:20px;">
                     <h4 style="margin:0 0 8px 0; color:#333; font-size: 16px;">🎁 আকর্ষণীয় পুরস্কারসমূহ:</h4>
                     <p style="margin:0; font-size:15px; font-weight:bold; color:red;">{t_prize}</p>
                 </div>
                 <div style="margin-top:20px;">
                     <h4 style="color:#333; margin-bottom:8px; font-size: 16px;">📋 প্রধান নিয়মাবলী:</h4>
                     <ol style="font-size:14px; line-height:1.8; margin:0; padding-left:20px;">
-                        {rules_li_html}
+                        <li>ম্যাচ শুরুর নির্ধারিত সময়ের ১৫ মিনিট পূর্বে মাঠে উপস্থিত থাকতে হবে।</li>
+                        <li>আম্পায়ারের সিদ্ধান্তই চূড়ান্ত সিদ্ধান্ত বলে গণ্য হবে।</li>
+                        <li>খেলার মাঠে শৃঙ্খলা বজায় রাখা বাধ্যতামূলক। বিশৃঙ্খলা সৃষ্টিকারী দলকে বহিষ্কার করা হবে।</li>
+                        <li>এন্ট্রি ফি জমা দিয়ে নির্দিষ্ট সময়ের মধ্যে টিম রেজিস্ট্রেশন সম্পন্ন করতে হবে।</li>
                     </ol>
                 </div>
             </div>
