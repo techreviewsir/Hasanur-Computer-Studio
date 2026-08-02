@@ -16,7 +16,7 @@ except ImportError:
 st.set_page_config(page_title="হাসানুর কম্পিউটার স্টুডিও", layout="wide")
 
 # ==============================================================================
-# মূল স্টাইল ও কালার ডিজাইন
+# মূল স্টাইল ও সার্কেল ইমেজ ডিজাইন
 # ==============================================================================
 st.markdown("""
 <style>
@@ -49,23 +49,49 @@ st.markdown("""
         line-height: 1.5;
         color: white;
     }
+    .circle-img-container {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 15px;
+    }
+    .circle-img {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 4px solid white;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    }
 </style>
 """, unsafe_allow_html=True)
 
 # ==============================================================================
-# গিটহাব থেকে সরাসরি hasanur.jpg ছবি হোমপেজে প্রদর্শন
+# গিটহাব থেকে সরাসরি গোল বৃত্তের মধ্যে ছবি প্রদর্শন
 # ==============================================================================
 github_image_url = "https://raw.githubusercontent.com/techreviewsir/Hasanur-Computer-Studio/45b0a5162b89ae7aea9eebf03c27684ffa636bec/hasanur.jpg"
 
-col_l1, col_l2, col_l3 = st.columns([1, 1, 1])
-with col_l2:
-    try:
-        st.image(github_image_url, caption="হাসানুর কম্পিউটার স্টুডিও", width=180)
-    except Exception:
-        st.info("ছবিটি লোড হচ্ছে...")
+st.markdown(f"""
+<div class="circle-img-container">
+    <img src="{github_image_url}" class="circle-img" alt="হাসানুর">
+</div>
+""", unsafe_allow_html=True)
 
 # ==============================================================================
-# হোমপেজ হেডার ও সোশ্যাল লিংক (ইউটিউব ও ফেসবুক বাটন)
+# ইউটিউব ও ফেসবুক বাটন (হেডার কার্ডের উপরে)
+# ==============================================================================
+st.markdown("""
+<div style="display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; margin-bottom: 20px;">
+    <a href="https://www.youtube.com/@hasanurcomputerstudio" target="_blank" style="background-color: #FF0000; color: white; padding: 10px 20px; border-radius: 25px; text-decoration: none; font-weight: bold; font-size: 14px; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">
+        🔴 ইউটিউব চ্যানেল ভিজিট করুন
+    </a>
+    <a href="https://www.facebook.com/hasanurcomputerstudio" target="_blank" style="background-color: #1877F2; color: white; padding: 10px 20px; border-radius: 25px; text-decoration: none; font-weight: bold; font-size: 14px; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">
+        🔵 ফেসবুক পেজ ভিজিট করুন
+    </a>
+</div>
+""", unsafe_allow_html=True)
+
+# ==============================================================================
+# হোমপেজ হেডার কার্ড
 # ==============================================================================
 st.markdown("""
 <div class="studio-header">
@@ -74,17 +100,7 @@ st.markdown("""
         <p style="margin: 3px 0;"><b>ঠিকানা:</b> গালদা, তালতলা বাজার, মণিরামপুর, যশোর</p>
         <p style="margin: 3px 0;"><b>মোবাইল:</b> ০১৭৪৩-৬১৪৩৫৯</p>
         <hr style="border: 0.5px solid rgba(255,255,255,0.3); width: 80%; margin: 12px auto;">
-        <p style="margin: 0 0 15px 0; font-size: 13px; font-weight: 500;">সকল ধরনের কম্পিউটার, ডিজাইন ও অনলাইন সার্ভিসের অল-ইন-ওয়ান মাস্টার ড্যাশবোর্ড</p>
-        
-        <!-- ইউটিউব ও ফেসবুক বাটন -->
-        <div style="display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; margin-top: 10px;">
-            <a href="https://www.youtube.com/@hasanurcomputerstudio" target="_blank" style="background-color: #FF0000; color: white; padding: 10px 20px; border-radius: 25px; text-decoration: none; font-weight: bold; font-size: 14px; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">
-                🔴 ইউটিউব চ্যানেল ভিজিট করুন
-            </a>
-            <a href="https://www.facebook.com/hasanurcomputerstudio" target="_blank" style="background-color: #1877F2; color: white; padding: 10px 20px; border-radius: 25px; text-decoration: none; font-weight: bold; font-size: 14px; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">
-                🔵 ফেসবুক পেজ ভিজিট করুন
-            </a>
-        </div>
+        <p style="margin: 0; font-size: 13px; font-weight: 500;">সকল ধরনের কম্পিউটার, ডিজাইন ও অনলাইন সার্ভিসের অল-ইন-ওয়ান মাস্টার ড্যাশবোর্ড</p>
     </div>
 </div>
 """, unsafe_allow_html=True)
@@ -248,13 +264,13 @@ if app_mode == 2:
         st.info("দয়া করে উপরে ফাইল আপলোড অপশন থেকে একটি পাসপোর্ট বা পোর্ট্রেট ছবি আপলোড করুন।")
 
 # ==============================================================================
-# মোড ৬: ক্যাশ মেমো / রশিদ জেনারেটর (ডিফল্ট ঠিকানা কাস্টমাইজেবল)
+# মোড ৬: ক্যাশ মেমো / রশিদ জেনারেটর 
 # ==============================================================================
 elif app_mode == 6:
     st.header("🧾 দোকানের ক্যাশ মেমো / রশিদ জেনারেটর")
     
     shop_name = st.text_input("দোকানের নাম", "হাসানুর কম্পিউটার স্টুডিও")
-    shop_address = st.text_input("দোকানের ঠিকানা ও ফোন (মুছে নিজের মতো এডিট করতে পারবেন)", "গালদা, তালতলা বাজার, মণিরামপুর, যশোর। মোবাইল: ০১৭৪৩-৬১৪৩৫৯")
+    shop_address = st.text_input("দোকানের ঠিকানা ও ফোন", "গালদা, তালতলা বাজার, মণিরামপুর, যশোর। মোবাইল: ০১৭৪৩-৬১৪৩৫৯")
 
     col_c1, col_c2 = st.columns(2)
     with col_c1:
