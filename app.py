@@ -16,7 +16,7 @@ except ImportError:
 st.set_page_config(page_title="হাসানুর কম্পিউটার স্টুডিও", layout="wide")
 
 # ==============================================================================
-# মূল স্টাইল ও পুরো পেজের গ্রেডিয়েন্ট ব্যাকগ্রাউন্ড
+# মূল স্টাইল ও কালার ডিজাইন
 # ==============================================================================
 st.markdown("""
 <style>
@@ -52,20 +52,46 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# হেডার সেকশন
+# ==============================================================================
+# গিটহাব থেকে সরাসরি hasanur.jpg ছবি হোমপেজে প্রদর্শন
+# ==============================================================================
+github_image_url = "https://raw.githubusercontent.com/techreviewsir/Hasanur-Computer-Studio/45b0a5162b89ae7aea9eebf03c27684ffa636bec/hasanur.jpg"
+
+col_l1, col_l2, col_l3 = st.columns([1, 1, 1])
+with col_l2:
+    try:
+        st.image(github_image_url, caption="হাসানুর কম্পিউটার স্টুডিও", width=180)
+    except Exception:
+        st.info("ছবিটি লোড হচ্ছে...")
+
+# ==============================================================================
+# হোমপেজ হেডার ও সোশ্যাল লিংক (ইউটিউব ও ফেসবুক বাটন)
+# ==============================================================================
 st.markdown("""
 <div class="studio-header">
     <div style="background: rgba(255,255,255,0.15); padding: 18px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.3);">
-        <h1 style="margin: 0 0 6px 0;">🖨️ হাসানুর কম্পিউটার স্টুডিও</h1>
-        <p style="margin: 3px 0;"><b>ঠিকানা:</b> দিঘীরপাড়, মনিরামপুর, যশোর</p>
+        <h1 style="margin: 0 0 6px 0;">হাসানুর কম্পিউটার স্টুডিও</h1>
+        <p style="margin: 3px 0;"><b>ঠিকানা:</b> গালদা, তালতলা বাজার, মণিরামপুর, যশোর</p>
         <p style="margin: 3px 0;"><b>মোবাইল:</b> ০১৭৪৩-৬১৪৩৫৯</p>
-        <hr style="border: 0.5px solid rgba(255,255,255,0.3); width: 80%; margin: 10px auto;">
-        <p style="margin: 0; font-size: 13px; font-weight: 500;">সকল ধরনের কম্পিউটার, ডিজাইন ও অনলাইন সার্ভিসের অল-ইন-ওয়ান মাস্টার ড্যাশবোর্ড</p>
+        <hr style="border: 0.5px solid rgba(255,255,255,0.3); width: 80%; margin: 12px auto;">
+        <p style="margin: 0 0 15px 0; font-size: 13px; font-weight: 500;">সকল ধরনের কম্পিউটার, ডিজাইন ও অনলাইন সার্ভিসের অল-ইন-ওয়ান মাস্টার ড্যাশবোর্ড</p>
+        
+        <!-- ইউটিউব ও ফেসবুক বাটন -->
+        <div style="display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; margin-top: 10px;">
+            <a href="https://www.youtube.com/@hasanurcomputerstudio" target="_blank" style="background-color: #FF0000; color: white; padding: 10px 20px; border-radius: 25px; text-decoration: none; font-weight: bold; font-size: 14px; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">
+                🔴 ইউটিউব চ্যানেল ভিজিট করুন
+            </a>
+            <a href="https://www.facebook.com/hasanurcomputerstudio" target="_blank" style="background-color: #1877F2; color: white; padding: 10px 20px; border-radius: 25px; text-decoration: none; font-weight: bold; font-size: 14px; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">
+                🔵 ফেসবুক পেজ ভিজিট করুন
+            </a>
+        </div>
     </div>
 </div>
 """, unsafe_allow_html=True)
 
-global_file = st.file_uploader("ছবি বা পিডিএফ ফাইল আপলোড করুন", type=["jpg", "jpeg", "png", "pdf"])
+# অন্যান্য কাজের জন্য ফাইল আপলোডার
+global_file = st.file_uploader("এডিটিং বা কাজের জন্য ছবি বা পিডিএফ ফাইল আপলোড করুন", type=["jpg", "jpeg", "png", "pdf"])
+
 st.markdown("---")
 
 if 'app_mode' not in st.session_state:
@@ -159,22 +185,22 @@ def print_content_html(html_content, button_text):
 if app_mode == 2:
     st.header("🎨 স্টুডিও ব্যাকগ্রাউন্ড রিমুভ ও কালার/ছবি পরিবর্তন")
     if global_file is not None:
-        image = Image.open(global_file).convert("RGB")
-        st.image(image, caption="মূল আপলোড করা ছবি", width=300)
-        
-        bg_type = st.radio("ব্যাকগ্রাউন্ড পরিবর্তনের মাধ্যম বেছে নিন:", ["রঙ (Color Picker)", "কম্পিউটার থেকে ছবি আপলোড (Custom Image)"])
-        
-        bg_color = "#ffffff"
-        bg_custom_file = None
-        
-        if bg_type == "রঙ (Color Picker)":
-            bg_color = st.color_picker("নতুন ব্যাকগ্রাউন্ড কালার সিলেক্ট করুন", "#ffffff")
-        else:
-            bg_custom_file = st.file_uploader("ব্যাকগ্রাউন্ডের জন্য একটি ছবি আপলোড করুন", type=["jpg", "jpeg", "png"], key="bg_img_upload")
-        
-        if st.button("🚀 ব্যাকগ্রাউন্ড রিমুভ ও নতুন ব্যাকগ্রাউন্ড সেট করুন"):
-            with st.spinner("প্রসেসিং হচ্ছে, দয়া করে অপেক্ষা করুন..."):
-                try:
+        try:
+            image = Image.open(global_file).convert("RGB")
+            st.image(image, caption="মূল আপলোড করা ছবি", width=300)
+            
+            bg_type = st.radio("ব্যাকগ্রাউন্ড পরিবর্তনের মাধ্যম বেছে নিন:", ["রঙ (Color Picker)", "কম্পিউটার থেকে ছবি আপলোড (Custom Image)"])
+            
+            bg_color = "#ffffff"
+            bg_custom_file = None
+            
+            if bg_type == "রঙ (Color Picker)":
+                bg_color = st.color_picker("নতুন ব্যাকগ্রাউন্ড কালার সিলেক্ট করুন", "#ffffff")
+            else:
+                bg_custom_file = st.file_uploader("ব্যাকগ্রাউন্ডের জন্য একটি ছবি আপলোড করুন", type=["jpg", "jpeg", "png"], key="bg_img_upload")
+            
+            if st.button("🚀 ব্যাকগ্রাউন্ড রিমুভ ও নতুন ব্যাকগ্রাউন্ড সেট করুন"):
+                with st.spinner("প্রসেসিং হচ্ছে, দয়া করে অপেক্ষা করুন..."):
                     img_np = np.array(image)
                     h, w = img_np.shape[:2]
                     
@@ -216,19 +242,19 @@ if app_mode == 2:
                     
                     st.success("✅ ব্যাকগ্রাউন্ড সফলভাবে পরিবর্তন করা হয়েছে!")
                     st.image(final_img, caption="রিমুভ ও পরিবর্তিত ব্যাকগ্রাউন্ডের ছবি", use_column_width=True)
-                except Exception as e:
-                    st.error(f"⚠️ ত্রুটি ঘটেছে: {e}")
+        except Exception as e:
+            st.error(f"⚠️ ত্রুটি ঘটেছে: {e}")
     else:
         st.info("দয়া করে উপরে ফাইল আপলোড অপশন থেকে একটি পাসপোর্ট বা পোর্ট্রেট ছবি আপলোড করুন।")
 
 # ==============================================================================
-# মোড ৬: ক্যাশ মেমো / রশিদ জেনারেটর 
+# মোড ৬: ক্যাশ মেমো / রশিদ জেনারেটর (ডিফল্ট ঠিকানা কাস্টমাইজেবল)
 # ==============================================================================
 elif app_mode == 6:
     st.header("🧾 দোকানের ক্যাশ মেমো / রশিদ জেনারেটর")
     
     shop_name = st.text_input("দোকানের নাম", "হাসানুর কম্পিউটার স্টুডিও")
-    shop_address = st.text_input("দোকানের ঠিকানা ও ফোন", "দিঘীরপাড়, মনিরামপুর, যশোর | মোবাইল: ০১৭৪৩-৬১৪৩৫৯")
+    shop_address = st.text_input("দোকানের ঠিকানা ও ফোন (মুছে নিজের মতো এডিট করতে পারবেন)", "গালদা, তালতলা বাজার, মণিরামপুর, যশোর। মোবাইল: ০১৭৪৩-৬১৪৩৫৯")
 
     col_c1, col_c2 = st.columns(2)
     with col_c1:
@@ -275,7 +301,6 @@ elif app_mode == 6:
             del st.session_state.memo_items[idx]
         st.rerun()
 
-    # সর্বমোট বিল দেখানোর পর কাস্টমারের পরিশোধ বা জমা অপশন
     st.markdown("---")
     st.markdown(f"### 🧮 সর্বমোট বিল: **{total_amount} TK**")
     
