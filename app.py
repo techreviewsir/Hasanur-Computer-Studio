@@ -275,15 +275,17 @@ elif app_mode == 6:
             del st.session_state.memo_items[idx]
         st.rerun()
 
-    # পেমেন্ট স্ট্যাটাস এবং জমা টাকা নির্ধারণের অপশন
-    st.markdown("### 💰 পেমেন্ট তথ্য")
-    payment_status = st.selectbox("পরিশোধের মাধ্যম সিলেক্ট করুন:", ["সম্পূর্ণ পরিশোধ (Paid)", "কিছু টাকা জমা (Advance/Due)"])
+    # সর্বমোট বিল দেখানোর পর কাস্টমারের পরিশোধ বা জমা অপশন
+    st.markdown("---")
+    st.markdown(f"### 🧮 সর্বমোট বিল: **{total_amount} TK**")
     
+    pay_choice = st.selectbox("কাস্টমারের পেমেন্ট অপশন সিলেক্ট করুন:", ["সম্পূর্ণ পরিশোধ (Paid)", "কিছু টাকা জমা (Advance / Due)"])
+
     paid_amount = total_amount
     due_amount = 0
 
-    if payment_status == "কিছু টাকা জমা (Advance/Due)":
-        paid_amount = st.number_input("জমা দেওয়া টাকার পরিমাণ (TK)", 0, int(total_amount), int(total_amount // 2))
+    if pay_choice == "কিছু টাকা জমা (Advance / Due)":
+        paid_amount = st.number_input("কাস্টমার কত টাকা জমা দিল? (TK)", 0, int(total_amount), int(total_amount // 2))
         due_amount = total_amount - paid_amount
     else:
         paid_amount = total_amount
@@ -338,7 +340,7 @@ elif app_mode == 6:
                 
                 <div style='text-align: right; font-size: 15px; background-color: #f8f9fa; padding: 12px; border-radius: 5px; line-height: 1.6;'>
                     <b>সর্বমোট বিল (Total): <span style='color: #0B50FA;'>{total_amount} TK</span></b><br>
-                    <b>জমা দেওয়া টাকা (Paid): <span style='color: green;'>{paid_amount} TK</span></b><br>
+                    <b>জমা দেওয়া টাকা (Paid/Advance): <span style='color: green;'>{paid_amount} TK</span></b><br>
                     <b>বাকি টাকা (Due): <span style='color: red; font-size: 17px;'>{due_amount} TK</span></b><br>
                     <hr style='border: 0.5px dashed #ccc; margin: 6px 0;'>
                     <b>স্ট্যাটাস: <span style='color: {"green" if due_amount == 0 else "red"};'>{"সম্পূর্ণ পরিশোধ (Paid)" if due_amount == 0 else "বাকি আছে (Due)"}</span></b>
